@@ -364,7 +364,6 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCLQKlAQNAnW2v5n5EdzDxW465a_Bgx8tU",
@@ -378,7 +377,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     // AUTH SIMPLE
     window.checkAuth = () => {
@@ -450,6 +448,34 @@
       document.getElementById('p-desc').value = data.desc || '';
     };
 
+    // Helper to resize and convert image to Base64
+    async function processImage(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const max = 600; // Max dimension to keep document size under 1MB
+            if (width > height) {
+              if (width > max) { height *= max / width; width = max; }
+            } else {
+              if (height > max) { width *= max / height; height = max; }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            resolve(canvas.toDataURL('image/jpeg', 0.7)); // Compress to 70% quality
+          };
+          img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
     document.getElementById('product-form').onsubmit = async (e) => {
       e.preventDefault();
       const id = document.getElementById('p-id').value;
@@ -462,9 +488,7 @@
 
       let imageUrl = null;
       if (file) {
-        const storageRef = ref(storage, 'productos/' + file.name + Date.now());
-        await uploadBytes(storageRef, file);
-        imageUrl = await getDownloadURL(storageRef);
+        imageUrl = await processImage(file);
       }
 
       const data = {
@@ -493,12 +517,14 @@
         closeForm();
         loadProducts();
       } catch (err) {
+        console.error(err);
         alert('Error: ' + err.message);
       } finally {
         loading.style.display = 'none';
         buttons.style.display = 'flex';
       }
     };
+  </script>
 
     // Initial load if auth is bypassed (for dev)
     // loadProducts();
