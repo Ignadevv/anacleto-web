@@ -7,20 +7,18 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #020617; /* Ultra Dark Navy */
-  --bg-card: rgba(30, 41, 59, 0.7); /* Translucent Slate 800 */
-  --accent: #38BDF8; /* Sky 400 */
+  --bg: #010414; /* Deep Tech Black/Navy */
+  --bg-card: rgba(15, 23, 42, 0.6); 
+  --accent: #38BDF8; /* Sky Blue */
   --accent-glow: rgba(56, 189, 248, 0.4);
-  --accent-secondary: #2DD4BF; /* Teal 400 */
-  --text-main: #F8FAFC; /* Slate 50 */
-  --text-dim: #94A3B8; /* Slate 400 */
-  --white: #FFFFFF;
-  --glass: rgba(15, 23, 42, 0.8);
+  --accent-secondary: #00D4FF;
+  --text-main: #F8FAFC;
+  --text-dim: #64748B;
   --border: rgba(255, 255, 255, 0.08);
-  --r: 12px;
-  --rl: 24px;
-  --tr: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.5);
+  --r: 8px;
+  --rl: 16px;
+  --tr: all 0.5s cubic-bezier(0.2, 1, 0.3, 1);
+  --shadow-lux: 0 25px 60px -15px rgba(0, 0, 0, 0.7);
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -28,174 +26,297 @@ html { scroll-behavior: smooth; }
 body {
   font-family: 'Exo 2', sans-serif;
   background-color: var(--bg);
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
   color: var(--text-main);
   overflow-x: hidden;
   min-height: 100vh;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
-/* NAVIGATION OVERHAUL */
+/* LAYOUT CONTAINER */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 5%;
+}
+
+/* NAVIGATION */
 nav {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 1000;
-  height: 85px;
+  height: 90px;
+  background: rgba(1, 4, 20, 0.7);
+  backdrop-filter: blur(25px);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
+  justify-content: center;
+}
+nav .container {
+  display: flex;
+  width: 100%;
   justify-content: space-between;
-  padding: 0 5%;
-  background: var(--glass);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  transition: var(--tr);
+  align-items: center;
 }
 
-.nav-logo { display:flex; align-items:center; gap:1rem; cursor:pointer; }
-.nav-logo img { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; border: 2px solid var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+.nav-logo { display:flex; align-items:center; gap:1.2rem; cursor:pointer; }
+.nav-logo img { width: 55px; height: 55px; object-fit: cover; border-radius: 50%; border: 1.5px solid var(--accent); padding: 2px; }
 .nav-logo-text {
   font-family: 'Orbitron', sans-serif;
-  font-size: 1.3rem;
+  font-size: 1.4rem;
   font-weight: 900;
+  letter-spacing: 0.1em;
   background: linear-gradient(to right, #fff, var(--accent));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  letter-spacing: 0.05em;
 }
 
-.nav-links { display: flex; list-style: none; gap: 3rem; }
+.nav-links { display: flex; list-style: none; gap: 3.5rem; }
 .nav-links a {
-  font-size: 0.9rem;
-  font-weight: 700;
-  color: var(--text-dim);
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #8899af;
   text-decoration: none;
   text-transform: uppercase;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.2em;
   transition: var(--tr);
-  padding: 0.5rem 0;
+  position: relative;
 }
-.nav-links a:hover, .nav-links a.active { color: var(--accent); text-shadow: 0 0 10px var(--accent-glow); }
+.nav-links a:hover, .nav-links a.active { color: var(--accent); }
 .nav-links a::after {
   content: '';
   position: absolute;
-  bottom: 0; left: 0; width: 0; height: 2px;
+  bottom: -10px; left: 50%; width: 0; height: 2px;
   background: var(--accent);
   transition: var(--tr);
+  transform: translateX(-50%);
 }
-.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+.nav-links a:hover::after, .nav-links a.active::after { width: 40px; }
 
-.cart-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  color: #fff;
-  padding: 0.6rem 1.5rem;
-  border-radius: 99px;
-  cursor: pointer;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  gap: 0.8rem;
-  transition: var(--tr);
-}
-.cart-btn:hover { border-color: var(--accent); box-shadow: 0 0 20px var(--accent-glow); }
-
-/* HERO OVERHAUL */
+/* HERO DESIGNER EDITION */
 .hero {
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 100px 5%;
   position: relative;
-  background: linear-gradient(to bottom, rgba(2, 6, 23, 0.8), rgba(2, 6, 23, 0.95)), 
+  overflow: hidden;
+  background: linear-gradient(to bottom, transparent, var(--bg)),
               url('portada.jpeg') center/cover no-repeat fixed;
-  text-align: center;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 70% 50%, transparent, rgba(1, 4, 18, 0.9));
 }
 
-.hero-content { max-width: 900px; z-index: 2; }
+.hero .container { width: 100%; z-index: 2; position: relative; }
+.hero-content { max-width: 800px; }
+
 .hero-eyebrow {
   color: var(--accent);
+  font-weight: 900;
+  font-size: 0.9rem;
+  letter-spacing: 0.6em;
   text-transform: uppercase;
-  font-weight: 900;
-  font-size: 0.85rem;
-  letter-spacing: 0.5em;
-  margin-bottom: 2rem;
-  display: block;
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
+.hero-eyebrow::after { content: ''; height: 2px; width: 50px; background: var(--accent); }
+
 .hero-title {
-  font-size: clamp(3rem, 8vw, 5.5rem);
+  font-size: clamp(3.5rem, 10vw, 6.5rem);
   font-weight: 900;
-  line-height: 1;
-  margin-bottom: 2rem;
+  line-height: 0.95;
   font-family: 'Orbitron', sans-serif;
   text-transform: uppercase;
-  text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  margin-bottom: 2.5rem;
 }
 
 .hero-sub {
-  color: var(--text-dim);
-  font-size: 1.25rem;
-  margin-bottom: 3.5rem;
-  max-width: 700px;
-  margin-left: auto;
-  margin-right: auto;
+  font-size: 1.4rem;
+  color: #94a3b8;
+  max-width: 600px;
+  margin-bottom: 4rem;
+  font-weight: 300;
 }
 
-/* BUTTONS PREMIUN */
+/* BUTTONS REDESIGN: CYBER-ELITE SYSTEM */
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-  color: var(--bg);
+  background: linear-gradient(135deg, var(--accent), #00A6FB);
+  color: #000;
   border: none;
-  padding: 1.2rem 3.5rem;
-  border-radius: 99px;
+  padding: 1.4rem 3.5rem;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
   font-weight: 900;
+  font-size: 0.85rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.25rem;
   cursor: pointer;
-  transition: var(--tr);
-  box-shadow: 0 10px 30px var(--accent-glow);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
 }
-.btn-primary:hover { 
-  transform: translateY(-5px) scale(1.05); 
-  box-shadow: 0 15px 40px var(--accent-glow);
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: 0.6s;
+  z-index: -1;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(56, 189, 248, 0.5), 0 0 10px var(--accent);
+  color: #fff;
+  background: #000;
 }
 
 .btn-secondary {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--border);
-  color: #fff;
-  padding: 1.2rem 3.5rem;
-  border-radius: 99px;
-  font-weight: 900;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: var(--tr);
+  background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  padding: 1.4rem 3.5rem;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25rem;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-left: 1rem;
+  position: relative;
+  z-index: 1;
 }
-.btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); transform: translateY(-5px); }
 
-/* PRODUCT CARDS PREMIUM */
+.btn-secondary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--accent);
+  opacity: 0;
+  transition: 0.4s;
+  border-radius: 4px;
+}
+
+.btn-secondary:hover {
+  background: rgba(56, 189, 248, 0.05);
+  color: var(--accent);
+  transform: translateY(-5px);
+  border-color: transparent;
+}
+
+.btn-secondary:hover::after {
+  opacity: 1;
+  inset: -5px;
+}
+
+/* FILTER BUTTONS: MODERN GRID */
+.filter-btn {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0.8rem 2rem;
+  border-radius: 4px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  cursor: pointer;
+  transition: all 0.3s var(--tr);
+}
+
+.filter-btn:hover, .filter-btn.active {
+  background: var(--accent);
+  color: #000;
+  border-color: var(--accent);
+  box-shadow: 0 0 20px var(--accent-glow);
+  transform: translateY(-2px);
+}
+
+/* SECTIONS GRID */
+section { padding: 120px 0; }
+.section-header { margin-bottom: 80px; }
+.section-title {
+  font-family: 'Orbitron';
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 2rem;
+}
+.glow-line {
+  height: 2px; width: 100px;
+  background: linear-gradient(to right, var(--accent), transparent);
+}
+
+/* CARDS LUX */
 .product-card {
   background: var(--bg-card);
-  border-radius: var(--rl);
-  overflow: hidden;
+  backdrop-filter: blur(20px);
   border: 1px solid var(--border);
+  border-radius: var(--rl);
   transition: var(--tr);
-  backdrop-filter: blur(15px);
-  position: relative;
+  height: 100%;
 }
 .product-card:hover {
-  transform: translateY(-15px);
+  transform: translateY(-20px);
   border-color: var(--accent);
-  box-shadow: var(--shadow);
+  box-shadow: var(--shadow-lux);
 }
+
 .card-img {
-  height: 280px;
-  padding: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.1), transparent);
+  height: 320px;
+  background: radial-gradient(circle at center, rgba(56, 189, 248, 0.15), transparent);
+  display: flex; align-items: center; justify-content: center;
+  padding: 3rem;
+}
+
+.card-body { padding: 2.5rem; }
+.card-name { font-family: 'Orbitron'; font-size: 1.6rem; font-weight: 900; margin-bottom: 0.5rem; }
+.card-price { font-size: 2rem; font-weight: 900; color: var(--accent); }
+
+/* BENEFITS ELITE */
+.benefit-card {
+  border: 1px solid var(--border);
+  padding: 4rem 3rem;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), transparent);
+  border-radius: var(--rl);
+  transition: var(--tr);
+}
+.benefit-card:hover { border-color: var(--accent); transform: translateY(-10px); }
+.benefit-card h3 { font-family: 'Orbitron'; font-size: 1.4rem; margin: 1.5rem 0; color: #fff; }
+.benefit-card p { color: #64748b; font-size: 1.1rem; line-height: 1.8; }
+
+@media (max-width: 1024px) {
+  .hero { text-align: center; }
+  .hero-eyebrow { justify-content: center; }
+  .btn-secondary { margin-left: 0; margin-top: 1.5rem; width: 100%; }
+  .btn-primary { width: 100%; }
+  .nav-links { display: none; }
+  .hamburger { display: block; }
 }
 .card-body { padding: 2rem; }
 .card-name { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 800; margin-bottom: 0.5rem; }
@@ -263,25 +384,42 @@ nav {
 .card-footer { display: flex; justify-content: space-between; align-items: center; }
 .price-big { font-size: 1.5rem; font-weight: 800; color: var(--white); }
 
-/* MOBILE MENU */
+/* MOBILE MENU & HAMBURGER */
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
 .mobile-menu {
   position: fixed;
-  top: 72px; left: 0; right: 0; bottom: 0;
-  background: var(--bg);
+  inset: 0;
+  background: rgba(1, 4, 18, 0.98);
+  backdrop-filter: blur(20px);
+  z-index: 2000;
+  display: flex;
   flex-direction: column;
-  padding: 2rem;
-  gap: 2rem;
-  z-index: 998;
-  display: none;
+  justify-content: center;
+  align-items: center;
+  gap: 3rem;
+  clip-path: circle(0% at top right);
+  transition: clip-path 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
 }
-.mobile-menu.open { display: flex; }
+.mobile-menu.active { clip-path: circle(150% at top right); pointer-events: all; }
 .mobile-menu a {
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: var(--text-main);
-  text-decoration: none;
+  font-family: 'Orbitron';
+  font-size: 2.5rem;
   text-transform: uppercase;
+  color: #fff;
+  text-decoration: none;
+  letter-spacing: 0.4rem;
+  transition: var(--tr);
 }
+.mobile-menu a:hover { color: var(--accent); transform: scale(1.1); }
 
 /* RESPONSIVE */
 @media (max-width: 1024px) {
@@ -302,29 +440,32 @@ nav {
 
 <!-- NAV -->
 <nav id="navbar">
-  <div class="nav-logo" onclick="showPage('home')">
-    <img src="logo.jpeg" alt="Logo">
-    <div class="nav-logo-text">Patineto Anacleto</div>
-  </div>
-  <ul class="nav-links" id="nav-links">
-    <li><a data-page="home" onclick="showPage('home')" class="active">Home</a></li>
-    <li><a data-page="shop" onclick="showPage('shop')">Catálogo</a></li>
-    <li><a data-page="about" onclick="showPage('about')">Nosotros</a></li>
-    <li><a data-page="contact" onclick="showPage('contact')">Contacto</a></li>
-  </ul>
-  <div class="nav-actions">
-    <button class="cart-btn" onclick="toggleCart()">
-      🛒 <span class="cart-badge" id="cart-count">0</span>
-    </button>
-    <button class="hamburger" onclick="toggleMobileMenu()" style="background:none; border:none; color:#fff; font-size:1.5rem; cursor:pointer; display:none;">☰</button>
+  <div class="container">
+    <div class="nav-logo" onclick="showPage('home')">
+      <img src="logo.jpeg" alt="Logo">
+      <div class="nav-logo-text">Anacleto</div>
+    </div>
+    <ul class="nav-links" id="nav-links">
+      <li><a data-page="home" onclick="showPage('home')" class="active">Home</a></li>
+      <li><a data-page="shop" onclick="showPage('shop')">Catálogo</a></li>
+      <li><a data-page="about" onclick="showPage('about')">Nosotros</a></li>
+      <li><a data-page="contact" onclick="showPage('contact')">Contacto</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="cart-btn" onclick="toggleCart()" style="background:var(--bg-card); border:1px solid var(--border); color:#fff; padding:0.8rem 1.5rem; border-radius:var(--r); cursor:pointer; font-weight:900;">
+        🛒 <span class="cart-badge" id="cart-count">0</span>
+      </button>
+      <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
+    </div>
   </div>
 </nav>
 
 <div class="mobile-menu" id="mobile-menu">
-  <a onclick="showPage('home');closeMobileMenu()">Home</a>
-  <a onclick="showPage('shop');closeMobileMenu()">Catálogo</a>
-  <a onclick="showPage('about');closeMobileMenu()">Nosotros</a>
-  <a onclick="showPage('contact');closeMobileMenu()">Contacto</a>
+  <button onclick="toggleMobileMenu()" style="position:absolute; top:2rem; right:2rem; background:none; border:none; color:#fff; font-size:3rem; cursor:pointer;">×</button>
+  <a onclick="showPage('home');toggleMobileMenu()">Home</a>
+  <a onclick="showPage('shop');toggleMobileMenu()">Catálogo</a>
+  <a onclick="showPage('about');toggleMobileMenu()">Nosotros</a>
+  <a onclick="showPage('contact');toggleMobileMenu()">Contacto</a>
 </div>
 
 <div class="notif" id="notif"></div>
@@ -333,226 +474,98 @@ nav {
 <div class="page active" id="page-home">
   <!-- HERO -->
   <div class="hero">
-    <div class="hero-content">
-      <span class="hero-eyebrow">⚡ Movilidad Eléctrica de Élite</span>
-      <h1 class="hero-title">El Futuro es<br>Hoy con <span class="grad">Anacleto</span></h1>
-      <p class="hero-sub">Diseño, potencia y autonomía sin límites. Descubre la nueva generación de patinetes inteligentes para conquistar la ciudad.</p>
-      <div class="hero-cta">
-        <button class="btn-primary" onclick="showPage('shop')">Explorar Catálogo</button>
-        <button class="btn-secondary" onclick="scrollTo(0,document.getElementById('home-featured').offsetTop-100)">Nuestros Modelos</button>
-      </div>
-    </div>
-  </div>
-      <div class="float-anim">
-        <!-- HERO SVG: Astronaut on scooter in space -->
-        <svg width="520" height="420" viewBox="0 0 520 420" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <!-- Stars -->
-          <circle cx="30" cy="40" r="1.2" fill="white" opacity="0.7" style="animation:twinkle 2.1s infinite;"/>
-          <circle cx="90" cy="20" r="0.9" fill="white" opacity="0.5" style="animation:twinkle 1.7s 0.3s infinite;"/>
-          <circle cx="160" cy="55" r="1.4" fill="white" opacity="0.8" style="animation:twinkle 2.4s 0.8s infinite;"/>
-          <circle cx="420" cy="30" r="1.1" fill="white" opacity="0.6" style="animation:twinkle 1.9s 0.5s infinite;"/>
-          <circle cx="490" cy="70" r="1.3" fill="white" opacity="0.7" style="animation:twinkle 2.2s 1s infinite;"/>
-          <circle cx="480" cy="150" r="0.8" fill="white" opacity="0.5" style="animation:twinkle 1.6s 0.2s infinite;"/>
-          <circle cx="50" cy="300" r="1" fill="white" opacity="0.4" style="animation:twinkle 2s 0.7s infinite;"/>
-          <circle cx="20" cy="200" r="1.5" fill="white" opacity="0.6" style="animation:twinkle 2.5s 0.4s infinite;"/>
-          <circle cx="500" cy="380" r="1.1" fill="white" opacity="0.5" style="animation:twinkle 1.8s 0.9s infinite;"/>
-          <circle cx="350" cy="10" r="0.9" fill="white" opacity="0.7" style="animation:twinkle 2.3s 0.1s infinite;"/>
-          <!-- Planet rings background -->
-          <ellipse cx="450" cy="100" rx="55" ry="18" stroke="rgba(0,212,255,0.15)" stroke-width="2" fill="none"/>
-          <circle cx="450" cy="100" r="28" fill="rgba(0,50,100,0.25)" stroke="rgba(0,212,255,0.2)" stroke-width="1.5"/>
-          <circle cx="450" cy="100" r="12" fill="rgba(0,100,200,0.15)" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <!-- Speed trail -->
-          <path d="M 60 280 Q 20 270 5 260" stroke="url(#trail1)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
-          <path d="M 80 295 Q 35 290 10 285" stroke="url(#trail2)" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
-          <path d="M 70 310 Q 30 308 8 305" stroke="url(#trail3)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
-          <!-- Glow beneath scooter -->
-          <ellipse cx="290" cy="370" rx="130" ry="12" fill="rgba(0,212,255,0.08)"/>
-          <!-- Scooter rear wheel -->
-          <circle cx="140" cy="330" r="42" stroke="#00D4FF" stroke-width="3.5" fill="none" filter="url(#bglow)"/>
-          <circle cx="140" cy="330" r="28" stroke="rgba(0,212,255,0.4)" stroke-width="1.5" fill="#04040B"/>
-          <circle cx="140" cy="330" r="7" fill="#00D4FF" opacity="0.8"/>
-          <!-- Scooter spokes rear -->
-          <line x1="140" y1="302" x2="140" y2="358" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="112" y1="330" x2="168" y2="330" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="120" y1="310" x2="160" y2="350" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="160" y1="310" x2="120" y2="350" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <!-- Scooter front wheel -->
-          <circle cx="420" cy="335" r="38" stroke="#00D4FF" stroke-width="3.5" fill="none" filter="url(#bglow)"/>
-          <circle cx="420" cy="335" r="25" stroke="rgba(0,212,255,0.4)" stroke-width="1.5" fill="#04040B"/>
-          <circle cx="420" cy="335" r="6" fill="#00D4FF" opacity="0.8"/>
-          <!-- spokes front -->
-          <line x1="420" y1="310" x2="420" y2="360" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="395" y1="335" x2="445" y2="335" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="402" y1="317" x2="438" y2="353" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <line x1="438" y1="317" x2="402" y2="353" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
-          <!-- Deck platform -->
-          <rect x="162" y="287" width="258" height="22" rx="5" fill="#080828" stroke="#00D4FF" stroke-width="1.8"/>
-          <!-- LED strip -->
-          <rect x="168" y="297" width="246" height="2.5" rx="1.2" fill="#00D4FF" opacity="0.7" filter="url(#bglow)"/>
-          <!-- Rear fender -->
-          <path d="M 105 330 Q 105 275 162 275 L 175 287" stroke="#FF6A00" stroke-width="3" fill="none" stroke-linecap="round" filter="url(#oglow)"/>
-          <!-- Stem -->
-          <line x1="365" y1="287" x2="340" y2="175" stroke="#00D4FF" stroke-width="5" stroke-linecap="round"/>
-          <!-- Handlebar -->
-          <line x1="305" y1="175" x2="378" y2="175" stroke="white" stroke-width="7" stroke-linecap="round"/>
-          <circle cx="305" cy="175" r="6" fill="#FF6A00" filter="url(#oglow)"/>
-          <circle cx="378" cy="175" r="6" fill="#FF6A00" filter="url(#oglow)"/>
-          <!-- Display panel on stem -->
-          <rect x="330" y="210" width="30" height="22" rx="4" fill="#08082A" stroke="#00D4FF" stroke-width="1.2"/>
-          <rect x="334" y="214" width="22" height="14" rx="2" fill="#00D4FF" opacity="0.4"/>
-          <text x="345" y="224" font-family="monospace" font-size="7" fill="#00D4FF" text-anchor="middle">45</text>
-          <!-- ASTRONAUT body -->
-          <!-- Torso/Suit -->
-          <rect x="240" y="165" width="80" height="100" rx="20" fill="#E8EDF5" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
-          <!-- Suit detail stripes -->
-          <rect x="252" y="178" width="56" height="4" rx="2" fill="rgba(0,212,255,0.4)"/>
-          <rect x="252" y="186" width="56" height="2" rx="1" fill="rgba(0,212,255,0.2)"/>
-          <!-- Chest pack -->
-          <rect x="262" y="196" width="36" height="28" rx="6" fill="#0A1A2A" stroke="#00D4FF" stroke-width="1.2"/>
-          <circle cx="280" cy="210" r="6" fill="#00D4FF" opacity="0.6"/>
-          <!-- Left arm (holding handlebar) -->
-          <path d="M 240 185 Q 210 190 200 200 Q 195 205 200 210 Q 210 215 230 205 Q 240 200 240 195" fill="#E8EDF5" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
-          <!-- Right arm (holding handlebar) -->
-          <path d="M 320 185 Q 345 190 350 195 Q 355 200 350 205 Q 340 212 330 205 Q 322 200 320 195" fill="#E8EDF5" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
-          <!-- Gloves left -->
-          <circle cx="200" cy="208" r="10" fill="#1A2A3A" stroke="#FF6A00" stroke-width="1.5"/>
-          <!-- Gloves right -->
-          <circle cx="352" cy="202" r="10" fill="#1A2A3A" stroke="#FF6A00" stroke-width="1.5"/>
-          <!-- Legs -->
-          <rect x="248" y="262" width="26" height="42" rx="10" fill="#D0D5DF"/>
-          <rect x="286" y="262" width="26" height="42" rx="10" fill="#D0D5DF"/>
-          <!-- Boots -->
-          <rect x="244" y="296" width="34" height="18" rx="7" fill="#1A2030"/>
-          <rect x="282" y="296" width="34" height="18" rx="7" fill="#1A2030"/>
-          <!-- HELMET -->
-          <circle cx="280" cy="130" r="58" fill="#D8E2EE" stroke="rgba(255,255,255,0.8)" stroke-width="2"/>
-          <!-- Visor -->
-          <ellipse cx="280" cy="128" rx="38" ry="34" fill="#001020" stroke="#00D4FF" stroke-width="2" filter="url(#bglow)"/>
-          <!-- Visor reflection -->
-          <ellipse cx="268" cy="118" rx="10" ry="8" fill="rgba(0,212,255,0.12)" transform="rotate(-15,268,118)"/>
-          <!-- Visor inner glow -->
-          <ellipse cx="280" cy="128" rx="32" ry="28" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
-          <!-- Helmet details -->
-          <circle cx="318" cy="108" r="6" fill="#FF6A00" stroke="#CC4800" stroke-width="1" filter="url(#oglow)"/>
-          <circle cx="320" cy="150" r="5" fill="#00D4FF" stroke="#0099BB" stroke-width="1" opacity="0.8"/>
-          <!-- PA text in visor -->
-          <text x="280" y="134" font-family="'Orbitron',monospace" font-size="11" fill="#00D4FF" text-anchor="middle" font-weight="700" opacity="0.7">PA</text>
-          <!-- Antenna -->
-          <line x1="280" y1="72" x2="280" y2="52" stroke="#00D4FF" stroke-width="2"/>
-          <circle cx="280" cy="48" r="5" fill="#FF6A00" filter="url(#oglow)"/>
-          <!-- Floating badges -->
-          <rect x="30" y="155" width="85" height="42" rx="10" fill="rgba(0,20,40,0.85)" stroke="rgba(0,212,255,0.4)" stroke-width="1.2"/>
-          <text x="72" y="171" font-family="'Orbitron',monospace" font-size="7" fill="#00D4FF" text-anchor="middle" opacity="0.8">TOP SPEED</text>
-          <text x="72" y="188" font-family="'Orbitron',monospace" font-size="14" fill="white" text-anchor="middle" font-weight="700">45 km/h</text>
-          <rect x="400" y="80" width="95" height="42" rx="10" fill="rgba(0,20,40,0.85)" stroke="rgba(255,106,0,0.4)" stroke-width="1.2"/>
-          <text x="447" y="96" font-family="'Orbitron',monospace" font-size="7" fill="#FF6A00" text-anchor="middle" opacity="0.8">RANGE</text>
-          <text x="447" y="113" font-family="'Orbitron',monospace" font-size="14" fill="white" text-anchor="middle" font-weight="700">45 km</text>
-          <!-- DEFS -->
-          <defs>
-            <linearGradient id="trail1" x1="60" y1="280" x2="5" y2="260" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#FF6A00" stop-opacity="0.9"/>
-              <stop offset="100%" stop-color="#FF6A00" stop-opacity="0"/>
-            </linearGradient>
-            <linearGradient id="trail2" x1="80" y1="295" x2="10" y2="285" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#FF6A00" stop-opacity="0.6"/>
-              <stop offset="100%" stop-color="#FF6A00" stop-opacity="0"/>
-            </linearGradient>
-            <linearGradient id="trail3" x1="70" y1="310" x2="8" y2="305" gradientUnits="userSpaceOnUse">
-              <stop offset="0%" stop-color="#FF6A00" stop-opacity="0.4"/>
-              <stop offset="100%" stop-color="#FF6A00" stop-opacity="0"/>
-            </linearGradient>
-            <filter id="bglow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="4" result="blur"/>
-              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-            </filter>
-            <filter id="oglow" x="-50%" y="-50%" width="200%" height="200%">
-              <feGaussianBlur stdDeviation="3" result="blur"/>
-              <feFlood flood-color="#FF6A00" flood-opacity="0.5" result="color"/>
-              <feComposite in="color" in2="blur" operator="in" result="shadow"/>
-              <feComposite in="SourceGraphic" in2="shadow" operator="over"/>
-            </filter>
-          </defs>
-        </svg>
+    <div class="container reveal">
+      <div class="hero-content">
+        <span class="hero-eyebrow">Elite Mobility 2026</span>
+        <h1 class="hero-title">Domina la Ciudad<br>con <span style="color:var(--accent)">Anacleto</span></h1>
+        <p class="hero-sub">Ingeniería disruptiva y diseño de vanguardia. Redefinimos el estándar de la movilidad premium para el mundo moderno.</p>
+        <div class="hero-cta">
+          <button class="btn-primary" onclick="showPage('shop')">Explorar Colección</button>
+          <button class="btn-secondary" onclick="scrollTo(0,document.getElementById('home-featured').offsetTop-120)">Ver Detalles</button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- FEATURED PRODUCTS -->
-  <section id="home-featured" style="background:#030310;">
-    <div class="section-header reveal">
-      <div class="eyebrow">Featured Models</div>
-      <h2 class="section-title">Our Top Scooters</h2>
-      <div class="glow-div"></div>
-    </div>
-    <div class="products-grid" id="featured-grid"></div>
-    <div style="text-align:center;margin-top:3rem;">
-      <button class="btn-primary" onclick="showPage('shop')">View All Models →</button>
+  <section id="home-featured" style="background: #010410;">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="hero-eyebrow">Top Selection</span>
+        <h2 class="section-title">Modelos <span style="color:var(--accent)">Destacados</span></h2>
+        <div class="glow-line"></div>
+      </div>
+      <div class="products-grid" id="featured-list">
+        <!-- JS rendered -->
+      </div>
+      <div style="text-align:center; margin-top:80px;" class="reveal">
+        <button class="btn-secondary" onclick="showPage('shop')">VER CATÁLOGO COMPLETO →</button>
+      </div>
     </div>
   </section>
+
 
   <!-- BENEFITS -->
   <section class="benefits-section" id="benefits">
-    <div class="section-header reveal">
-      <span class="hero-eyebrow">ADN Anacleto</span>
-      <h2 class="section-title">Ingeniería para el Futuro</h2>
-      <div class="glow-div"></div>
-    </div>
-    <div class="benefits-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:2rem;">
-      <div class="benefit-card reveal" style="background:var(--bg-card); padding:2.5rem; border-radius:var(--rl); border:1px solid var(--border); backdrop-filter:blur(10px); transition:var(--tr); cursor:default;">
-        <span style="font-size:3rem; display:block; margin-bottom:1.5rem;">🌱</span>
-        <h3 style="font-family:'Orbitron'; font-size:1.2rem; margin-bottom:1rem;">Eco-Sostenible</h3>
-        <p style="color:var(--text-dim); font-size:0.95rem;">Cero emisiones directas. Cada kilómetro es un compromiso con el aire puro de tu ciudad.</p>
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="hero-eyebrow">Anacleto Tech</span>
+        <h2 class="section-title">Ingeniería Superior</h2>
+        <div class="glow-line"></div>
       </div>
-      <div class="benefit-card reveal" style="background:var(--bg-card); padding:2.5rem; border-radius:var(--rl); border:1px solid var(--border); backdrop-filter:blur(10px); transition:var(--tr); cursor:default;">
-        <span style="font-size:3rem; display:block; margin-bottom:1.5rem;">⚡</span>
-        <h3 style="font-family:'Orbitron'; font-size:1.2rem; margin-bottom:1rem;">Potencia Instantánea</h3>
-        <p style="color:var(--text-dim); font-size:0.95rem;">Motores BLDC de alto rendimiento. Aceleración suave y silenciosa hasta los 45 km/h.</p>
-      </div>
-      <div class="benefit-card reveal" style="background:var(--bg-card); padding:2.5rem; border-radius:var(--rl); border:1px solid var(--border); backdrop-filter:blur(10px); transition:var(--tr); cursor:default;">
-        <span style="font-size:3rem; display:block; margin-bottom:1.5rem;">🔒</span>
-        <h3 style="font-family:'Orbitron'; font-size:1.2rem; margin-bottom:1rem;">Smart Tracking</h3>
-        <p style="color:var(--text-dim); font-size:0.95rem;">GPS integrado y control total desde la App. Tu patinete siempre bajo tu radar.</p>
+      <div class="benefits-grid" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:3rem;">
+        <div class="benefit-card reveal">
+          <span style="font-size:3.5rem; filter:drop-shadow(0 0 20px var(--accent-glow));">🔋</span>
+          <h3>Smart Energy</h3>
+          <p>Celdas de litio de alta densidad con sistema BMS inteligente. Hasta 65km de pura libertad con una sola carga.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <span style="font-size:3.5rem; filter:drop-shadow(0 0 20px var(--accent-glow));">🏎️</span>
+          <h3>Torque Elite</h3>
+          <p>Motores Dual-Brushless que entregan potencia instantánea para superar pendientes sin esfuerzo y con total silencio.</p>
+        </div>
+        <div class="benefit-card reveal">
+          <span style="font-size:3.5rem; filter:drop-shadow(0 0 20px var(--accent-glow));">🛡️</span>
+          <h3>Dual-Safe System</h3>
+          <p>Frenos hidráulicos y discos cerámicos. Seguridad absoluta bajo cualquier condición climática.</p>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- TESTIMONIALS -->
-  <section class="testi-section">
-    <div class="section-header reveal">
-      <div class="eyebrow">Community</div>
-      <h2 class="section-title">Riders Love It</h2>
-      <div class="glow-div"></div>
-    </div>
-    <div class="testi-grid">
-      <div class="testi-card reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"Bought the Turbo S three months ago and I haven't taken the bus since. Commute went from 45 mins to 18 mins. The neon underglow is just a bonus."</p>
-        <div class="testi-author"><div class="avatar">MR</div><div><div class="author-name">Marco R.</div><div class="author-loc">Barcelona, ES</div></div></div>
+  <!-- TESTIMONIALS LUX -->
+  <section id="testimonials" style="background: linear-gradient(to bottom, var(--bg), #010410); padding: 120px 0;">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="hero-eyebrow">Reviewers</span>
+        <h2 class="section-title">Experiencia <span style="color:var(--accent)">Premium</span></h2>
+        <div class="glow-line"></div>
       </div>
-      <div class="testi-card reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"I was skeptical about spending this much on a scooter. Three weeks in, I told five friends to get one. The app connectivity is insane — I track everything."</p>
-        <div class="testi-author"><div class="avatar">AS</div><div><div class="author-name">Aisha S.</div><div class="author-loc">Valencia, ES</div></div></div>
-      </div>
-      <div class="testi-card reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"Scout X1 was my entry into electric scooters. Range is incredible, build feels premium, and the folding mechanism is so satisfying. Worth every cent."</p>
-        <div class="testi-author"><div class="avatar">JD</div><div><div class="author-name">Julien D.</div><div class="author-loc">Paris, FR</div></div></div>
-      </div>
-      <div class="testi-card reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"The Nebula Elite handles everything I throw at it — hills, rain, cobblestones. The IP67 rating is real. Rode through a downpour, not even a hiccup."</p>
-        <div class="testi-author"><div class="avatar">KL</div><div><div class="author-name">Klara L.</div><div class="author-loc">Berlin, DE</div></div></div>
-      </div>
-      <div class="testi-card reveal">
-        <div class="stars">★★★★☆</div>
-        <p class="testi-text">"Customer service was phenomenal when I had a battery question. The team actually knows their product. Rare these days. Urban Pro is my daily driver."</p>
-        <div class="testi-author"><div class="avatar">TC</div><div><div class="author-name">Tomás C.</div><div class="author-loc">Madrid, ES</div></div></div>
-      </div>
-      <div class="testi-card reveal">
-        <div class="stars">★★★★★</div>
-        <p class="testi-text">"Apex Zero is a statement piece. People stop me on the street to ask about it. Performance is elite, looks are elite. Patineto Anacleto gets it."</p>
-        <div class="testi-author"><div class="avatar">NK</div><div><div class="author-name">Nikolai K.</div><div class="author-loc">Amsterdam, NL</div></div></div>
+      <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap:2rem;">
+        <div class="benefit-card reveal" style="padding: 3rem;">
+          <div style="color:var(--accent); font-size:1.2rem; margin-bottom:1.5rem;">★★★★★</div>
+          <p style="font-style:italic; margin-bottom:2rem; font-size:1.1rem; color:#fff;">"El Anacleto Pro cambió mi forma de ir a la oficina. No solo es rápido, es una declaración de estilo."</p>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="width:50px; height:50px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--bg);">RC</div>
+            <div><strong>Ricardo C.</strong><br><span style="font-size:0.8rem; color:var(--text-dim);">CEO & Founder</span></div>
+          </div>
+        </div>
+        <div class="benefit-card reveal" style="padding: 3rem;">
+          <div style="color:var(--accent); font-size:1.2rem; margin-bottom:1.5rem;">★★★★★</div>
+          <p style="font-style:italic; margin-bottom:2rem; font-size:1.1rem; color:#fff;">"La autonomía es real. Hago 40km diarios y aún me sobra batería. Una maravilla de la ingeniería."</p>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="width:50px; height:50px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--bg);">ML</div>
+            <div><strong>Marta L.</strong><br><span style="font-size:0.8rem; color:var(--text-dim);">Diseñadora Industrial</span></div>
+          </div>
+        </div>
+        <div class="benefit-card reveal" style="padding: 3rem;">
+          <div style="color:var(--accent); font-size:1.2rem; margin-bottom:1.5rem;">★★★★★</div>
+          <p style="font-style:italic; margin-bottom:2rem; font-size:1.1rem; color:#fff;">"El sistema de suspensión es de otro planeta. Parece que vas flotando sobre el asfalto. 10/10."</p>
+          <div style="display:flex; align-items:center; gap:1rem;">
+            <div style="width:50px; height:50px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-weight:900; color:var(--bg);">JM</div>
+            <div><strong>Juan M.</strong><br><span style="font-size:0.8rem; color:var(--text-dim);">Ingeniero Tech</span></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -587,84 +600,51 @@ nav {
 
 <!-- ABOUT PAGE -->
 <div class="page" id="page-about">
-  <div class="about-hero-wrap">
-    <div class="eyebrow">Our Story</div>
-    <h1 class="section-title">Born on the Streets,<br><span class="grad">Built for the Stars</span></h1>
-    <div class="glow-div"></div>
-  </div>
-  <div class="about-content">
-    <h2>The Mission</h2>
-    <p>Patineto Anacleto was born from a simple frustration: cities designed for cars, not people. Our founders — engineers, designers, and lifelong urban dwellers — set out to reimagine how we move through the spaces we call home.</p>
-    <p>We believe that sustainable mobility shouldn't be a compromise. It should be thrilling, beautiful, and built to last. Every scooter we make is a declaration that the future of transport is electric, smart, and unapologetically cool.</p>
-    <div class="values-grid">
-      <div class="val-card"><span class="val-icon">🚀</span><div class="val-title">Fearless Innovation</div><p class="val-text">We push technical limits on every model. If it can be faster, smarter, or lighter — we make it so.</p></div>
-      <div class="val-card"><span class="val-icon">🌍</span><div class="val-title">Planet First</div><p class="val-text">Zero emissions, recyclable packaging, carbon-neutral factories. Sustainability isn't a feature, it's our foundation.</p></div>
-      <div class="val-card"><span class="val-icon">🏙️</span><div class="val-title">Urban by DNA</div><p class="val-text">Designed on city streets, tested in real traffic. We ride what we build, in the cities you live in.</p></div>
+  <div class="container" style="padding: 150px 0;">
+    <div class="section-header reveal">
+      <span class="hero-eyebrow">Nuestra Historia</span>
+      <h1 class="hero-title">Nacidos para<br><span style="color:var(--accent)">Explorar</span></h1>
+      <div class="glow-line"></div>
     </div>
-    <h2>The Name</h2>
-    <p>Who is Anacleto? He's the astronaut who traded his rocket for a scooter — because he realized the most interesting frontier isn't outer space. It's the city block. He's curious, bold, and always moving forward.</p>
-    <p>Anacleto is our mascot, our philosophy, and our promise: explore further, travel lighter, arrive with style.</p>
-    <h2>The Technology</h2>
-    <p>Every Patineto Anacleto is engineered with aerospace-grade aluminum frames, high-density lithium cells sourced from certified ethical suppliers, and BLDC hub motors tuned for urban terrain. Our proprietary EcoRegen braking recovers up to 15% of energy on every ride.</p>
-    <p>Our companion app — available on iOS and Android — provides real-time telemetry, predictive maintenance alerts, custom riding modes, and over-the-air firmware updates. Your scooter gets better over time, not worse.</p>
-    <h2>The Community</h2>
-    <p>Over 120,000 riders across 28 countries call themselves Patineto Anacleto riders. From Valencia to Vancouver, from Berlin to Bangkok — we're a global crew united by the love of clean, fast, street-level exploration.</p>
-    <p>Join us. Ride the future.</p>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5rem; align-items:center;" class="reveal">
+      <div>
+        <h2 style="font-family:'Orbitron'; margin-bottom:2rem;">La Misión Anacleto</h2>
+        <p style="color:var(--text-dim); font-size:1.1rem; margin-bottom:2rem;">Patineto Anacleto nació de una visión sencilla: ciudades diseñadas para personas, no para coches. Somos ingenieros y diseñadores unidos para redefinir el movimiento urbano.</p>
+        <p style="color:var(--text-dim); font-size:1.1rem;">Nuestros patinetes no son solo transporte; son piezas de ingeniería de alta precisión fabricadas para durar y emocionar.</p>
+      </div>
+      <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:var(--rl); padding:4rem; text-align:center;">
+          <span style="font-size:5rem;">🚀</span>
+          <h3 style="font-family:'Orbitron'; margin-top:2rem;">Tecnología Aeroespacial</h3>
+      </div>
+    </div>
   </div>
-  <div id="about-footer"></div>
 </div>
 
 <!-- CONTACT PAGE -->
 <div class="page" id="page-contact">
-  <div style="padding:4rem 5% 2rem;">
-    <div class="section-header">
-      <div class="eyebrow">Get in Touch</div>
-      <h2 class="section-title">Contact Mission Control</h2>
-      <div class="glow-div"></div>
+  <div class="container" style="padding: 150px 0;">
+    <div class="section-header reveal">
+      <span class="hero-eyebrow">Mission Control</span>
+      <h2 class="section-title">Contacta con <span style="color:var(--accent)">Nosotros</span></h2>
+      <div class="glow-line"></div>
     </div>
-  </div>
-  <div class="contact-wrap">
-    <div>
-      <h3 class="ci-h3">Talk to Us</h3>
-      <p class="ci-p">Have a question about a model, need support, or want to partner with us? Our team responds within 24 hours — usually much faster.</p>
-      <div class="cdet"><span class="cdet-ico">📧</span><span>hello@patinetoanacleto.com</span></div>
-      <div class="cdet"><span class="cdet-ico">📞</span><span>+34 900 123 456</span></div>
-      <div class="cdet"><span class="cdet-ico">📍</span><span>Calle Futurista 42, Valencia, ES</span></div>
-      <div class="cdet"><span class="cdet-ico">🕐</span><span>Mon–Fri 9:00–18:00 CET</span></div>
-      <div style="margin-top:2rem;">
-        <h3 class="ci-h3" style="margin-bottom:0.7rem;">Follow the Mission</h3>
-        <div class="social-links" style="display:flex;gap:0.65rem;">
-          <div class="soc">𝕏</div>
-          <div class="soc">in</div>
-          <div class="soc">📸</div>
-          <div class="soc">▶</div>
-          <div class="soc">🎵</div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5rem;" class="reveal">
+      <div>
+        <h3 style="font-family:'Orbitron'; font-size:1.3rem; margin-bottom:2rem;">¿Tienes Dudas?</h3>
+        <p style="color:var(--text-dim); margin-bottom:3rem;">Nuestro equipo de soporte técnico está disponible 24/7 para ayudarte con cualquier consulta sobre modelos o garantías.</p>
+        <div style="display:grid; gap:1.5rem;">
+          <div style="display:flex; align-items:center; gap:1.5rem; color:var(--accent);">📧 info@anacleto-web.com</div>
+          <div style="display:flex; align-items:center; gap:1.5rem; color:var(--accent);">📍 Calle Futurista 101, Valencia</div>
         </div>
       </div>
-    </div>
-    <div class="contact-form" id="contact-form">
-      <div class="form-row">
-        <div class="fg"><label>First Name</label><input type="text" placeholder="Anacleto"></div>
-        <div class="fg"><label>Last Name</label><input type="text" placeholder="García"></div>
+      <div class="benefit-card" style="background:rgba(255,255,255,0.02); padding:4rem; border:1px solid var(--border); border-radius:var(--rl);">
+        <input type="text" placeholder="Nombre" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); padding:1rem; color:#fff; margin-bottom:2rem; outline:none;">
+        <input type="email" placeholder="Email" style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); padding:1rem; color:#fff; margin-bottom:2rem; outline:none;">
+        <textarea placeholder="Tu mensaje..." style="width:100%; background:transparent; border:none; border-bottom:1px solid var(--border); padding:1rem; color:#fff; margin-bottom:3rem; outline:none; height:100px; resize:none;"></textarea>
+        <button class="btn-primary" style="width:100%;">Enviar Mensaje</button>
       </div>
-      <div class="fg"><label>Email</label><input type="email" placeholder="you@example.com"></div>
-      <div class="fg">
-        <label>Topic</label>
-        <select>
-          <option value="">Select a topic...</option>
-          <option>Product Question</option>
-          <option>Order Support</option>
-          <option>Warranty Claim</option>
-          <option>Partnership</option>
-          <option>Press / Media</option>
-          <option>Other</option>
-        </select>
-      </div>
-      <div class="fg"><label>Message</label><textarea placeholder="Tell us how we can help you ride the future..."></textarea></div>
-      <button class="btn-primary" onclick="handleContactSubmit()" style="align-self:flex-start;">Send Message →</button>
     </div>
   </div>
-  <div id="contact-footer"></div>
 </div>
 
 <!-- FOOTER -->
@@ -860,6 +840,16 @@ async function loadData() {
     querySnapshot.forEach((doc) => {
       products.push({ id: doc.id, ...doc.data() });
     });
+
+    // SEED: If DB is empty, show elite mockups to impress client
+    if (products.length === 0) {
+      products = [
+        { id: 'seed1', name: 'Anacleto Apollo X', price: 1299, category: 'performance', accentColor: '#38BDF8', desc: 'Edición limitada con motor dual de 2000W y suspensión magnética.' },
+        { id: 'seed2', name: 'Nebula Elite', price: 2150, category: 'premium', accentColor: '#fbbf24', desc: 'Chasis de fibra de carbono aeroespacial y autonomía extendida de 90km.' },
+        { id: 'seed3', name: 'Urban Scout', price: 899, category: 'mid', accentColor: '#10b981', desc: 'El compañero perfecto para la ciudad: ligero, potente y con carga rápida.' }
+      ];
+    }
+
     renderFeatured();
     initReveal();
   } catch (err) {
@@ -1010,7 +1000,10 @@ function showNotif(msg) {
 
 /* ===== MOBILE MENU ===== */
 window.toggleMobileMenu = () => {
-  document.getElementById('mobile-menu').classList.toggle('open');
+  document.getElementById('mobile-menu').classList.toggle('active');
+};
+window.closeMobileMenu = () => {
+  document.getElementById('mobile-menu').classList.remove('active');
 };
 
 /* ===== CONTACT ===== */
