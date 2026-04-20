@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patineto Anacleto | Ride the Future</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0F172A; /* Navy Blue (Slate 900) */
+  --bg-darker: #020617; /* Slate 950 */
+  --bg-card: #1E293B; /* Slate 800 */
+  --accent: #38BDF8; /* Sky 400 */
+  --accent-secondary: #2DD4BF; /* Teal 400 */
+  --accent-dim: rgba(56, 189, 248, 0.15);
+  --white: #FFFFFF;
+  --text-main: #F1F5F9; /* Slate 100 */
+  --text-dim: #94A3B8; /* Slate 400 */
+  --r: 12px;
+  --rl: 16px;
+  --tr: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Exo 2', sans-serif;
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(45, 212, 191, 0.05) 0px, transparent 50%);
+  color: var(--text-main);
+  overflow-x: hidden;
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-darker); }
+::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 5%;
+  background: rgba(15, 23, 42, 0.9);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.nav-logo { display:flex; align-items:center; gap:0.75rem; cursor:pointer; }
+.nav-logo-text {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: linear-gradient(to right, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.02em;
+}
+
+.nav-links { display: flex; list-style: none; gap: 2.5rem; }
+.nav-links a {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: var(--tr);
+  position: relative;
+}
+.nav-links a:hover, .nav-links a.active { color: var(--accent); }
+
+.nav-actions { display: flex; align-items: center; gap: 1rem; }
+.cart-btn {
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-main);
+  padding: 0.5rem 1.25rem;
+  border-radius: 99px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: var(--tr);
+}
+.cart-btn:hover { border-color: var(--accent); background: var(--accent-dim); }
+.cart-badge { background: var(--accent); color: var(--bg-darker); border-radius: 50%; width: 18px; height: 18px; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; font-weight: 800; }
+
+.hamburger { display: none; background: none; border: none; color: var(--text-main); font-size: 1.5rem; cursor: pointer; }
+
+/* REVEAL ANIMATION */
+.reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* HERO */
+.hero {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  padding: 80px 5% 40px;
+  gap: 4rem;
+  position: relative;
+}
+.hero-content { flex: 1; }
+.hero-eyebrow {
+  color: var(--accent);
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.75rem;
+  letter-spacing: 0.3em;
+  margin-bottom: 1.5rem;
+}
+.hero-title {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  font-weight: 900;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+  font-family: 'Orbitron', sans-serif;
+}
+.grad {
+  background: linear-gradient(to right, var(--accent), var(--accent-secondary));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.hero-sub {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  max-width: 540px;
+  margin-bottom: 2.5rem;
+}
+.hero-cta { display: flex; gap: 1rem; }
+
+.hero-visual { flex: 1.2; display: flex; justify-content: center; }
+
+/* BUTTONS */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+  color: var(--bg-darker);
+  border: none;
+  padding: 1rem 2.5rem;
+  border-radius: 99px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: var(--tr);
+  box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(56, 189, 248, 0.4); }
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 1rem 2.5rem;
+  border-radius: 99px;
+  font-weight: 800;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: var(--tr);
+}
+.btn-secondary:hover { background: var(--accent-dim); transform: translateY(-2px); }
+
+/* SECTIONS */
+section { padding: 80px 5%; }
+.section-header { text-align: center; margin-bottom: 60px; }
+.section-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  margin-bottom: 1rem;
+}
+.glow-div {
+  width: 60px; height: 4px; border-radius: 2px;
+  background: linear-gradient(to right, var(--accent), var(--accent-secondary));
+  margin: 0 auto;
+}
+
+/* PRODUCT CARDS */
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 2rem;
+}
+.product-card {
+  background: var(--bg-card);
+  border-radius: var(--rl);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: var(--tr);
+  cursor: pointer;
+}
+.product-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent);
+  box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.5);
+}
+.card-img {
+  height: 240px;
+  background: var(--bg-darker);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.card-body { padding: 1.5rem; }
+.card-name { font-family: 'Orbitron', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+.card-tag { color: var(--text-dim); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; }
+.price-big { font-size: 1.5rem; font-weight: 800; color: var(--white); }
+
+/* MOBILE MENU */
+.mobile-menu {
+  position: fixed;
+  top: 72px; left: 0; right: 0; bottom: 0;
+  background: var(--bg);
+  flex-direction: column;
+  padding: 2rem;
+  gap: 2rem;
+  z-index: 998;
+  display: none;
+}
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-main);
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .hero { flex-direction: column; text-align: center; gap: 2rem; padding-top: 120px; }
+  .hero-sub { margin: 0 auto 2.5rem; }
+  .hero-cta { justify-content: center; }
+}
+
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  .hamburger { display: block; }
+  .hero-visual svg { width: 100%; height: auto; }
+}
+</style>
+</head>
+<body>
+<canvas id="particles"></canvas>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo" onclick="showPage('home')">
+    <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="22" cy="12" r="9" stroke="#00D4FF" stroke-width="1.8" fill="#04040B"/>
+      <ellipse cx="22" cy="12" rx="6" ry="4" fill="#001A2E" stroke="#00AEEF" stroke-width="1" opacity="0.9"/>
+      <circle cx="22" cy="12" r="2" fill="#00D4FF" opacity="0.6"/>
+      <rect x="16" y="20" width="12" height="8" rx="2" fill="#0A0A2A" stroke="#00D4FF" stroke-width="1.2"/>
+      <line x1="13" y1="23" x2="16" y2="23" stroke="#FF6A00" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="28" y1="23" x2="31" y2="23" stroke="#FF6A00" stroke-width="1.5" stroke-linecap="round"/>
+      <circle cx="15" cy="38" r="4.5" stroke="#00D4FF" stroke-width="1.5" fill="#04040B"/>
+      <circle cx="29" cy="38" r="4" stroke="#00D4FF" stroke-width="1.5" fill="#04040B"/>
+      <rect x="17" y="33" width="12" height="3" rx="1" fill="#0A0A2A" stroke="#00D4FF" stroke-width="1"/>
+      <line x1="26" y1="28" x2="28" y2="33" stroke="#00D4FF" stroke-width="1.5" stroke-linecap="round"/>
+      <line x1="22" y1="26" x2="32" y2="26" stroke="white" stroke-width="2" stroke-linecap="round"/>
+      <rect x="17" y="34.5" width="11" height="1" rx="0.5" fill="#00D4FF" opacity="0.7"/>
+    </svg>
+    <div class="nav-logo-text">Patineto Anacleto</div>
+  </div>
+  <ul class="nav-links" id="nav-links">
+    <li><a onclick="showPage('home')" class="active" id="nl-home">Home</a></li>
+    <li><a onclick="showPage('shop')" id="nl-shop">Shop</a></li>
+    <li><a onclick="showPage('about')" id="nl-about">About</a></li>
+    <li><a onclick="showPage('contact')" id="nl-contact">Contact</a></li>
+  </ul>
+  <div class="nav-actions">
+    <button class="cart-btn" onclick="toggleCart()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      Cart <span class="cart-badge" id="cart-count">0</span>
+    </button>
+    <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
+  </div>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu">
+  <a onclick="showPage('home');closeMobileMenu()">Home</a>
+  <a onclick="showPage('shop');closeMobileMenu()">Shop</a>
+  <a onclick="showPage('about');closeMobileMenu()">About</a>
+  <a onclick="showPage('contact');closeMobileMenu()">Contact</a>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<!-- HOME PAGE -->
+<div class="page active grid-bg" id="page-home">
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">⚡ Electric Mobility Redefined</div>
+      <h1 class="hero-title">Ride the Future<br>with <span class="grad">Patineto<br>Anacleto</span></h1>
+      <p class="hero-sub">Speed. Freedom. Zero emissions. The next generation of urban transport has arrived — smart, electric, and built for the streets of tomorrow.</p>
+      <div class="hero-cta">
+        <button class="btn-primary" onclick="showPage('shop')">Shop Now →</button>
+        <button class="btn-secondary" onclick="scrollTo(0,document.getElementById('home-featured').offsetTop-80)">Explore Models</button>
+      </div>
+      <div class="hero-stats">
+        <div><div class="stat-num">45+</div><div class="stat-label">km Range</div></div>
+        <div><div class="stat-num">45</div><div class="stat-label">km/h Max</div></div>
+        <div><div class="stat-num">0%</div><div class="stat-label">Emissions</div></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="float-anim">
+        <!-- HERO SVG: Astronaut on scooter in space -->
+        <svg width="520" height="420" viewBox="0 0 520 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Stars -->
+          <circle cx="30" cy="40" r="1.2" fill="white" opacity="0.7" style="animation:twinkle 2.1s infinite;"/>
+          <circle cx="90" cy="20" r="0.9" fill="white" opacity="0.5" style="animation:twinkle 1.7s 0.3s infinite;"/>
+          <circle cx="160" cy="55" r="1.4" fill="white" opacity="0.8" style="animation:twinkle 2.4s 0.8s infinite;"/>
+          <circle cx="420" cy="30" r="1.1" fill="white" opacity="0.6" style="animation:twinkle 1.9s 0.5s infinite;"/>
+          <circle cx="490" cy="70" r="1.3" fill="white" opacity="0.7" style="animation:twinkle 2.2s 1s infinite;"/>
+          <circle cx="480" cy="150" r="0.8" fill="white" opacity="0.5" style="animation:twinkle 1.6s 0.2s infinite;"/>
+          <circle cx="50" cy="300" r="1" fill="white" opacity="0.4" style="animation:twinkle 2s 0.7s infinite;"/>
+          <circle cx="20" cy="200" r="1.5" fill="white" opacity="0.6" style="animation:twinkle 2.5s 0.4s infinite;"/>
+          <circle cx="500" cy="380" r="1.1" fill="white" opacity="0.5" style="animation:twinkle 1.8s 0.9s infinite;"/>
+          <circle cx="350" cy="10" r="0.9" fill="white" opacity="0.7" style="animation:twinkle 2.3s 0.1s infinite;"/>
+          <!-- Planet rings background -->
+          <ellipse cx="450" cy="100" rx="55" ry="18" stroke="rgba(0,212,255,0.15)" stroke-width="2" fill="none"/>
+          <circle cx="450" cy="100" r="28" fill="rgba(0,50,100,0.25)" stroke="rgba(0,212,255,0.2)" stroke-width="1.5"/>
+          <circle cx="450" cy="100" r="12" fill="rgba(0,100,200,0.15)" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <!-- Speed trail -->
+          <path d="M 60 280 Q 20 270 5 260" stroke="url(#trail1)" stroke-width="4" stroke-linecap="round" opacity="0.9"/>
+          <path d="M 80 295 Q 35 290 10 285" stroke="url(#trail2)" stroke-width="2.5" stroke-linecap="round" opacity="0.7"/>
+          <path d="M 70 310 Q 30 308 8 305" stroke="url(#trail3)" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+          <!-- Glow beneath scooter -->
+          <ellipse cx="290" cy="370" rx="130" ry="12" fill="rgba(0,212,255,0.08)"/>
+          <!-- Scooter rear wheel -->
+          <circle cx="140" cy="330" r="42" stroke="#00D4FF" stroke-width="3.5" fill="none" filter="url(#bglow)"/>
+          <circle cx="140" cy="330" r="28" stroke="rgba(0,212,255,0.4)" stroke-width="1.5" fill="#04040B"/>
+          <circle cx="140" cy="330" r="7" fill="#00D4FF" opacity="0.8"/>
+          <!-- Scooter spokes rear -->
+          <line x1="140" y1="302" x2="140" y2="358" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <line x1="112" y1="330" x2="168" y2="330" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <line x1="120" y1="310" x2="160" y2="350" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <line x1="160" y1="310" x2="120" y2="350" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <!-- Scooter front wheel -->
+          <circle cx="420" cy="335" r="38" stroke="#00D4FF" stroke-width="3.5" fill="none" filter="url(#bglow)"/>
+          <circle cx="420" cy="335" r="25" stroke="rgba(0,212,255,0.4)" stroke-width="1.5" fill="#04040B"/>
+          <circle cx="420" cy="335" r="6" fill="#00D4FF" opacity="0.8"/>
+          <!-- spokes front -->
+          <line x1="420" y1="310" x2="420" y2="360" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <line x1="395" y1="335" x2="445" y2="335" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <line x1="402" y1="317" x2="438" y2="353" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <line x1="438" y1="317" x2="402" y2="353" stroke="rgba(0,212,255,0.3)" stroke-width="1"/>
+          <!-- Deck platform -->
+          <rect x="162" y="287" width="258" height="22" rx="5" fill="#080828" stroke="#00D4FF" stroke-width="1.8"/>
+          <!-- LED strip -->
+          <rect x="168" y="297" width="246" height="2.5" rx="1.2" fill="#00D4FF" opacity="0.7" filter="url(#bglow)"/>
+          <!-- Rear fender -->
+          <path d="M 105 330 Q 105 275 162 275 L 175 287" stroke="#FF6A00" stroke-width="3" fill="none" stroke-linecap="round" filter="url(#oglow)"/>
+          <!-- Stem -->
+          <line x1="365" y1="287" x2="340" y2="175" stroke="#00D4FF" stroke-width="5" stroke-linecap="round"/>
+          <!-- Handlebar -->
+          <line x1="305" y1="175" x2="378" y2="175" stroke="white" stroke-width="7" stroke-linecap="round"/>
+          <circle cx="305" cy="175" r="6" fill="#FF6A00" filter="url(#oglow)"/>
+          <circle cx="378" cy="175" r="6" fill="#FF6A00" filter="url(#oglow)"/>
+          <!-- Display panel on stem -->
+          <rect x="330" y="210" width="30" height="22" rx="4" fill="#08082A" stroke="#00D4FF" stroke-width="1.2"/>
+          <rect x="334" y="214" width="22" height="14" rx="2" fill="#00D4FF" opacity="0.4"/>
+          <text x="345" y="224" font-family="monospace" font-size="7" fill="#00D4FF" text-anchor="middle">45</text>
+          <!-- ASTRONAUT body -->
+          <!-- Torso/Suit -->
+          <rect x="240" y="165" width="80" height="100" rx="20" fill="#E8EDF5" stroke="rgba(0,212,255,0.3)" stroke-width="1.5"/>
+          <!-- Suit detail stripes -->
+          <rect x="252" y="178" width="56" height="4" rx="2" fill="rgba(0,212,255,0.4)"/>
+          <rect x="252" y="186" width="56" height="2" rx="1" fill="rgba(0,212,255,0.2)"/>
+          <!-- Chest pack -->
+          <rect x="262" y="196" width="36" height="28" rx="6" fill="#0A1A2A" stroke="#00D4FF" stroke-width="1.2"/>
+          <circle cx="280" cy="210" r="6" fill="#00D4FF" opacity="0.6"/>
+          <!-- Left arm (holding handlebar) -->
+          <path d="M 240 185 Q 210 190 200 200 Q 195 205 200 210 Q 210 215 230 205 Q 240 200 240 195" fill="#E8EDF5" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+          <!-- Right arm (holding handlebar) -->
+          <path d="M 320 185 Q 345 190 350 195 Q 355 200 350 205 Q 340 212 330 205 Q 322 200 320 195" fill="#E8EDF5" stroke="rgba(0,212,255,0.2)" stroke-width="1"/>
+          <!-- Gloves left -->
+          <circle cx="200" cy="208" r="10" fill="#1A2A3A" stroke="#FF6A00" stroke-width="1.5"/>
+          <!-- Gloves right -->
+          <circle cx="352" cy="202" r="10" fill="#1A2A3A" stroke="#FF6A00" stroke-width="1.5"/>
+          <!-- Legs -->
+          <rect x="248" y="262" width="26" height="42" rx="10" fill="#D0D5DF"/>
+          <rect x="286" y="262" width="26" height="42" rx="10" fill="#D0D5DF"/>
+          <!-- Boots -->
+          <rect x="244" y="296" width="34" height="18" rx="7" fill="#1A2030"/>
+          <rect x="282" y="296" width="34" height="18" rx="7" fill="#1A2030"/>
+          <!-- HELMET -->
+          <circle cx="280" cy="130" r="58" fill="#D8E2EE" stroke="rgba(255,255,255,0.8)" stroke-width="2"/>
+          <!-- Visor -->
+          <ellipse cx="280" cy="128" rx="38" ry="34" fill="#001020" stroke="#00D4FF" stroke-width="2" filter="url(#bglow)"/>
+          <!-- Visor reflection -->
+          <ellipse cx="268" cy="118" rx="10" ry="8" fill="rgba(0,212,255,0.12)" transform="rotate(-15,268,118)"/>
+          <!-- Visor inner glow -->
+          <ellipse cx="280" cy="128" rx="32" ry="28" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1"/>
+          <!-- Helmet details -->
+          <circle cx="318" cy="108" r="6" fill="#FF6A00" stroke="#CC4800" stroke-width="1" filter="url(#oglow)"/>
+          <circle cx="320" cy="150" r="5" fill="#00D4FF" stroke="#0099BB" stroke-width="1" opacity="0.8"/>
+          <!-- PA text in visor -->
+          <text x="280" y="134" font-family="'Orbitron',monospace" font-size="11" fill="#00D4FF" text-anchor="middle" font-weight="700" opacity="0.7">PA</text>
+          <!-- Antenna -->
+          <line x1="280" y1="72" x2="280" y2="52" stroke="#00D4FF" stroke-width="2"/>
+          <circle cx="280" cy="48" r="5" fill="#FF6A00" filter="url(#oglow)"/>
+          <!-- Floating badges -->
+          <rect x="30" y="155" width="85" height="42" rx="10" fill="rgba(0,20,40,0.85)" stroke="rgba(0,212,255,0.4)" stroke-width="1.2"/>
+          <text x="72" y="171" font-family="'Orbitron',monospace" font-size="7" fill="#00D4FF" text-anchor="middle" opacity="0.8">TOP SPEED</text>
+          <text x="72" y="188" font-family="'Orbitron',monospace" font-size="14" fill="white" text-anchor="middle" font-weight="700">45 km/h</text>
+          <rect x="400" y="80" width="95" height="42" rx="10" fill="rgba(0,20,40,0.85)" stroke="rgba(255,106,0,0.4)" stroke-width="1.2"/>
+          <text x="447" y="96" font-family="'Orbitron',monospace" font-size="7" fill="#FF6A00" text-anchor="middle" opacity="0.8">RANGE</text>
+          <text x="447" y="113" font-family="'Orbitron',monospace" font-size="14" fill="white" text-anchor="middle" font-weight="700">45 km</text>
+          <!-- DEFS -->
+          <defs>
+            <linearGradient id="trail1" x1="60" y1="280" x2="5" y2="260" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF6A00" stop-opacity="0.9"/>
+              <stop offset="100%" stop-color="#FF6A00" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="trail2" x1="80" y1="295" x2="10" y2="285" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF6A00" stop-opacity="0.6"/>
+              <stop offset="100%" stop-color="#FF6A00" stop-opacity="0"/>
+            </linearGradient>
+            <linearGradient id="trail3" x1="70" y1="310" x2="8" y2="305" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#FF6A00" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#FF6A00" stop-opacity="0"/>
+            </linearGradient>
+            <filter id="bglow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+            <filter id="oglow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="3" result="blur"/>
+              <feFlood flood-color="#FF6A00" flood-opacity="0.5" result="color"/>
+              <feComposite in="color" in2="blur" operator="in" result="shadow"/>
+              <feComposite in="SourceGraphic" in2="shadow" operator="over"/>
+            </filter>
+          </defs>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURED PRODUCTS -->
+  <section id="home-featured" style="background:#030310;">
+    <div class="section-header reveal">
+      <div class="eyebrow">Featured Models</div>
+      <h2 class="section-title">Our Top Scooters</h2>
+      <div class="glow-div"></div>
+    </div>
+    <div class="products-grid" id="featured-grid"></div>
+    <div style="text-align:center;margin-top:3rem;">
+      <button class="btn-primary" onclick="showPage('shop')">View All Models →</button>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="benefits-section">
+    <div class="section-header reveal">
+      <div class="eyebrow">Why Anacleto</div>
+      <h2 class="section-title">Built for the Future</h2>
+      <div class="glow-div"></div>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-card reveal"><span class="b-icon">🌱</span><h3 class="b-title">Eco-Friendly</h3><p class="b-text">Zero direct emissions on every ride. Every kilometre on a Patineto Anacleto is a vote for cleaner air and a sustainable city.</p></div>
+      <div class="benefit-card reveal"><span class="b-icon">⚡</span><h3 class="b-title">Blazing Speed</h3><p class="b-text">Instant torque delivers thrilling acceleration. Reach up to 45 km/h silently — feel the power without the noise pollution.</p></div>
+      <div class="benefit-card reveal"><span class="b-icon">🛴</span><h3 class="b-title">Ultra Portable</h3><p class="b-text">Fold in 3 seconds. Carry it onto the metro, stash it under your desk, or pop it in your car boot — it goes everywhere you go.</p></div>
+      <div class="benefit-card reveal"><span class="b-icon">📱</span><h3 class="b-title">Smart Connected</h3><p class="b-text">Full control from the Anacleto app. Real-time speed, battery, range prediction, and diagnostics at your fingertips.</p></div>
+      <div class="benefit-card reveal"><span class="b-icon">🔒</span><h3 class="b-title">Anti-Theft GPS</h3><p class="b-text">Integrated GPS with remote lock and instant theft alerts. Your scooter reports its position to you 24/7.</p></div>
+      <div class="benefit-card reveal"><span class="b-icon">🛡️</span><h3 class="b-title">3-Year Warranty</h3><p class="b-text">Every Patineto Anacleto ships with our industry-leading 3-year comprehensive warranty. We back every scooter we make.</p></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testi-section">
+    <div class="section-header reveal">
+      <div class="eyebrow">Community</div>
+      <h2 class="section-title">Riders Love It</h2>
+      <div class="glow-div"></div>
+    </div>
+    <div class="testi-grid">
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"Bought the Turbo S three months ago and I haven't taken the bus since. Commute went from 45 mins to 18 mins. The neon underglow is just a bonus."</p>
+        <div class="testi-author"><div class="avatar">MR</div><div><div class="author-name">Marco R.</div><div class="author-loc">Barcelona, ES</div></div></div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"I was skeptical about spending this much on a scooter. Three weeks in, I told five friends to get one. The app connectivity is insane — I track everything."</p>
+        <div class="testi-author"><div class="avatar">AS</div><div><div class="author-name">Aisha S.</div><div class="author-loc">Valencia, ES</div></div></div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"Scout X1 was my entry into electric scooters. Range is incredible, build feels premium, and the folding mechanism is so satisfying. Worth every cent."</p>
+        <div class="testi-author"><div class="avatar">JD</div><div><div class="author-name">Julien D.</div><div class="author-loc">Paris, FR</div></div></div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"The Nebula Elite handles everything I throw at it — hills, rain, cobblestones. The IP67 rating is real. Rode through a downpour, not even a hiccup."</p>
+        <div class="testi-author"><div class="avatar">KL</div><div><div class="author-name">Klara L.</div><div class="author-loc">Berlin, DE</div></div></div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">★★★★☆</div>
+        <p class="testi-text">"Customer service was phenomenal when I had a battery question. The team actually knows their product. Rare these days. Urban Pro is my daily driver."</p>
+        <div class="testi-author"><div class="avatar">TC</div><div><div class="author-name">Tomás C.</div><div class="author-loc">Madrid, ES</div></div></div>
+      </div>
+      <div class="testi-card reveal">
+        <div class="stars">★★★★★</div>
+        <p class="testi-text">"Apex Zero is a statement piece. People stop me on the street to ask about it. Performance is elite, looks are elite. Patineto Anacleto gets it."</p>
+        <div class="testi-author"><div class="avatar">NK</div><div><div class="author-name">Nikolai K.</div><div class="author-loc">Amsterdam, NL</div></div></div>
+      </div>
+    </div>
+  </section>
+  <div id="home-footer"></div>
+</div>
+
+<!-- SHOP PAGE -->
+<div class="page" id="page-shop">
+  <section style="padding:4rem 5%;">
+    <div class="section-header">
+      <div class="eyebrow">Our Collection</div>
+      <h2 class="section-title">All Models</h2>
+      <div class="glow-div"></div>
+    </div>
+    <div class="shop-filters" id="shop-filters">
+      <button class="filter-btn active" onclick="filterProds('all',this)">All Models</button>
+      <button class="filter-btn" onclick="filterProds('entry',this)">Entry Level</button>
+      <button class="filter-btn" onclick="filterProds('mid',this)">Mid Range</button>
+      <button class="filter-btn" onclick="filterProds('performance',this)">Performance</button>
+      <button class="filter-btn" onclick="filterProds('premium',this)">Premium</button>
+    </div>
+    <div class="products-grid" id="shop-grid"></div>
+  </section>
+  <div id="shop-footer"></div>
+</div>
+
+<!-- PRODUCT DETAIL PAGE -->
+<div class="page" id="page-product">
+  <div class="pd-wrap" id="pd-content"></div>
+  <div id="prod-footer"></div>
+</div>
+
+<!-- ABOUT PAGE -->
+<div class="page" id="page-about">
+  <div class="about-hero-wrap">
+    <div class="eyebrow">Our Story</div>
+    <h1 class="section-title">Born on the Streets,<br><span class="grad">Built for the Stars</span></h1>
+    <div class="glow-div"></div>
+  </div>
+  <div class="about-content">
+    <h2>The Mission</h2>
+    <p>Patineto Anacleto was born from a simple frustration: cities designed for cars, not people. Our founders — engineers, designers, and lifelong urban dwellers — set out to reimagine how we move through the spaces we call home.</p>
+    <p>We believe that sustainable mobility shouldn't be a compromise. It should be thrilling, beautiful, and built to last. Every scooter we make is a declaration that the future of transport is electric, smart, and unapologetically cool.</p>
+    <div class="values-grid">
+      <div class="val-card"><span class="val-icon">🚀</span><div class="val-title">Fearless Innovation</div><p class="val-text">We push technical limits on every model. If it can be faster, smarter, or lighter — we make it so.</p></div>
+      <div class="val-card"><span class="val-icon">🌍</span><div class="val-title">Planet First</div><p class="val-text">Zero emissions, recyclable packaging, carbon-neutral factories. Sustainability isn't a feature, it's our foundation.</p></div>
+      <div class="val-card"><span class="val-icon">🏙️</span><div class="val-title">Urban by DNA</div><p class="val-text">Designed on city streets, tested in real traffic. We ride what we build, in the cities you live in.</p></div>
+    </div>
+    <h2>The Name</h2>
+    <p>Who is Anacleto? He's the astronaut who traded his rocket for a scooter — because he realized the most interesting frontier isn't outer space. It's the city block. He's curious, bold, and always moving forward.</p>
+    <p>Anacleto is our mascot, our philosophy, and our promise: explore further, travel lighter, arrive with style.</p>
+    <h2>The Technology</h2>
+    <p>Every Patineto Anacleto is engineered with aerospace-grade aluminum frames, high-density lithium cells sourced from certified ethical suppliers, and BLDC hub motors tuned for urban terrain. Our proprietary EcoRegen braking recovers up to 15% of energy on every ride.</p>
+    <p>Our companion app — available on iOS and Android — provides real-time telemetry, predictive maintenance alerts, custom riding modes, and over-the-air firmware updates. Your scooter gets better over time, not worse.</p>
+    <h2>The Community</h2>
+    <p>Over 120,000 riders across 28 countries call themselves Patineto Anacleto riders. From Valencia to Vancouver, from Berlin to Bangkok — we're a global crew united by the love of clean, fast, street-level exploration.</p>
+    <p>Join us. Ride the future.</p>
+  </div>
+  <div id="about-footer"></div>
+</div>
+
+<!-- CONTACT PAGE -->
+<div class="page" id="page-contact">
+  <div style="padding:4rem 5% 2rem;">
+    <div class="section-header">
+      <div class="eyebrow">Get in Touch</div>
+      <h2 class="section-title">Contact Mission Control</h2>
+      <div class="glow-div"></div>
+    </div>
+  </div>
+  <div class="contact-wrap">
+    <div>
+      <h3 class="ci-h3">Talk to Us</h3>
+      <p class="ci-p">Have a question about a model, need support, or want to partner with us? Our team responds within 24 hours — usually much faster.</p>
+      <div class="cdet"><span class="cdet-ico">📧</span><span>hello@patinetoanacleto.com</span></div>
+      <div class="cdet"><span class="cdet-ico">📞</span><span>+34 900 123 456</span></div>
+      <div class="cdet"><span class="cdet-ico">📍</span><span>Calle Futurista 42, Valencia, ES</span></div>
+      <div class="cdet"><span class="cdet-ico">🕐</span><span>Mon–Fri 9:00–18:00 CET</span></div>
+      <div style="margin-top:2rem;">
+        <h3 class="ci-h3" style="margin-bottom:0.7rem;">Follow the Mission</h3>
+        <div class="social-links" style="display:flex;gap:0.65rem;">
+          <div class="soc">𝕏</div>
+          <div class="soc">in</div>
+          <div class="soc">📸</div>
+          <div class="soc">▶</div>
+          <div class="soc">🎵</div>
+        </div>
+      </div>
+    </div>
+    <div class="contact-form" id="contact-form">
+      <div class="form-row">
+        <div class="fg"><label>First Name</label><input type="text" placeholder="Anacleto"></div>
+        <div class="fg"><label>Last Name</label><input type="text" placeholder="García"></div>
+      </div>
+      <div class="fg"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+      <div class="fg">
+        <label>Topic</label>
+        <select>
+          <option value="">Select a topic...</option>
+          <option>Product Question</option>
+          <option>Order Support</option>
+          <option>Warranty Claim</option>
+          <option>Partnership</option>
+          <option>Press / Media</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="fg"><label>Message</label><textarea placeholder="Tell us how we can help you ride the future..."></textarea></div>
+      <button class="btn-primary" onclick="handleContactSubmit()" style="align-self:flex-start;">Send Message →</button>
+    </div>
+  </div>
+  <div id="contact-footer"></div>
+</div>
+
+<!-- CART OVERLAY -->
+<div class="cart-overlay" id="cart-overlay">
+  <div class="cart-backdrop" onclick="toggleCart()"></div>
+  <div class="cart-side">
+    <div class="cart-hdr">
+      <div class="cart-hdr-title">🛒 Your Cart</div>
+      <button class="cart-x" onclick="toggleCart()">×</button>
+    </div>
+    <div class="cart-items-wrap" id="cart-items-wrap">
+      <div class="cart-empty-msg show" id="cart-empty-msg">
+        <div style="font-size:3rem;margin-bottom:1rem;">🛴</div>
+        <p style="font-weight:600;margin-bottom:0.5rem;">Your cart is empty</p>
+        <p style="font-size:0.8rem;">Add a scooter and start riding the future!</p>
+      </div>
+    </div>
+    <div class="cart-ftr">
+      <div class="cart-total-row">
+        <span class="ct-lbl">Total</span>
+        <span class="ct-val" id="cart-total">€0</span>
+      </div>
+      <button class="btn-checkout" onclick="handleCheckout()">Checkout Now →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCLQKlAQNAnW2v5n5EdzDxW465a_Bgx8tU",
+    authDomain: "anacleto-dcba8.firebaseapp.com",
+    projectId: "anacleto-dcba8",
+    storageBucket: "anacleto-dcba8.firebasestorage.app",
+    messagingSenderId: "479401040293",
+    appId: "1:479401040293:web:cc8bfaa40a23464a30704c",
+    measurementId: "G-02V2BGPPMC"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+/* ===== STATE ===== */
+let products = [];
+let cart = [];
+let currentPage = 'home';
+let currentProductId = null;
+
+/* ===== SCOOTER SVG (Fallback) ===== */
+function scooterSVG(color = '#38BDF8', size = 160) {
+  return `<svg width="${size}" height="${Math.round(size*0.65)}" viewBox="0 0 240 156" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="120" cy="150" rx="90" ry="6" fill="rgba(0,0,0,0.3)"/>
+    <circle cx="47" cy="125" r="26" stroke="${color}" stroke-width="3" fill="none"/>
+    <circle cx="193" cy="128" r="23" stroke="${color}" stroke-width="3" fill="none"/>
+    <rect x="65" y="98" width="130" height="16" rx="4" fill="#080820" stroke="${color}" stroke-width="1.5"/>
+    <path d="M 26 125 Q 26 88 65 88 L 74 98" stroke="#10B981" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <line x1="162" y1="98" x2="148" y2="48" stroke="${color}" stroke-width="4" stroke-linecap="round"/>
+    <line x1="122" y1="48" x2="165" y2="48" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  </svg>`;
+}
+
+/* ===== FOOTER HTML ===== */
+function footerHTML() {
+  return `<footer>
+    <div class="footer-grid">
+      <div>
+        <div class="footer-brand">Patineto Anacleto</div>
+        <p class="footer-desc">Movilidad eléctrica premium para el cliente final. Discreto, potente y sostenible.</p>
+        <div class="social-links">
+          <div class="soc">𝕏</div>
+          <div class="soc">📸</div>
+          <div class="soc">▶</div>
+        </div>
+      </div>
+      <div>
+        <div class="fc-title">Tienda</div>
+        <ul class="fc-links">
+          <li><a onclick="showPage('shop')">Todos los Modelos</a></li>
+          <li><a onclick="showPage('about')">Nosotros</a></li>
+          <li><a onclick="showPage('contact')">Contacto</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div>© 2026 Patineto Anacleto S.L.</div>
+      <div style="display:flex;gap:1.5rem;">
+        <a onclick="location.href='admin.html'">Panel Admin</a>
+      </div>
+    </div>
+  </footer>`;
+}
+
+/* ===== PRODUCT CARD ===== */
+function productCard(p) {
+  return `<div class="product-card" onclick="showProduct('${p.id}')">
+    ${p.badge ? `<div class="card-badge" style="background:var(--accent); color:var(--bg-darker); position:absolute; padding:4px 10px; border-radius:4px; font-size:0.7rem; font-weight:800; top:10px; left:10px;">${p.badge}</div>` : ''}
+    <div class="card-img">
+      ${p.imageUrl ? `<img src="${p.imageUrl}" style="width:100%; height:100%; object-fit:contain; padding:20px;">` : `
+      <div style="filter:drop-shadow(0 0 20px ${p.accentColor}55);">
+        ${scooterSVG(p.accentColor, 180)}
+      </div>`}
+    </div>
+    <div class="card-body">
+      <div class="card-name">${p.name}</div>
+      <div class="card-tag">${p.category.toUpperCase()}</div>
+      <div class="card-footer">
+        <span class="price-big">€${p.price}</span>
+        <button class="btn-primary" style="padding: 0.5rem 1rem; font-size: 0.7rem;" onclick="event.stopPropagation();addToCart('${p.id}')">Añadir</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ===== PAGE NAVIGATION ===== */
+window.showPage = (page, pid) => {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  const nl = document.getElementById('nl-' + page);
+  if (nl) nl.classList.add('active');
+  currentPage = page;
+  window.scrollTo(0, 0);
+  if (page === 'shop') renderShop();
+  if (page === 'product' && pid) { currentProductId = pid; renderProduct(pid); }
+  initReveal();
+};
+
+window.showProduct = (id) => {
+  showPage('product', id);
+};
+
+/* ===== FETCH DATA FROM FIREBASE ===== */
+async function loadData() {
+  try {
+    const querySnapshot = await getDocs(collection(db, "productos"));
+    products = [];
+    querySnapshot.forEach((doc) => {
+      products.push({ id: doc.id, ...doc.data() });
+    });
+    renderFeatured();
+    initReveal();
+  } catch (err) {
+    console.error("Error loading products:", err);
+  }
+}
+
+/* ===== RENDER FUNCTIONS ===== */
+function renderFeatured() {
+  const featured = products.slice(0, 4);
+  const grid = document.getElementById('featured-grid');
+  if (grid) grid.innerHTML = featured.length ? featured.map(productCard).join('') : '<p style="grid-column:1/-1; text-align:center; color:var(--text-dim);">No hay productos destacados.</p>';
+}
+
+function renderShop(filter = 'all') {
+  const filtered = filter === 'all' ? products : products.filter(p => p.category === filter);
+  const grid = document.getElementById('shop-grid');
+  if (grid) grid.innerHTML = filtered.length ? filtered.map(productCard).join('') : '<p style="grid-column:1/-1; text-align:center; color:var(--text-dim);">No hay productos disponibles.</p>';
+}
+
+window.filterProds = (cat, btn) => {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderShop(cat);
+};
+
+function renderProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('pd-content').innerHTML = `
+    <button class="btn-secondary" style="margin-bottom:2rem;" onclick="showPage('shop')">← Volver a Tienda</button>
+    <div class="pd-grid">
+      <div class="pd-visual" style="border-radius:16px; background:var(--bg-darker); display:flex; align-items:center; justify-content:center;">
+        ${p.imageUrl ? `<img src="${p.imageUrl}" style="max-width:90%; max-height:400px; object-fit:contain;">` : scooterSVG(p.accentColor, 300)}
+      </div>
+      <div>
+        ${p.badge ? `<div class="pd-badge" style="background:var(--accent); color:var(--bg-darker); display:inline-block; padding:4px 12px; border-radius:4px; font-weight:800; font-size:0.8rem; margin-bottom:1rem;">${p.badge}</div>` : ''}
+        <h1 class="pd-name" style="font-family:'Orbitron'; font-size:2.5rem; margin-bottom:1rem;">${p.name}</h1>
+        <div class="pd-price" style="font-size:2rem; font-weight:800; color:var(--accent); margin-bottom:2rem;">€${p.price}</div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin-bottom:2rem;">
+          <div style="background:var(--bg-card); padding:1rem; border-radius:8px;">
+            <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase;">Velocidad</div>
+            <div style="font-weight:700;">${p.speed || 'N/A'}</div>
+          </div>
+          <div style="background:var(--bg-card); padding:1rem; border-radius:8px;">
+            <div style="font-size:0.7rem; color:var(--text-dim); text-transform:uppercase;">Autonomía</div>
+            <div style="font-weight:700;">${p.range || 'N/A'}</div>
+          </div>
+        </div>
+
+        <p class="pd-desc" style="color:var(--text-dim); line-height:1.8; margin-bottom:2rem;">${p.desc || 'Sin descripción disponible.'}</p>
+        <button class="btn-primary" style="width:100%;" onclick="addToCart('${p.id}')">Añadir al Carrito</button>
+      </div>
+    </div>`;
+  document.getElementById('prod-footer').innerHTML = footerHTML();
+}
+
+/* ===== CART ===== */
+window.addToCart = (id) => {
+  const p = products.find(x => x.id === id);
+  const existing = cart.find(x => x.id === id);
+  if (existing) existing.qty++;
+  else cart.push({ id, name: p.name, price: p.price, qty: 1, color: p.accentColor || '#38BDF8', imageUrl: p.imageUrl });
+  updateCartUI();
+  showNotif(`${p.name} añadido! 🛴`);
+};
+
+window.removeFromCart = (id) => {
+  cart = cart.filter(x => x.id !== id);
+  updateCartUI();
+};
+
+window.updateQty = (id, delta) => {
+  const item = cart.find(x => x.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) removeFromCart(id);
+  else updateCartUI();
+};
+
+function updateCartUI() {
+  const count = cart.reduce((s, x) => s + x.qty, 0);
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  document.getElementById('cart-count').textContent = count;
+  document.getElementById('cart-total').textContent = '€' + total.toLocaleString();
+  const wrap = document.getElementById('cart-items-wrap');
+  const empty = document.getElementById('cart-empty-msg');
+  
+  const existingItems = wrap.querySelectorAll('.ci');
+  existingItems.forEach(el => el.remove());
+
+  if (cart.length === 0) {
+    empty.classList.add('show');
+  } else {
+    empty.classList.remove('show');
+    cart.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'ci';
+      div.innerHTML = `
+        <div class="ci-img" style="background:var(--bg-darker); border-radius:8px; padding:5px;">
+           ${item.imageUrl ? `<img src="${item.imageUrl}" style="width:50px; height:50px; object-fit:contain;">` : scooterSVG(item.color, 50)}
+        </div>
+        <div class="ci-info">
+          <div class="ci-name" style="font-size:0.8rem; font-weight:700;">${item.name}</div>
+          <div class="ci-price" style="color:var(--accent); font-size:0.9rem;">€${item.price.toLocaleString()}</div>
+          <div class="ci-ctrl" style="display:flex; align-items:center; gap:0.5rem; margin-top:0.5rem;">
+            <button class="qty-btn" style="width:24px; height:24px; border-radius:50%; border:1px solid var(--text-dim); background:none; color:#fff; cursor:pointer;" onclick="updateQty('${item.id}',-1)">−</button>
+            <span>${item.qty}</span>
+            <button class="qty-btn" style="width:24px; height:24px; border-radius:50%; border:1px solid var(--text-dim); background:none; color:#fff; cursor:pointer;" onclick="updateQty('${item.id}',1)">+</button>
+          </div>
+        </div>
+        <button style="background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:0.7rem;" onclick="removeFromCart('${item.id}')">Quitar</button>`;
+      wrap.appendChild(div);
+    });
+  }
+}
+
+window.toggleCart = () => {
+  document.getElementById('cart-overlay').classList.toggle('open');
+};
+
+/* ===== SCROLL REVEAL ===== */
+function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  els.forEach(el => obs.observe(el));
+}
+
+/* ===== NOTIFICATION ===== */
+function showNotif(msg) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.style.transform = 'translateY(0)';
+  el.style.opacity = '1';
+  setTimeout(() => {
+    el.style.transform = 'translateY(120px)';
+    el.style.opacity = '0';
+  }, 3000);
+}
+
+/* ===== MOBILE MENU ===== */
+window.toggleMobileMenu = () => {
+  document.getElementById('mobile-menu').classList.toggle('open');
+};
+
+/* ===== CONTACT ===== */
+window.handleContactSubmit = () => {
+  showNotif('¡Mensaje enviado! Te contactaremos pronto. 🚀');
+};
+
+/* ===== INIT ===== */
+document.addEventListener('DOMContentLoaded', () => {
+  loadData();
+  document.getElementById('home-footer').innerHTML = footerHTML();
+  document.getElementById('shop-footer').innerHTML = footerHTML();
+  document.getElementById('about-footer').innerHTML = footerHTML();
+  document.getElementById('contact-footer').innerHTML = footerHTML();
+});
+</script>
+</body>
+</html>

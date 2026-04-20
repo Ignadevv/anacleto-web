@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Patineto Anacleto</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Exo+2:wght@300;400;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0F172A;
+      --bg-card: #1E293B;
+      --accent: #38BDF8;
+      --accent-secondary: #2DD4BF;
+      --text-main: #F1F5F9;
+      --text-dim: #94A3B8;
+      --white: #FFFFFF;
+      --danger: #EF4444;
+      --r: 8px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+    }
+
+    /* LOGIN OVERLAY */
+    #login-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+    }
+
+    .login-card {
+      background: var(--bg-card);
+      padding: 2.5rem;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .login-card h2 {
+      margin-bottom: 1.5rem;
+      font-family: 'Orbitron';
+      color: var(--accent);
+    }
+
+    .login-card input {
+      width: 100%;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--r);
+      color: #fff;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 1rem;
+      cursor: pointer;
+      background: var(--accent);
+      border: none;
+      border-radius: var(--r);
+      font-weight: 700;
+      color: var(--bg);
+    }
+
+    /* SIDEBAR */
+    aside {
+      width: 260px;
+      background: #020617;
+      padding: 2rem;
+      border-right: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .brand {
+      font-family: 'Orbitron';
+      font-size: 1.2rem;
+      color: var(--accent);
+      margin-bottom: 3rem;
+    }
+
+    nav ul {
+      list-style: none;
+    }
+
+    nav li {
+      margin-bottom: 1rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    nav li.active {
+      color: var(--accent);
+    }
+
+    /* MAIN CONTENT */
+    main {
+      flex: 1;
+      padding: 3rem 5%;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-family: 'Orbitron';
+      font-size: 1.5rem;
+    }
+
+    /* CRUD TABLE/CARDS */
+    .product-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .product-item {
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: var(--r);
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .product-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px;
+      background: rgba(0, 0, 0, 0.2);
+    }
+
+    .product-info {
+      flex: 1;
+    }
+
+    .p-name {
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+      font-family: 'Orbitron';
+      font-size: 1rem;
+    }
+
+    .p-price {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .btn-edit {
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-del {
+      background: rgba(239, 68, 68, 0.1);
+      color: var(--danger);
+      border: 1px solid var(--danger);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* FORM MODAL */
+    #form-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .fg {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .fg label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
+
+    .fg input,
+    .fg select,
+    .fg textarea {
+      padding: 0.75rem;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      color: #fff;
+      font-family: inherit;
+    }
+
+    .modal-actions {
+      margin-top: 2rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+    }
+
+    .btn-save {
+      background: var(--accent);
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .btn-cancel {
+      background: transparent;
+      color: var(--text-dim);
+      border: 1px solid var(--text-dim);
+      padding: 0.75rem 2rem;
+      border-radius: 4px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .loading-overlay {
+      display: none;
+      margin-top: 1rem;
+      color: var(--accent);
+      font-weight: 800;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div id="login-overlay">
+    <div class="login-card">
+      <h2>Admin Access</h2>
+      <input type="password" id="admin-pass" placeholder="Password (admin123)">
+      <button class="btn-login" onclick="checkAuth()">Entrar</button>
+    </div>
+  </div>
+
+  <aside>
+    <div class="brand">Anacleto Admin</div>
+    <nav>
+      <ul>
+        <li class="active">📦 Productos</li>
+      </ul>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="header">
+      <h1>Listado de Patinetes</h1>
+      <button class="btn-primary" onclick="openForm()">+ Nuevo Producto</button>
+    </div>
+
+    <div class="product-list" id="product-list">
+      <!-- Items from Firebase -->
+    </div>
+  </main>
+
+  <div id="form-modal">
+    <div class="modal-content">
+      <h2 id="modal-title" style="font-family: 'Orbitron';">Producto</h2>
+      <form id="product-form">
+        <input type="hidden" id="p-id">
+        <div class="form-grid">
+          <div class="fg"><label>Nombre</label><input type="text" id="p-name" required></div>
+          <div class="fg">
+            <label>Categoría</label>
+            <select id="p-cat">
+              <option value="entry">Entry Level</option>
+              <option value="mid">Mid Range</option>
+              <option value="performance">Performance</option>
+              <option value="premium">Premium</option>
+            </select>
+          </div>
+          <div class="fg"><label>Precio (€)</label><input type="number" id="p-price" required></div>
+          <div class="fg"><label>Precio Orig (€)</label><input type="number" id="p-orig"></div>
+          <div class="fg"><label>Velicidad Máx</label><input type="text" id="p-speed" placeholder="25 km/h"></div>
+          <div class="fg"><label>Autonomía</label><input type="text" id="p-range" placeholder="30 km"></div>
+          <div class="fg"><label>Peso</label><input type="text" id="p-weight" placeholder="12 kg"></div>
+          <div class="fg"><label>Carga Tiempo</label><input type="text" id="p-charging" placeholder="4h"></div>
+          <div class="fg"><label>Badge</label><input type="text" id="p-badge" placeholder="NEW, POPULAR..."></div>
+          <div class="fg"><label>Color Acento</label><input type="color" id="p-color" value="#38BDF8"></div>
+        </div>
+        <div class="fg"><label>Descripción</label><textarea id="p-desc" rows="3"></textarea></div>
+        <div class="fg"><label>Imagen</label><input type="file" id="p-img" accept="image/*"></div>
+
+        <div class="loading-overlay" id="loading">Procesando...</div>
+
+        <div class="modal-actions" id="form-buttons">
+          <button type="button" class="btn-cancel" onclick="closeForm()">Cancelar</button>
+          <button type="submit" class="btn-save">Guardar Cambios</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCLQKlAQNAnW2v5n5EdzDxW465a_Bgx8tU",
+      authDomain: "anacleto-dcba8.firebaseapp.com",
+      projectId: "anacleto-dcba8",
+      storageBucket: "anacleto-dcba8.firebasestorage.app",
+      messagingSenderId: "479401040293",
+      appId: "1:479401040293:web:cc8bfaa40a23464a30704c",
+      measurementId: "G-02V2BGPPMC"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+
+    // AUTH SIMPLE
+    window.checkAuth = () => {
+      const pass = document.getElementById('admin-pass').value;
+      if (pass === 'admin123') {
+        document.getElementById('login-overlay').style.display = 'none';
+        loadProducts();
+      } else {
+        alert('Contraseña incorrecta');
+      }
+    };
+
+    // CRUD
+    async function loadProducts() {
+      const querySnapshot = await getDocs(collection(db, "productos"));
+      const list = document.getElementById('product-list');
+      list.innerHTML = '';
+      querySnapshot.forEach((docSnap) => {
+        const p = docSnap.data();
+        const div = document.createElement('div');
+        div.className = 'product-item';
+        div.innerHTML = `
+        <img src="${p.imageUrl || 'https://via.placeholder.com/80'}" alt="">
+        <div class="product-info">
+          <div class="p-name">${p.name}</div>
+          <div class="p-price">€${p.price}</div>
+        </div>
+        <div class="actions">
+          <button class="btn-edit" onclick="editProduct('${docSnap.id}', ${JSON.stringify(p).replace(/"/g, '&quot;')})">Editar</button>
+          <button class="btn-del" onclick="deleteProduct('${docSnap.id}')">Borrar</button>
+        </div>
+      `;
+        list.appendChild(div);
+      });
+    }
+
+    window.deleteProduct = async (id) => {
+      if (confirm('¿Seguro?')) {
+        await deleteDoc(doc(db, "productos", id));
+        loadProducts();
+      }
+    };
+
+    window.openForm = () => {
+      document.getElementById('product-form').reset();
+      document.getElementById('p-id').value = '';
+      document.getElementById('modal-title').innerText = 'Nuevo Producto';
+      document.getElementById('form-modal').style.display = 'flex';
+    };
+
+    window.closeForm = () => {
+      document.getElementById('form-modal').style.display = 'none';
+    };
+
+    window.editProduct = (id, data) => {
+      openForm();
+      document.getElementById('modal-title').innerText = 'Editar Producto';
+      document.getElementById('p-id').value = id;
+      document.getElementById('p-name').value = data.name;
+      document.getElementById('p-cat').value = data.category;
+      document.getElementById('p-price').value = data.price;
+      document.getElementById('p-orig').value = data.orig || '';
+      document.getElementById('p-speed').value = data.speed || '';
+      document.getElementById('p-range').value = data.range || '';
+      document.getElementById('p-weight').value = data.weight || '';
+      document.getElementById('p-charging').value = data.charging || '';
+      document.getElementById('p-badge').value = data.badge || '';
+      document.getElementById('p-color').value = data.accentColor || '#38BDF8';
+      document.getElementById('p-desc').value = data.desc || '';
+    };
+
+    document.getElementById('product-form').onsubmit = async (e) => {
+      e.preventDefault();
+      const id = document.getElementById('p-id').value;
+      const file = document.getElementById('p-img').files[0];
+      const loading = document.getElementById('loading');
+      const buttons = document.getElementById('form-buttons');
+
+      loading.style.display = 'block';
+      buttons.style.display = 'none';
+
+      let imageUrl = null;
+      if (file) {
+        const storageRef = ref(storage, 'productos/' + file.name + Date.now());
+        await uploadBytes(storageRef, file);
+        imageUrl = await getDownloadURL(storageRef);
+      }
+
+      const data = {
+        name: document.getElementById('p-name').value,
+        category: document.getElementById('p-cat').value,
+        price: parseInt(document.getElementById('p-price').value),
+        orig: parseInt(document.getElementById('p-orig').value) || null,
+        speed: document.getElementById('p-speed').value,
+        range: document.getElementById('p-range').value,
+        weight: document.getElementById('p-weight').value,
+        charging: document.getElementById('p-charging').value,
+        badge: document.getElementById('p-badge').value,
+        accentColor: document.getElementById('p-color').value,
+        desc: document.getElementById('p-desc').value,
+        lastUpdated: new Date()
+      };
+
+      if (imageUrl) data.imageUrl = imageUrl;
+
+      try {
+        if (id) {
+          await updateDoc(doc(db, "productos", id), data);
+        } else {
+          await addDoc(collection(db, "productos"), data);
+        }
+        closeForm();
+        loadProducts();
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        loading.style.display = 'none';
+        buttons.style.display = 'flex';
+      }
+    };
+
+    // Initial load if auth is bypassed (for dev)
+    // loadProducts();
+  </script>
+
+</body>
+
+</html>
