@@ -267,6 +267,25 @@ section { padding: 120px 0; }
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 3rem;
   margin-top: 50px;
+  width: 100%;
+}
+
+.page { 
+  display: none; 
+  width: 100%; 
+  min-height: 100vh;
+  opacity: 0;
+}
+
+.page.active { 
+  display: block; 
+  opacity: 1;
+  animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .section-title {
