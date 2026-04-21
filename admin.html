@@ -56,12 +56,21 @@
       border: 1px solid rgba(255,255,255,0.05);
       box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
-    .login-card h2 { margin-bottom: 2rem; color: var(--accent); }
+    .login-card h2 { margin-bottom: 2rem; color: var(--accent); font-family: 'Orbitron'; }
     .login-card input {
       width: 100%; padding: 1rem; margin-bottom: 1rem;
       background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
       border-radius: 4px; color: #fff;
     }
+
+    .btn-login {
+      width: 100%; padding: 1.2rem; cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
+      border: none; border-radius: 4px; font-family: 'Orbitron';
+      font-weight: 900; font-size: 0.85rem; text-transform: uppercase;
+      letter-spacing: 0.2rem; color: #000; transition: all 0.4s ease;
+    }
+    .btn-login:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(56, 189, 248, 0.4); }
 
     /* SIDEBAR */
     aside {
@@ -345,9 +354,9 @@
 
   <div id="login-overlay">
     <div class="login-card">
-      <h2>Admin Access</h2>
-      <input type="password" id="admin-pass" placeholder="Password (admin123)">
-      <button class="btn-login" onclick="checkAuth()">Entrar</button>
+      <h2>Acceso Administrador</h2>
+      <input type="password" id="admin-pass" placeholder="Contraseña (admin123)">
+      <button class="btn-login" onclick="checkAuth()">Ingresar</button>
     </div>
   </div>
 
@@ -356,6 +365,7 @@
     <nav>
       <ul>
         <li class="active">📦 Productos</li>
+        <li onclick="window.location.href='index.html'" style="margin-top:2rem; opacity:0.6;">← Volver a la Web</li>
       </ul>
     </nav>
   </aside>
@@ -389,7 +399,7 @@
           </div>
           <div class="fg"><label>Precio (€)</label><input type="number" id="p-price" required></div>
           <div class="fg"><label>Precio Orig (€)</label><input type="number" id="p-orig"></div>
-          <div class="fg"><label>Velicidad Máx</label><input type="text" id="p-speed" placeholder="25 km/h"></div>
+          <div class="fg"><label>Velocidad Máx</label><input type="text" id="p-speed" placeholder="25 km/h"></div>
           <div class="fg"><label>Autonomía</label><input type="text" id="p-range" placeholder="30 km"></div>
           <div class="fg"><label>Peso</label><input type="text" id="p-weight" placeholder="12 kg"></div>
           <div class="fg"><label>Carga Tiempo</label><input type="text" id="p-charging" placeholder="4h"></div>
@@ -481,7 +491,6 @@
     };
 
     window.editProduct = (id, data) => {
-      openForm();
       document.getElementById('modal-title').innerText = 'Editar Producto';
       document.getElementById('p-id').value = id;
       document.getElementById('p-name').value = data.name;
@@ -495,6 +504,7 @@
       document.getElementById('p-badge').value = data.badge || '';
       document.getElementById('p-color').value = data.accentColor || '#38BDF8';
       document.getElementById('p-desc').value = data.desc || '';
+      document.getElementById('form-modal').style.display = 'flex';
     };
 
     // Helper to resize and convert image to Base64
@@ -574,11 +584,5 @@
       }
     };
   </script>
-
-    // Initial load if auth is bypassed (for dev)
-    // loadProducts();
-  </script>
-
 </body>
-
 </html>
