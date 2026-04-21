@@ -846,8 +846,10 @@ function productCard(p) {
 
 /* ===== FETCH DATA FROM FIREBASE ===== */
 async function loadData() {
+  console.log("📥 Iniciando descarga de productos desde Firebase...");
   try {
     const querySnapshot = await getDocs(collection(db, "productos"));
+    console.log(`✅ Conexión establecida. Documentos recibidos: ${querySnapshot.size}`);
     products = [];
     querySnapshot.forEach((doc) => {
       products.push({ id: doc.id, ...doc.data() });
@@ -1117,13 +1119,26 @@ function footerHTML() {
 }
 
 /* ===== INIT ===== */
-document.addEventListener('DOMContentLoaded', () => {
-  loadData();
-  document.getElementById('home-footer').innerHTML = footerHTML();
-  document.getElementById('shop-footer').innerHTML = footerHTML();
-  document.getElementById('about-footer').innerHTML = footerHTML();
-  document.getElementById('contact-footer').innerHTML = footerHTML();
-});
+async function initApp() {
+  console.log("🚀 Anacleto Elite App: Inicializando sistema...");
+  try {
+    await loadData();
+    
+    // Rener footers
+    const footer = footerHTML();
+    ['home-footer', 'shop-footer', 'about-footer', 'contact-footer'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.innerHTML = footer;
+    });
+
+    console.log("🏆 Sistema listo. Renderizado completado.");
+  } catch (err) {
+    console.error("🛑 Error crítico en arranque:", err);
+  }
+}
+
+// Ejecución inmediata (los módulos son diferidos por defecto)
+initApp();
 </script>
 </body>
 </html>
