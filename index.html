@@ -885,7 +885,13 @@ async function loadData() {
 
     renderFeatured();
     renderShop('all');
+    
+    // FORCE VISIBILITY: If we are on home, ensure home is active
+    if (!currentPage) currentPage = 'home';
+    showPage(currentPage, currentProductId, false);
+    
     initReveal();
+    console.log("💎 Renderizado de productos completado satisfactoriamente.");
   } catch (err) {
     console.error("Error loading products:", err);
   }
@@ -905,6 +911,7 @@ function renderShop(filter = 'all') {
 }
 
 window.filterProds = (cat, btn) => {
+  console.log(`🔍 Filtrando por: ${cat}`);
   document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderShop(cat);
@@ -1156,8 +1163,17 @@ async function initApp() {
   }
 }
 
-// Ejecución inmediata (los módulos son diferidos por defecto)
-initApp();
+// Ejecución inmediata con respaldo
+initApp().then(() => {
+  // Garantizar que la página 'home' sea visible si todo lo demás falla el primer segundo
+  setTimeout(() => {
+    if (products.length > 0 && document.getElementById('featured-list').innerHTML === "") {
+        console.warn("⚠️ Re-renderizado de emergencia activado...");
+        renderFeatured();
+        renderShop('all');
+    }
+  }, 1500);
+});
 </script>
 </body>
 </html>
