@@ -446,7 +446,7 @@ section { padding: 120px 0; }
       <div class="nav-logo-text">Anacleto</div>
     </div>
     <ul class="nav-links" id="nav-links">
-      <li><a data-page="home" onclick="showPage('home')" class="active">Home</a></li>
+      <li><a data-page="home" onclick="showPage('home')" class="active">Inicio</a></li>
       <li><a data-page="shop" onclick="showPage('shop')">Catálogo</a></li>
       <li><a data-page="about" onclick="showPage('about')">Nosotros</a></li>
       <li><a data-page="contact" onclick="showPage('contact')">Contacto</a></li>
@@ -462,7 +462,7 @@ section { padding: 120px 0; }
 
 <div class="mobile-menu" id="mobile-menu">
   <button onclick="toggleMobileMenu()" style="position:absolute; top:2rem; right:2rem; background:none; border:none; color:#fff; font-size:3rem; cursor:pointer;">×</button>
-  <a onclick="showPage('home');toggleMobileMenu()">Home</a>
+  <a onclick="showPage('home');toggleMobileMenu()">Inicio</a>
   <a onclick="showPage('shop');toggleMobileMenu()">Catálogo</a>
   <a onclick="showPage('about');toggleMobileMenu()">Nosotros</a>
   <a onclick="showPage('contact');toggleMobileMenu()">Contacto</a>
@@ -481,7 +481,7 @@ section { padding: 120px 0; }
         <p class="hero-sub">Ingeniería disruptiva y diseño de vanguardia. Redefinimos el estándar de la movilidad premium para el mundo moderno.</p>
         <div class="hero-cta">
           <button class="btn-primary" onclick="showPage('shop')">Explorar Colección</button>
-          <button class="btn-secondary" onclick="scrollTo(0,document.getElementById('home-featured').offsetTop-120)">Ver Detalles</button>
+          <button class="btn-secondary" onclick="document.getElementById('home-featured').scrollIntoView({behavior:'smooth'})">Ver Detalles</button>
         </div>
       </div>
     </div>
@@ -491,7 +491,7 @@ section { padding: 120px 0; }
   <section id="home-featured" style="background: #010410;">
     <div class="container">
       <div class="section-header reveal">
-        <span class="hero-eyebrow">Top Selection</span>
+        <span class="hero-eyebrow">Selección Elite</span>
         <h2 class="section-title">Modelos <span style="color:var(--accent)">Destacados</span></h2>
         <div class="glow-line"></div>
       </div>
@@ -576,15 +576,15 @@ section { padding: 120px 0; }
 <div class="page" id="page-shop">
   <section style="padding:4rem 5%;">
     <div class="section-header">
-      <div class="eyebrow">Our Collection</div>
-      <h2 class="section-title">All Models</h2>
+      <div class="eyebrow">Nuestra Colección</div>
+      <h2 class="section-title">Todos los Modelos</h2>
       <div class="glow-div"></div>
     </div>
     <div class="shop-filters" id="shop-filters">
-      <button class="filter-btn active" onclick="filterProds('all',this)">All Models</button>
-      <button class="filter-btn" onclick="filterProds('entry',this)">Entry Level</button>
-      <button class="filter-btn" onclick="filterProds('mid',this)">Mid Range</button>
-      <button class="filter-btn" onclick="filterProds('performance',this)">Performance</button>
+      <button class="filter-btn active" onclick="filterProds('all',this)">Todos los Modelos</button>
+      <button class="filter-btn" onclick="filterProds('entry',this)">Nivel Entrada</button>
+      <button class="filter-btn" onclick="filterProds('mid',this)">Gama Media</button>
+      <button class="filter-btn" onclick="filterProds('performance',this)">Alto Rendimiento</button>
       <button class="filter-btn" onclick="filterProds('premium',this)">Premium</button>
     </div>
     <div class="products-grid" id="shop-grid"></div>
@@ -684,14 +684,14 @@ section { padding: 120px 0; }
   <div class="cart-backdrop" onclick="toggleCart()"></div>
   <div class="cart-side">
     <div class="cart-hdr">
-      <div class="cart-hdr-title">🛒 Your Cart</div>
+      <div class="cart-hdr-title">🛒 Tu Carrito</div>
       <button class="cart-x" onclick="toggleCart()">×</button>
     </div>
     <div class="cart-items-wrap" id="cart-items-wrap">
       <div class="cart-empty-msg show" id="cart-empty-msg">
         <div style="font-size:3rem;margin-bottom:1rem;">🛴</div>
-        <p style="font-weight:600;margin-bottom:0.5rem;">Your cart is empty</p>
-        <p style="font-size:0.8rem;">Add a scooter and start riding the future!</p>
+        <p style="font-weight:600;margin-bottom:0.5rem;">Tu carrito está vacío</p>
+        <p style="font-size:0.8rem;">¡Añade un patinete y empieza a rodar hacia el futuro!</p>
       </div>
     </div>
     <div class="cart-ftr">
@@ -699,7 +699,7 @@ section { padding: 120px 0; }
         <span class="ct-lbl">Total</span>
         <span class="ct-val" id="cart-total">€0</span>
       </div>
-      <button class="btn-checkout" onclick="handleCheckout()">Checkout Now →</button>
+      <button class="btn-checkout" onclick="handleCheckout()">Finalizar Compra Ahora →</button>
     </div>
   </div>
 </div>
@@ -781,7 +781,7 @@ async function renderProduct(id) {
       ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : scooterSVG(p.accentColor, 400)}
     </div>
     <div class="pd-info reveal">
-      <div class="hero-eyebrow">${p.category.toUpperCase()} SERIES</div>
+      <div class="hero-eyebrow">SERIE ${p.category.toUpperCase()}</div>
       <h1>${p.name}</h1>
       <div class="pd-price">€${p.price}</div>
       <p class="hero-sub" style="margin: 0;">${p.desc || 'Experimenta la máxima potencia y confort con el nuevo ${p.name}. Diseñado para el rendimiento en ciudad.'}</p>
@@ -844,9 +844,9 @@ async function loadData() {
     // SEED: If DB is empty, show elite mockups to impress client
     if (products.length === 0) {
       products = [
-        { id: 'seed1', name: 'Anacleto Apollo X', price: 1299, category: 'performance', accentColor: '#38BDF8', desc: 'Edición limitada con motor dual de 2000W y suspensión magnética.' },
+        { id: 'seed1', name: 'Anacleto Apollo X', price: 1299, category: 'alto rendimiento', accentColor: '#38BDF8', desc: 'Edición limitada con motor dual de 2000W y suspensión magnética.' },
         { id: 'seed2', name: 'Nebula Elite', price: 2150, category: 'premium', accentColor: '#fbbf24', desc: 'Chasis de fibra de carbono aeroespacial y autonomía extendida de 90km.' },
-        { id: 'seed3', name: 'Urban Scout', price: 899, category: 'mid', accentColor: '#10b981', desc: 'El compañero perfecto para la ciudad: ligero, potente y con carga rápida.' }
+        { id: 'seed3', name: 'Urban Scout', price: 899, category: 'gama media', accentColor: '#10b981', desc: 'El compañero perfecto para la ciudad: ligero, potente y con carga rápida.' }
       ];
     }
 
@@ -1006,10 +1006,54 @@ window.closeMobileMenu = () => {
   document.getElementById('mobile-menu').classList.remove('active');
 };
 
-/* ===== CONTACT ===== */
-window.handleContactSubmit = () => {
-  showNotif('¡Mensaje enviado! Te contactaremos pronto. 🚀');
+/* ===== CHECKOUT ===== */
+window.handleCheckout = () => {
+  if (cart.length === 0) return showNotif('El carrito está vacío');
+  
+  let msg = '¡Hola! Me gustaría comprar los siguientes patinetes:\n\n';
+  cart.forEach(item => {
+    msg += `- ${item.name} (x${item.qty}): €${(item.price * item.qty).toLocaleString()}\n`;
+  });
+  msg += `\nTotal: €${cart.reduce((s, x) => s + x.price * x.qty, 0).toLocaleString()}\n\n¿Están disponibles?`;
+  
+  const encoded = encodeURIComponent(msg);
+  window.open(`https://wa.me/34600000000?text=${encoded}`, '_blank');
 };
+
+/* ===== FOOTER GENERATOR ===== */
+function footerHTML() {
+  return `
+  <footer style="background:#010414; padding:80px 5% 40px; border-top:1px solid var(--border);">
+    <div class="container" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:4rem; margin-bottom:60px;">
+      <div>
+        <div class="nav-logo" style="margin-bottom:1.5rem;">
+          <img src="logo.jpeg" alt="Logo" style="width:55px; height:55px; border-radius:50%; border:1px solid var(--accent); padding:2px;">
+          <div class="nav-logo-text" style="font-size:1.1rem;">Anacleto</div>
+        </div>
+        <p style="color:var(--text-dim); line-height:1.8;">Redefiniendo la movilidad urbana con tecnología aeroespacial y diseño de vanguardia. Únete a la revolución eléctrica.</p>
+      </div>
+      <div>
+        <h4 style="font-family:'Orbitron'; margin-bottom:1.5rem; font-size:0.9rem; letter-spacing:0.1em; color:var(--accent);">NAVEGACIÓN</h4>
+        <ul style="list-style:none; display:grid; gap:0.8rem;">
+          <li><a onclick="showPage('home')" style="color:var(--text-dim); text-decoration:none; cursor:pointer;">Inicio</a></li>
+          <li><a onclick="showPage('shop')" style="color:var(--text-dim); text-decoration:none; cursor:pointer;">Catálogo</a></li>
+          <li><a onclick="showPage('about')" style="color:var(--text-dim); text-decoration:none; cursor:pointer;">Nosotros</a></li>
+          <li><a onclick="showPage('contact')" style="color:var(--text-dim); text-decoration:none; cursor:pointer;">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 style="font-family:'Orbitron'; margin-bottom:1.5rem; font-size:0.9rem; letter-spacing:0.1em; color:var(--accent);">ACCESO</h4>
+        <ul style="list-style:none; display:grid; gap:0.8rem;">
+          <li><a href="admin.html" style="color:var(--accent); text-decoration:none; font-weight:700;">Panel de Control</a></li>
+          <li><a style="color:var(--text-dim); text-decoration:none; cursor:pointer;">Soporte Técnico</a></li>
+        </ul>
+      </div>
+    </div>
+    <div style="text-align:center; padding-top:40px; border-top:1px solid rgba(255,255,255,0.05); color:var(--text-dim); font-size:0.85rem;">
+      © 2026 Patineto Anacleto. Todos los derechos reservados.
+    </div>
+  </footer>`;
+}
 
 /* ===== INIT ===== */
 document.addEventListener('DOMContentLoaded', () => {

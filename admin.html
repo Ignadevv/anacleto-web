@@ -38,107 +38,60 @@
     /* LOGIN OVERLAY */
     #login-overlay {
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: var(--bg);
       display: flex;
       align-items: center;
       justify-content: center;
       z-index: 10000;
+      backdrop-filter: blur(10px);
     }
-
     .login-card {
       background: var(--bg-card);
-      padding: 2.5rem;
+      padding: 3rem;
       border-radius: 16px;
       width: 100%;
       max-width: 400px;
       text-align: center;
+      border: 1px solid rgba(255,255,255,0.05);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
     }
-
-    .login-card h2 {
-      margin-bottom: 1.5rem;
-      font-family: 'Orbitron';
-      color: var(--accent);
-    }
-
+    .login-card h2 { margin-bottom: 2rem; color: var(--accent); }
     .login-card input {
-      width: 100%;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: var(--r);
-      color: #fff;
-    }
-
-    .btn-login {
-      width: 100%;
-      padding: 1.2rem;
-      cursor: pointer;
-      background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-      border: none;
-      border-radius: 4px;
-      font-family: 'Orbitron';
-      font-weight: 900;
-      font-size: 0.85rem;
-      text-transform: uppercase;
-      letter-spacing: 0.2rem;
-      color: #000;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(56, 189, 248, 0.3);
-    }
-
-    .btn-login::before {
-      content: '';
-      position: absolute;
-      top: 0; left: -100%;
-      width: 100%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-      transition: 0.6s;
-    }
-
-    .btn-login:hover::before { left: 100%; }
-    .btn-login:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 30px rgba(56, 189, 248, 0.5);
-      background: #fff;
+      width: 100%; padding: 1rem; margin-bottom: 1rem;
+      background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 4px; color: #fff;
     }
 
     /* SIDEBAR */
     aside {
-      width: 260px;
+      width: 280px;
       background: #020617;
-      padding: 2rem;
+      padding: 2.5rem;
       border-right: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      flex-direction: column;
     }
-
     .brand {
       font-family: 'Orbitron';
       font-size: 1.2rem;
+      font-weight: 900;
       color: var(--accent);
       margin-bottom: 3rem;
+      letter-spacing: 2px;
     }
-
-    nav ul {
-      list-style: none;
-    }
-
+    nav ul { list-style: none; }
     nav li {
-      margin-bottom: 1rem;
+      padding: 1rem 0;
       color: var(--text-dim);
       cursor: pointer;
       font-weight: 600;
-      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
     }
-
-    nav li.active {
-      color: var(--accent);
-    }
+    nav li:hover, nav li.active { color: var(--accent); }
 
     /* MAIN CONTENT */
     main {
@@ -428,9 +381,9 @@
           <div class="fg">
             <label>Categoría</label>
             <select id="p-cat">
-              <option value="entry">Entry Level</option>
-              <option value="mid">Mid Range</option>
-              <option value="performance">Performance</option>
+              <option value="entry">Nivel Entrada</option>
+              <option value="mid">Gama Media</option>
+              <option value="performance">Alto Rendimiento</option>
               <option value="premium">Premium</option>
             </select>
           </div>
