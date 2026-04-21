@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Patineto Anacleto | Ride the Future</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Exo+2:ital,wght@0,300;0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<!-- PayPal SDK with EUR -->
+<script src="https://www.paypal.com/sdk/js?client-id=ASDQKYlJVoxVBQQE2bP-xv9SrkB722bsjdUa5PHZSV6tNW6X7v1auEzBIvoFg7EJbOzdANOIbWbtg6J1&currency=EUR"></script>
 <style>
 :root {
   --bg: #010414; /* Deep Tech Black/Navy */
@@ -860,7 +862,7 @@ async function loadData() {
 /* ===== RENDER FUNCTIONS ===== */
 function renderFeatured() {
   const featured = products.slice(0, 4);
-  const grid = document.getElementById('featured-grid');
+  const grid = document.getElementById('featured-list');
   if (grid) grid.innerHTML = featured.length ? featured.map(productCard).join('') : '<p style="grid-column:1/-1; text-align:center; color:var(--text-dim);">No hay productos destacados.</p>';
 }
 
@@ -902,9 +904,17 @@ function renderProduct(id) {
         </div>
 
         <p class="pd-desc" style="color:var(--text-dim); line-height:1.8; margin-bottom:2rem;">${p.desc || 'Sin descripción disponible.'}</p>
-        <button class="btn-primary" style="width:100%;" onclick="addToCart('${p.id}')">Añadir al Carrito</button>
+        
+        <!-- PAYPAL BUTTON CONTAINER -->
+        <div id="paypal-button-container" style="margin-bottom: 1.5rem;"></div>
+
+        <button class="btn-primary" style="width:100%; margin-bottom: 1rem;" onclick="addToCart('${p.id}')">Añadir al Carrito</button>
       </div>
     </div>`;
+  
+  // Initialize PayPal button for this product
+  initPaypal(p);
+  
   document.getElementById('prod-footer').innerHTML = footerHTML();
 }
 
@@ -996,6 +1006,46 @@ function showNotif(msg) {
     el.style.transform = 'translateY(120px)';
     el.style.opacity = '0';
   }, 3000);
+}
+
+/* ===== PAYPAL INTEGRATION ===== */
+function initPaypal(product) {
+  const container = document.getElementById('paypal-button-container');
+  if (!container) return;
+  
+  // Clear previous buttons if any
+  container.innerHTML = '';
+  
+  paypal.Buttons({
+    style: {
+      layout: 'vertical',
+      color:  'gold',
+      shape:  'rect',
+      label:  'pay',
+      height: 45
+    },
+    createOrder: function(data, actions) {
+      return actions.order.create({
+        purchase_units: [{
+          amount: {
+            currency_code: 'EUR',
+            value: product.price.toString()
+          },
+          description: `Patineto Anacleto: ${product.name}`
+        }]
+      });
+    },
+    onApprove: function(data, actions) {
+      return actions.order.capture().then(function(details) {
+        showNotif(`¡Gracias por tu compra, ${details.payer.name.given_name}! 🚀`);
+        // Optional: save order to Firebase or redirect
+      });
+    },
+    onError: function(err) {
+      console.error('PayPal Error:', err);
+      showNotif('Error en el proceso de pago. ❌');
+    }
+  }).render('#paypal-button-container');
 }
 
 /* ===== MOBILE MENU ===== */
