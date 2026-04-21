@@ -279,8 +279,7 @@ section { padding: 120px 0; }
 
 .page.active { 
   display: block; 
-  opacity: 1 !important;
-  visibility: visible !important;
+  opacity: 1;
 }
 
 @keyframes fadeIn {
@@ -853,7 +852,7 @@ function productCard(p) {
       ${p.imageUrl ? `<img src="${p.imageUrl}" style="width:100%; height:100%; object-fit:contain;">` : scooterSVG(p.accentColor, 200)}
     </div>
     <div class="card-body">
-      <div class="card-name" style="opacity:1 !important; visibility:visible !important;">${p.name}</div>
+      <div class="card-name">${p.name}</div>
       <div class="card-tag" style="margin-bottom:1rem; opacity:0.6;">${(p.category || 'GENERAL').toUpperCase()}</div>
       <div class="card-footer">
         <span class="price-big">€${p.price}</span>
@@ -905,13 +904,10 @@ function renderFeatured() {
 }
 
 function renderShop(filter = 'all') {
-  console.log("🛠️ Forzando renderizado de tienda...");
   const filtered = filter === 'all' ? products : products.filter(p => (p.category || '').toLowerCase() === filter.toLowerCase());
   const grid = document.getElementById('shop-grid');
   if (grid) {
     grid.innerHTML = filtered.length ? filtered.map(productCard).join('') : '<p style="grid-column:1/-1; text-align:center; color:var(--text-dim);">No hay productos disponibles.</p>';
-    grid.style.opacity = "1";
-    grid.style.visibility = "visible";
   }
 }
 
@@ -1168,21 +1164,8 @@ async function initApp() {
   }
 }
 
-// Ejecución inmediata con respaldo agresivo
-initApp().then(() => {
-  // Vigilante de emergencia: revisa la visibilidad cada segundo
-  const emergencyCheck = setInterval(() => {
-    const featured = document.getElementById('featured-list');
-    if (products.length > 0 && (!featured || featured.innerHTML === "" || featured.innerHTML.includes('JS rendered'))) {
-        console.warn("🚨 ALERTA: Renderizado fallido detectado. Forzando re-inyección...");
-        renderFeatured();
-        renderShop('all');
-    } else if (products.length > 0) {
-        console.log("✅ Verificación de visibilidad: OK.");
-        clearInterval(emergencyCheck);
-    }
-  }, 1000);
-});
+// Ejecución inicial
+initApp();
 </script>
 </body>
 </html>
