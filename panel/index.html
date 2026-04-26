@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Reparaciones | Anacleto</title>
+  <base href="/panel/">
+  <meta name="description" content="Panel de gestión de reparaciones de patinetes eléctricos Anacleto">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Mobile Toggle -->
+  <button class="mobile-toggle" onclick="document.querySelector('.sidebar').classList.toggle('open')">☰</button>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="icon">⚡</div>
+      <div>
+        <h2>ANACLETO</h2>
+        <span>Taller de Reparación</span>
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Principal</div>
+      <div class="nav-item active" data-view="dashboard" onclick="navigate('dashboard')">
+        <span class="emoji">📊</span> Dashboard
+      </div>
+      <div class="nav-item" data-view="ordenes" onclick="navigate('ordenes')">
+        <span class="emoji">🔧</span> Órdenes
+      </div>
+      <div class="nav-item" data-view="clientes" onclick="navigate('clientes')">
+        <span class="emoji">👥</span> Clientes
+      </div>
+      <div class="nav-item" data-view="recordatorios" onclick="navigate('recordatorios')">
+        <span class="emoji">📝</span> Recordatorios
+      </div>
+    </div>
+
+    <div class="nav-section">
+      <div class="nav-section-title">Enlace</div>
+      <div class="nav-item" onclick="window.location.href='../admin.html'">
+        <span class="emoji">📦</span> Productos
+      </div>
+      <div class="nav-item" onclick="window.location.href='../index.html'">
+        <span class="emoji">🌐</span> Tienda Web
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">A</div>
+        <div>
+          <div style="font-weight:700;font-size:0.85rem;" id="user-name">Admin</div>
+          <div class="user-email" id="user-email">...@anacleto.com</div>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Cerrar Sesión</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- ===== VIEW: DASHBOARD ===== -->
+    <section class="view active" id="view-dashboard">
+      <div class="page-header">
+        <div>
+          <h1>📊 Dashboard</h1>
+          <p class="subtitle">Resumen de actividad del taller</p>
+        </div>
+        <button class="btn btn-primary" onclick="openOrderForm()">+ Nueva Cotización</button>
+      </div>
+
+      <div class="kpi-grid">
+        <div class="kpi-card" style="--card-color: var(--warning)">
+          <div class="kpi-icon">⏳</div>
+          <div class="kpi-value" id="kpi-pendientes">0</div>
+          <div class="kpi-label">Pendientes</div>
+        </div>
+        <div class="kpi-card" style="--card-color: var(--info)">
+          <div class="kpi-icon">🔧</div>
+          <div class="kpi-value" id="kpi-reparacion">0</div>
+          <div class="kpi-label">En Reparación</div>
+        </div>
+        <div class="kpi-card" style="--card-color: var(--success)">
+          <div class="kpi-icon">✅</div>
+          <div class="kpi-value" id="kpi-listos">0</div>
+          <div class="kpi-label">Listos</div>
+        </div>
+        <div class="kpi-card" style="--card-color: var(--accent2)">
+          <div class="kpi-icon">💰</div>
+          <div class="kpi-value" id="kpi-ingresos">€0</div>
+          <div class="kpi-label">Ingresos del Mes</div>
+        </div>
+      </div>
+
+      <div class="table-container">
+        <div class="table-toolbar">
+          <h3 class="font-tech" style="font-size:0.9rem;">Últimas Cotizaciones</h3>
+        </div>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Cliente</th><th>Patinete</th><th>Estado</th><th>Fecha</th><th>Total</th></tr>
+          </thead>
+          <tbody id="recent-orders">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: ÓRDENES ===== -->
+    <section class="view" id="view-ordenes">
+      <div class="page-header">
+        <div>
+          <h1>🔧 Cotizaciones de Reparación</h1>
+          <p class="subtitle">Gestiona todas las cotizaciones del taller</p>
+        </div>
+        <button class="btn btn-primary" onclick="openOrderForm()">+ Nueva Cotización</button>
+      </div>
+
+      <div class="table-container">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="search-orders" placeholder="Buscar por cliente, patinete..." oninput="filterOrders()">
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="todos" onclick="setFilter('todos',this)">Todos</button>
+            <button class="filter-btn" data-filter="pendiente" onclick="setFilter('pendiente',this)">Pendiente</button>
+            <button class="filter-btn" data-filter="en_reparacion" onclick="setFilter('en_reparacion',this)">En Reparación</button>
+            <button class="filter-btn" data-filter="listo" onclick="setFilter('listo',this)">Listo</button>
+            <button class="filter-btn" data-filter="entregado" onclick="setFilter('entregado',this)">Entregado</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>#</th><th>Cliente</th><th>Patinete</th><th>Fallos</th><th>Estado</th><th>Entrada</th><th>Total</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="orders-table">
+            <tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: CLIENTES ===== -->
+    <section class="view" id="view-clientes">
+      <div class="page-header">
+        <div>
+          <h1>👥 Clientes</h1>
+          <p class="subtitle">Directorio de clientes del taller</p>
+        </div>
+        <button class="btn btn-primary" onclick="openClientForm()">+ Nuevo Cliente</button>
+      </div>
+
+      <div class="table-container">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="search-clients" placeholder="Buscar por nombre, teléfono, DNI..." oninput="filterClients()">
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Nombre</th><th>Teléfono</th><th>Reparaciones</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="clients-table">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <!-- ===== VIEW: RECORDATORIOS ===== -->
+    <section class="view" id="view-recordatorios">
+      <div class="page-header">
+        <div>
+          <h1>📝 Recordatorios</h1>
+          <p class="subtitle">Gestiona notas y tareas pendientes del taller</p>
+        </div>
+        <div class="header-actions" style="display:flex; gap:1rem;">
+          <div class="search-box">
+             <input type="text" id="new-note-input" placeholder="Escribir un recordatorio..." style="min-width:300px;" onkeypress="if(event.key==='Enter') addNote()">
+          </div>
+          <button class="btn btn-primary" onclick="addNote()">Añadir Nota</button>
+        </div>
+      </div>
+
+      <div id="notes-grid" class="notes-grid">
+        <!-- Notas se cargan aquí -->
+      </div>
+    </section>
+  </div>
+
+  <!-- ===== MODAL: ORDEN ===== -->
+  <div class="modal-overlay" id="modal-order">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="order-modal-title">Nueva Cotización de Reparación</h2>
+        <button class="modal-close" onclick="closeModal('modal-order')">✕</button>
+      </div>
+      <div class="modal-body">
+        <!-- Wizard Steps -->
+        <div class="wizard-steps">
+          <div class="wizard-step active" data-step="1"><div class="step-num">1</div><div class="step-label">Cliente</div></div>
+          <div class="wizard-step" data-step="2"><div class="step-num">2</div><div class="step-label">Patinete</div></div>
+          <div class="wizard-step" data-step="3"><div class="step-num">3</div><div class="step-label">Reparación</div></div>
+        </div>
+        <form id="order-form" onsubmit="return false;">
+          <input type="hidden" id="order-id">
+
+          <!-- STEP 1: Cliente -->
+          <div class="wizard-panel active" id="step-1">
+            <div class="form-section-title">Datos del Cliente</div>
+            <div class="form-group">
+              <label>Buscar cliente existente</label>
+              <select id="order-client-select" onchange="onClientSelect()">
+                <option value="">— Crear nuevo cliente —</option>
+              </select>
+            </div>
+            <div id="client-fields">
+              <div class="form-row">
+                <div class="form-group"><label>Nombre completo *</label><input type="text" id="oc-nombre" required><span class="form-error">Nombre obligatorio</span></div>
+                <div class="form-group"><label>Teléfono *</label><input type="tel" id="oc-telefono" placeholder="+34 612 345 678" required><span class="form-error">Formato: +34 6XX XXX XXX</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- STEP 2: Patinete -->
+            <div class="form-row">
+              <div class="form-group"><label>Marca *</label><input type="text" id="op-marca" placeholder="Xiaomi, Segway, Cecotec..." required><span class="form-error">Marca obligatoria</span></div>
+              <div class="form-group"><label>Modelo *</label><input type="text" id="op-modelo" placeholder="Pro 2, Ninebot Max..." required><span class="form-error">Modelo obligatorio</span></div>
+            </div>
+          </div>
+
+          <!-- STEP 3: Reparación -->
+          <div class="wizard-panel" id="step-3">
+            <div class="form-section-title">Fallos Diagnosticados</div>
+            <div class="dynamic-list" id="fallos-list"></div>
+            <button type="button" class="btn-add-item" onclick="addFallo()">+ Añadir Fallo</button>
+
+            <div class="form-section-title" style="margin-top:2rem;">Piezas Utilizadas</div>
+            <div class="dynamic-list" id="piezas-list"></div>
+            <button type="button" class="btn-add-item" onclick="addPieza()">+ Añadir Pieza</button>
+
+            <div class="form-section-title" style="margin-top:2rem;">Detalles de la Cotización</div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Estado</label>
+                <select id="or-estado">
+                  <option value="pendiente">⏳ Pendiente</option>
+                  <option value="en_reparacion">🔧 En Reparación</option>
+                  <option value="listo">✅ Listo para recoger</option>
+                  <option value="entregado">📦 Entregado</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Total con IVA (€) *</label><input type="number" id="or-coste" step="0.01" min="0" required><span class="form-error">Debe ser un número positivo</span></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Nº de Factura (opcional)</label><input type="number" id="or-num-factura" placeholder="Dejar vacío para auto"></div>
+              <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; padding-top:1.5rem;">
+                <input type="checkbox" id="or-solo-total-piezas" style="width:auto; cursor:pointer;">
+                <label for="or-solo-total-piezas" style="margin:0; cursor:pointer; font-size:0.85rem;">Solo sumar total en piezas</label>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Método de Pago</label>
+                <select id="or-metodo-pago">
+                  <option value="efectivo">💵 Efectivo</option>
+                  <option value="tarjeta">💳 Tarjeta</option>
+                  <option value="bizum">📱 Bizum</option>
+                  <option value="transferencia">🏦 Transferencia</option>
+                </select>
+              </div>
+              <div class="form-group"><label>Pago Adelantado (€)</label><input type="number" id="or-pago-adelantado" step="0.01" min="0" value="0"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group"><label>Fecha Entrada</label><input type="date" id="or-fecha-entrada"></div>
+              <div class="form-group"><label>Fecha Salida</label><input type="date" id="or-fecha-salida"><span class="form-error">No puede ser antes de la entrada</span></div>
+            </div>
+            <div class="form-group"><label>Recomendaciones</label><input type="text" id="or-garantia" placeholder="ej: Revisar presión de neumáticos cada semana"></div>
+            <div class="form-group"><label>Notas internas</label><textarea id="or-notas" rows="3" style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Exo 2';font-size:0.9rem;outline:none;resize:vertical;"></textarea></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="btn-prev-step" onclick="wizardPrev()" style="display:none;">← Anterior</button>
+        <div style="flex:1;"></div>
+        <button class="btn btn-secondary" onclick="closeModal('modal-order')">Cancelar</button>
+        <button class="btn btn-primary" id="btn-next-step" onclick="wizardNext()">Siguiente →</button>
+        <button class="btn btn-secondary" id="btn-save-order" onclick="saveOrder()" style="display:none;">💾 Solo Guardar</button>
+        <button class="btn btn-primary" id="btn-save-pdf" onclick="saveAndGeneratePDF()" style="display:none;">📄 Guardar y Generar Cotización PDF</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: CLIENTE ===== -->
+  <div class="modal-overlay" id="modal-client">
+    <div class="modal" style="max-width:550px;">
+      <div class="modal-header">
+        <h2 id="client-modal-title">Nuevo Cliente</h2>
+        <button class="modal-close" onclick="closeModal('modal-client')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="client-form" onsubmit="return false;">
+          <input type="hidden" id="client-id">
+          <div class="form-row">
+            <div class="form-group"><label>Nombre completo *</label><input type="text" id="cf-nombre" required><span class="form-error">Nombre obligatorio</span></div>
+            <div class="form-group"><label>Teléfono *</label><input type="tel" id="cf-telefono" placeholder="+34 612 345 678" required><span class="form-error">Formato inválido</span></div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-client')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveClient()">💾 Guardar Cliente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: DETALLE ORDEN ===== -->
+  <div class="modal-overlay" id="modal-detail">
+    <div class="modal" style="max-width:650px;">
+      <div class="modal-header">
+        <h2>Detalle de Cotización</h2>
+        <button class="modal-close" onclick="closeModal('modal-detail')">✕</button>
+      </div>
+      <div class="modal-body" id="detail-body"></div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-detail')">Cerrar</button>
+        <button class="btn btn-info" id="btn-share-track" style="background:#25d366; color:#fff; border:none;">📱 Compartir Seguimiento</button>
+        <button class="btn btn-success" id="btn-detail-pdf">📄 Generar Cotización</button>
+        <button class="btn btn-primary" id="btn-detail-invoice" style="background:var(--accent2); color:#000;">🧾 Generar Factura</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <!-- CDN: jsPDF + AutoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Firebase Compat CDN (no modules needed) -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    // ===== FIREBASE SETUP =====
+    firebase.initializeApp({
+      apiKey: "AIzaSyCLQKlAQNAnW2v5n5EdzDxW465a_Bgx8tU",
+      authDomain: "anacleto-dcba8.firebaseapp.com",
+      projectId: "anacleto-dcba8",
+      storageBucket: "anacleto-dcba8.firebasestorage.app",
+      messagingSenderId: "479401040293",
+      appId: "1:479401040293:web:cc8bfaa40a23464a30704c"
+    });
+    var auth = firebase.auth();
+    var db = firebase.firestore();
+
+    var allOrders = [];
+    var allClients = [];
+    var allNotes = [];
+    var currentFilter = "todos";
+    var currentWizardStep = 1;
+    var falloCounter = 0;
+    var piezaCounter = 0;
+
+    // ===== AUTH GUARD =====
+    auth.onAuthStateChanged(function(user) {
+      if (!user) { window.location.href = "login.html"; return; }
+      document.getElementById("user-email").textContent = user.email;
+      document.getElementById("user-name").textContent = user.email.split("@")[0];
+      document.getElementById("user-avatar").textContent = user.email.charAt(0).toUpperCase();
+      loadAllData();
+    });
+
+    function showToast(msg, type) {
+      var t = document.getElementById("toast");
+      t.textContent = msg;
+      t.className = "toast toast-" + (type || "success") + " show";
+      setTimeout(function() { t.classList.remove("show"); }, 3000);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add("active"); }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("active");
+      if (id === "modal-order") resetWizard();
+    }
+
+    // ===== DATA =====
+    async function loadAllData() {
+      try { await Promise.all([loadOrders(), loadClients(), loadNotes()]); } catch(e) { console.error(e); }
+      updateKPIs(); renderRecentOrders(); renderOrdersTable(); renderClientsTable(); renderNotes(); populateClientSelect();
+    }
+
+    async function loadOrders() {
+      try {
+        var snap = await db.collection("reparaciones").orderBy("fechaEntrada", "desc").get();
+        allOrders = []; snap.forEach(function(d) { allOrders.push(Object.assign({id: d.id}, d.data())); });
+      } catch(e) {
+        try {
+          var snap2 = await db.collection("reparaciones").get();
+          allOrders = []; snap2.forEach(function(d) { allOrders.push(Object.assign({id: d.id}, d.data())); });
+        } catch(e2) { allOrders = []; }
+      }
+    }
+
+    async function loadClients() {
+      try {
+        var snap = await db.collection("clientes").get();
+        allClients = []; snap.forEach(function(d) { allClients.push(Object.assign({id: d.id}, d.data())); });
+      } catch(e) { allClients = []; }
+    }
+
+    function formatDate(val) {
+      if (!val) return "—"; var d = val.toDate ? val.toDate() : new Date(val);
+      return d.toLocaleDateString("es-ES", {day:"2-digit", month:"short", year:"numeric"});
+    }
+    function statusBadge(st) {
+      var l = {pendiente:"⏳ Pendiente", en_reparacion:"🔧 En Reparación", listo:"✅ Listo", entregado:"📦 Entregado"};
+      return '<span class="badge badge-'+st+'">'+(l[st]||st)+'</span>';
+    }
+    function truncStr(s, n) { if(!s) return "—"; n=n||30; return s.length>n?s.slice(0,n)+"...":s; }
+
+    function updateKPIs() {
+      var c = {pendiente:0, en_reparacion:0, listo:0, entregado:0}; var ing = 0; var now = new Date();
+      allOrders.forEach(function(o) {
+        if(c[o.estado]!==undefined) c[o.estado]++;
+        if(o.estado==="entregado"&&o.fechaSalida) {
+          var fs = o.fechaSalida.toDate?o.fechaSalida.toDate():new Date(o.fechaSalida);
+          if(fs.getMonth()===now.getMonth()&&fs.getFullYear()===now.getFullYear()) ing+=parseFloat(o.costeTotal)||0;
+        }
+      });
+      document.getElementById("kpi-pendientes").textContent = c.pendiente;
+      document.getElementById("kpi-reparacion").textContent = c.en_reparacion;
+      document.getElementById("kpi-listos").textContent = c.listo;
+      document.getElementById("kpi-ingresos").textContent = "€"+ing.toFixed(0);
+    }
+
+    function renderRecentOrders() {
+      var tb = document.getElementById("recent-orders"); var rec = allOrders.slice(0,5);
+      if(!rec.length) { tb.innerHTML='<tr><td colspan="6" class="empty-state"><p>No hay cotizaciones todavía</p></td></tr>'; return; }
+      var h=""; rec.forEach(function(o,i) {
+        h+='<tr>';
+        h+='<td style="color:var(--text-dim);">#'+String(i+1).padStart(3,"0")+'</td>';
+        h+='<td style="font-weight:600;">'+(o.clienteNombre||"—")+'</td>';
+        h+='<td>'+((o.patinete&&o.patinete.marca)||"")+' '+((o.patinete&&o.patinete.modelo)||"")+'</td>';
+        h+='<td>'+statusBadge(o.estado)+'</td>';
+        h+='<td style="font-weight:700;color:var(--accent);">€'+parseFloat(o.costeTotal||0).toFixed(2)+'</td>';
+        h+='<td><div style="display:flex;gap:0.4rem;">';
+        h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')">👁</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" style="background:rgba(255,255,255,0.05);padding: 0.45rem 0.6rem;">📄</button>';
+        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')">🟢 Listo</button>';
+        h+='</div></td></tr>';
+      }); tb.innerHTML=h;
+    }
+
+    function renderOrdersTable() {
+      var tb = document.getElementById("orders-table"); var fil = allOrders.slice();
+      var se = document.getElementById("search-orders"); var st = se?se.value.toLowerCase():"";
+      if(currentFilter!=="todos") fil=fil.filter(function(o){return o.estado===currentFilter;});
+      if(st) fil=fil.filter(function(o){
+        var cl=allClients.find(function(c){return c.id===o.clienteId;});
+        var ph=(cl?cl.telefono:"").toLowerCase();
+        return (o.clienteNombre||"").toLowerCase().indexOf(st)!==-1||
+          ((o.patinete&&o.patinete.marca)||"").toLowerCase().indexOf(st)!==-1||
+          ((o.patinete&&o.patinete.modelo)||"").toLowerCase().indexOf(st)!==-1||
+          ph.indexOf(st)!==-1;
+      });
+      if(!fil.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:3rem;">No se encontraron cotizaciones</td></tr>';return;}
+      var h=""; fil.forEach(function(o){
+        var fc=(o.fallos||[]).length;
+        h+='<tr><td style="color:var(--text-dim);font-size:0.8rem;">'+o.id.slice(0,6)+'</td>';
+        h+='<td style="font-weight:600;">'+(o.clienteNombre||"—")+'</td>';
+        h+='<td>'+((o.patinete&&o.patinete.marca)||"")+' '+((o.patinete&&o.patinete.modelo)||"")+'</td>';
+        h+='<td>'+fc+' fallo'+(fc!==1?"s":"")+'</td>';
+        h+='<td>'+statusBadge(o.estado)+'</td>';
+        h+='<td style="color:var(--text-dim);">'+formatDate(o.fechaEntrada)+'</td>';
+        h+='<td style="font-weight:700;">€'+parseFloat(o.costeTotal||0).toFixed(2)+'</td>';
+        h+='<td><div style="display:flex;gap:0.4rem;flex-wrap:wrap;">';
+        h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')">👁</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="editOrder(\''+o.id+'\')">✏️</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" style="background:rgba(255,255,255,0.05);color:var(--text);">📄 Factura</button>';
+        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')">🟢 Listo</button>';
+        h+='<button class="btn btn-danger btn-small" onclick="deleteOrder(\''+o.id+'\')">🗑</button>';
+        h+='</div></td></tr>';
+      }); tb.innerHTML=h;
+    }
+
+    async function whatsappReady(id) {
+      var o=allOrders.find(function(x){return x.id===id;}); if(!o) return;
+      var cl=allClients.find(function(c){return c.id===o.clienteId;});
+      var nombre = o.clienteNombre || (cl?cl.nombre:"");
+      var msg = "Hola " + nombre + ", ya esta listo tu patinete para que salga a rodar";
+      var tel = (cl && cl.telefono) ? cl.telefono.replace(/\D/g,'') : '';
+      if(tel.length === 9 && (tel.startsWith('6') || tel.startsWith('7'))) tel = '34' + tel;
+      window.open("https://api.whatsapp.com/send?phone=" + tel + "&text=" + encodeURIComponent(msg), "_blank");
+      
+      // AUTO-LISTO
+      if(o.estado !== 'listo' && o.estado !== 'entregado'){
+        try {
+          await db.collection("reparaciones").doc(id).update({ estado: 'listo' });
+          showToast("Estado actualizado a LISTO ✅");
+          await loadAllData();
+        } catch(e) { console.error("Error auto-listo:", e); }
+      }
+    }
+
+    function renderClientsTable() {
+      var tb = document.getElementById("clients-table"); var fil = allClients.slice();
+      var se = document.getElementById("search-clients"); var st = se?se.value.toLowerCase():"";
+      if(st) fil=fil.filter(function(c){
+        return (c.nombre||"").toLowerCase().indexOf(st)!==-1||(c.telefono||"").indexOf(st)!==-1;
+      });
+      if(!fil.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:3rem;">No hay clientes registrados</td></tr>';return;}
+      var h=""; fil.forEach(function(c){
+        var reps=allOrders.filter(function(o){return o.clienteId===c.id;}).length;
+        h+='<tr><td style="font-weight:600;">'+c.nombre+'</td>';
+        h+='<td>'+(c.telefono||"—")+'</td>';
+        h+='<td style="color:var(--text-dim);">'+reps+' reparacion'+(reps!==1?"es":"")+'</td>';
+        h+='<td><div style="display:flex;gap:0.4rem;">';
+        h+='<button class="btn btn-secondary btn-small" onclick="editClient(\''+c.id+'\')">✏️</button>';
+        h+='<button class="btn btn-danger btn-small" onclick="deleteClient(\''+c.id+'\')">🗑</button>';
+        h+='</div></td></tr>';
+      }); tb.innerHTML=h;
+    }
+
+    function populateClientSelect() {
+      var sel = document.getElementById("order-client-select");
+      sel.innerHTML='<option value="">— Crear nuevo cliente —</option>';
+      allClients.forEach(function(c){
+        var o=document.createElement("option"); o.value=c.id; o.textContent=c.nombre+" ("+(c.telefono||c.dni||"")+")"; sel.appendChild(o);
+      });
+    }
+
+    function resetWizard() {
+      currentWizardStep=1; document.getElementById("order-form").reset();
+      document.getElementById("order-id").value="";
+      document.getElementById("fallos-list").innerHTML="";
+      document.getElementById("piezas-list").innerHTML="";
+      document.getElementById("or-fecha-entrada").value=new Date().toISOString().split("T")[0];
+      document.getElementById("or-num-factura").value="";
+      document.getElementById("or-solo-total-piezas").checked=false;
+      updateWizardUI();
+    }
+
+    function updateWizardUI() {
+      document.querySelectorAll(".wizard-step").forEach(function(s){
+        var n=parseInt(s.dataset.step); s.classList.remove("active","done");
+        if(n===currentWizardStep) s.classList.add("active"); else if(n<currentWizardStep) s.classList.add("done");
+      });
+      document.querySelectorAll(".wizard-panel").forEach(function(p){p.classList.remove("active");});
+      document.getElementById("step-"+currentWizardStep).classList.add("active");
+      document.getElementById("btn-prev-step").style.display=currentWizardStep>1?"":"none";
+      document.getElementById("btn-next-step").style.display=currentWizardStep<3?"":"none";
+      document.getElementById("btn-save-order").style.display=currentWizardStep===3?"":"none";
+      var pb=document.getElementById("btn-save-pdf"); if(pb) pb.style.display=currentWizardStep===3?"":"none";
+    }
+
+    function validateStep(step) {
+      clearValidation(); var valid=true;
+      if(step===1){
+        var n=document.getElementById("oc-nombre"),t=document.getElementById("oc-telefono");
+        if(!n.value.trim()){markInvalid(n);valid=false;}
+        var tc=t.value.replace(/\s/g,"");
+        if(!tc||tc.length < 9){markInvalid(t);valid=false;}
+      }
+      if(step===2){
+        var m=document.getElementById("op-marca"),mo=document.getElementById("op-modelo");
+        if(!m.value.trim()){markInvalid(m);valid=false;}
+        if(!mo.value.trim()){markInvalid(mo);valid=false;}
+      }
+      if(step===3){
+        var co=document.getElementById("or-coste");
+        if(!co.value||parseFloat(co.value)<0){markInvalid(co);valid=false;}
+        if(document.getElementById("fallos-list").children.length===0){showToast("Añade al menos un fallo","error");valid=false;}
+      }
+      if(!valid) showToast("Corrige los campos marcados","error");
+      return valid;
+    }
+    function markInvalid(el){el.classList.add("invalid");}
+    function clearValidation(){document.querySelectorAll(".invalid").forEach(function(e){e.classList.remove("invalid");});}
+
+    function addFallo() {
+      falloCounter++;
+      var el=document.getElementById("fallos-list"), div=document.createElement("div"); div.className="dynamic-item";
+      div.innerHTML='<button type="button" class="remove-item" onclick="this.parentElement.remove()">✕</button>'+
+        '<div class="form-row"><div class="form-group" style="margin-bottom:0;"><label>Descripción del Fallo</label>'+
+        '<input type="text" class="fallo-desc" placeholder="ej: No enciende, pinchazo..." style="width:100%;"></div>'+
+        '<div class="form-group" style="margin-bottom:0;"><label>Prioridad</label>'+
+        '<select class="fallo-gravedad"><option value="normal">⚪ Normal</option>'+
+        '<option value="alta">🟠 Alta</option><option value="urgente">🔴 Servicio de Urgencia</option></select></div></div>';
+      el.appendChild(div);
+    }
+
+    function addPieza() {
+      piezaCounter++;
+      var el=document.getElementById("piezas-list"), div=document.createElement("div"); div.className="dynamic-item";
+      div.innerHTML='<button type="button" class="remove-item" onclick="this.parentElement.remove()">✕</button>'+
+        '<div class="form-row"><div class="form-group" style="margin-bottom:0;"><label>Nombre pieza</label>'+
+        '<input type="text" class="pieza-nombre" placeholder="Batería 10Ah, freno disco..."></div>'+
+        '<div class="form-group" style="margin-bottom:0;"><label>Precio (€)</label>'+
+        '<input type="number" class="pieza-precio" step="0.01" min="0" placeholder="0.00"></div></div>'+
+        '<div class="form-group" style="margin-top:0.8rem;margin-bottom:0;">'+
+        '<label>Cantidad</label><input type="number" class="pieza-cantidad" value="1" min="1"></div>';
+      el.appendChild(div);
+    }
+
+    function collectFallos(){var items=[];document.querySelectorAll("#fallos-list .dynamic-item").forEach(function(d){items.push({gravedad:d.querySelector(".fallo-gravedad").value,descripcion:d.querySelector(".fallo-desc").value});});return items;}
+    function collectPiezas(){var items=[];document.querySelectorAll("#piezas-list .dynamic-item").forEach(function(d){items.push({nombre:d.querySelector(".pieza-nombre").value,precio:parseFloat(d.querySelector(".pieza-precio").value)||0,cantidad:parseInt(d.querySelector(".pieza-cantidad").value)||1});});return items;}
+
+    function openOrderForm() {
+      resetWizard();
+      document.getElementById("order-modal-title").textContent="Nueva Cotización de Reparación";
+      addFallo(); openModal("modal-order");
+    }
+
+    async function saveOrder() {
+      if(!validateStep(3)) return null;
+      var cId=document.getElementById("order-client-select").value;
+      var cNom=document.getElementById("oc-nombre").value.trim();
+      var fId=cId;
+      var cTel = document.getElementById("oc-telefono").value.trim();
+      if(!cId){
+        try{
+          var r=await db.collection("clientes").add({nombre:cNom,telefono:cTel});
+          fId=r.id;
+        }catch(e){showToast("Error cliente: "+e.message,"error");return null;}
+      } else {
+        // ACTUALIZAR CLIENTE EXISTENTE si cambió
+        try {
+          await db.collection("clientes").doc(cId).update({nombre:cNom,telefono:cTel});
+        } catch(e) { console.error("No se pudo actualizar el cliente maestro:", e); }
+      }
+      var feV=document.getElementById("or-fecha-entrada").value, fsV=document.getElementById("or-fecha-salida").value;
+      var data={clienteId:fId,clienteNombre:cNom,
+        patinete:{marca:document.getElementById("op-marca").value.trim(),modelo:document.getElementById("op-modelo").value.trim()},
+        fallos:collectFallos(), piezasUsadas:collectPiezas(),
+        costeTotal:parseFloat(document.getElementById("or-coste").value)||0,
+        metodoPago:document.getElementById("or-metodo-pago").value,
+        pagoAdelantado:parseFloat(document.getElementById("or-pago-adelantado").value)||0,
+        estado:document.getElementById("or-estado").value,
+        fechaEntrada:feV?firebase.firestore.Timestamp.fromDate(new Date(feV)):firebase.firestore.Timestamp.now(),
+        fechaSalida:fsV?firebase.firestore.Timestamp.fromDate(new Date(fsV)):null,
+        garantia:document.getElementById("or-garantia").value.trim(),
+        notas:document.getElementById("or-notas").value.trim(),
+        numeroFactura: parseInt(document.getElementById("or-num-factura").value) || null,
+        soloTotalPiezas: document.getElementById("or-solo-total-piezas").checked,
+        lastUpdated:firebase.firestore.Timestamp.now()
+      };
+      try{
+        var eId=document.getElementById("order-id").value, sId=eId;
+        if(eId){await db.collection("reparaciones").doc(eId).update(data);showToast("Cotización actualizada ✅");}
+        else{var nr=await db.collection("reparaciones").add(data);sId=nr.id;showToast("Cotización creada ✅");}
+        closeModal("modal-order"); await loadAllData(); return sId;
+      }catch(e){showToast("Error: "+e.message,"error");return null;}
+    }
+
+    async function saveAndGeneratePDF(){var id=await saveOrder();if(id)setTimeout(function(){generatePDF(id);},600);}
+
+    function navigate(viewId){
+      document.querySelectorAll(".view").forEach(function(v){v.classList.remove("active");});
+      document.querySelectorAll(".nav-item[data-view]").forEach(function(n){n.classList.remove("active");});
+      document.getElementById("view-"+viewId).classList.add("active");
+      var ni=document.querySelector('.nav-item[data-view="'+viewId+'"]'); if(ni)ni.classList.add("active");
+      var sb=document.querySelector(".sidebar"); if(sb)sb.classList.remove("open");
+    }
+
+    async function doLogout(){await auth.signOut();window.location.href="login.html";}
+
+    function wizardNext(){if(!validateStep(currentWizardStep))return;if(currentWizardStep<3){currentWizardStep++;updateWizardUI();}}
+    function wizardPrev(){if(currentWizardStep>1){currentWizardStep--;updateWizardUI();}}
+    function setFilter(f,btn){currentFilter=f;document.querySelectorAll(".filter-btn").forEach(function(b){b.classList.remove("active");});btn.classList.add("active");renderOrdersTable();}
+    function filterOrders(){renderOrdersTable();}
+    function filterClients(){renderClientsTable();}
+
+    function onClientSelect(){
+      var sel=document.getElementById("order-client-select");
+      if(sel.value){var c=allClients.find(function(x){return x.id===sel.value;});
+        if(c){document.getElementById("oc-nombre").value=c.nombre||"";document.getElementById("oc-telefono").value=c.telefono||"";}
+      }else{["oc-nombre","oc-telefono"].forEach(function(id){document.getElementById(id).value="";});}
+    }
+
+    function viewOrder(id){
+      var o=allOrders.find(function(x){return x.id===id;}); if(!o) return;
+      var cl=allClients.find(function(c){return c.id===o.clienteId;});
+      var pm=(o.patinete&&o.patinete.marca)||"",pmo=(o.patinete&&o.patinete.modelo)||"";
+      var h='<div style="display:grid;gap:1.5rem;"><div style="display:flex;justify-content:space-between;align-items:center;"><div><div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Ficha de Reparación</div><div style="font-family:Orbitron;font-size:1.1rem;">#'+o.id.slice(0,8)+'</div></div>'+statusBadge(o.estado)+'</div>';
+      h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;"><div style="background:rgba(0,0,0,0.2);padding:1rem;border-radius:8px;border:1px solid var(--border);"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.5rem;">Cliente</div><div style="font-weight:700;">'+(o.clienteNombre||"—")+'</div><div style="font-size:0.85rem;color:var(--text-dim);">'+((cl&&cl.telefono)||"")+'</div></div>';
+      h+='<div style="background:rgba(0,0,0,0.2);padding:1rem;border-radius:8px;border:1px solid var(--border);"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.5rem;">Patinete</div><div style="font-weight:700;">'+pm+' '+pmo+'</div></div></div>';
+      h+='<div><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.5rem;">Resumen de Fallos</div>';
+      (o.fallos||[]).forEach(function(f){
+        var lbls={normal:"Normal",alta:"Alta",urgente:"Urgente"};
+        h+='<div style="display:flex;gap:0.5rem;align-items:center;margin-bottom:0.4rem;">';
+        h+='<span class="badge badge-'+f.gravedad+'">'+(lbls[f.gravedad]||f.gravedad)+'</span>';
+        h+='<span style="font-size:0.85rem;">'+(f.descripcion||"")+'</span></div>';
+      });
+      if(!(o.fallos||[]).length) h+='<div style="color:var(--text-dim);">Sin fallos</div>';
+      h+='</div>';
+      if((o.piezasUsadas||[]).length){h+='<div><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;margin-bottom:0.5rem;">Piezas</div>';(o.piezasUsadas||[]).forEach(function(p){h+='<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.85rem;"><span>'+p.cantidad+'x '+p.nombre+'</span><span style="color:var(--accent);">€'+(p.precio*p.cantidad).toFixed(2)+'</span></div>';});h+='</div>';}
+      
+      var tci=parseFloat(o.costeTotal||0), tsi=tci/1.21, iva=tci-tsi, pad=parseFloat(o.pagoAdelantado||0), res=tci-pad;
+      h+='<div style="background:rgba(56,189,248,0.05);padding:1rem;border-radius:8px;border:1px solid var(--border);">';
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:0.3rem;"><span style="color:var(--text-dim);font-size:0.75rem;">Base Imponible:</span><span style="font-size:0.8rem;">€'+tsi.toFixed(2)+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="color:var(--text-dim);font-size:0.75rem;">IVA (21%):</span><span style="font-size:0.8rem;">€'+iva.toFixed(2)+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;margin-bottom:0.5rem;"><span style="color:var(--text-dim);font-size:0.8rem;">P. Adelantado:</span><span style="color:var(--warning);">-€'+pad.toFixed(2)+'</span></div>';
+      h+='<div style="display:flex;justify-content:space-between;align-items:center;padding-top:0.5rem;border-top:1px solid var(--border);">';
+      h+='<div><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;">TOTAL (Pte. Pagar)</div><div style="font-family:Orbitron;font-size:1.4rem;color:var(--accent);">€'+res.toFixed(2)+'</div></div>';
+      h+='<div style="text-align:right;"><div style="font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;">Método</div><div style="font-size:0.85rem;font-weight:700;">'+(o.metodoPago||"EFECTIVO").toUpperCase()+'</div></div></div></div>';
+      
+      h+='<div style="display:flex;justify-content:space-between;padding-top:0.5rem;"><div><span style="color:var(--text-dim);">Entrada:</span> '+formatDate(o.fechaEntrada)+'<br><span style="color:var(--text-dim);">Salida:</span> '+formatDate(o.fechaSalida)+'</div></div>';
+      if(o.garantia) h+='<div style="padding:0.8rem;background:rgba(255,255,255,0.02);border-radius:6px;font-size:0.85rem;"><span style="color:var(--accent);font-weight:700;">💡 Recomendaciones:</span> '+o.garantia+'</div>';
+      if(o.notas) h+='<div style="font-size:0.8rem;color:var(--text-dim);"><span style="font-weight:700;">Notas:</span> '+o.notas+'</div>';
+      h+='</div>';
+      document.getElementById("detail-body").innerHTML=h;
+      document.getElementById("btn-detail-pdf").onclick=function(){generatePDF(id);};
+      document.getElementById("btn-detail-invoice").onclick=function(){generateInvoice(id);};
+      document.getElementById("btn-share-track").onclick=function(){
+        const url = window.location.href.replace('index.html', 'cliente.html') + '?id=' + id;
+        const msg = `Hola ${o.clienteNombre}! Puedes seguir el progreso de tu patinete en tiempo real aquí: ${url}`;
+        var tel = (cl && cl.telefono) ? cl.telefono.replace(/\D/g,'') : '';
+        if(tel.length === 9 && (tel.startsWith('6') || tel.startsWith('7'))) tel = '34' + tel;
+        window.open(`https://api.whatsapp.com/send?phone=${tel}&text=${encodeURIComponent(msg)}`, '_blank');
+      };
+      openModal("modal-detail");
+    }
+
+    function editOrder(id){
+      var o=allOrders.find(function(x){return x.id===id;}); if(!o) return;
+      resetWizard(); document.getElementById("order-modal-title").textContent="Editar Cotización"; document.getElementById("order-id").value=id;
+      if(o.clienteId) document.getElementById("order-client-select").value=o.clienteId;
+      document.getElementById("oc-nombre").value=o.clienteNombre||"";
+      var cl=allClients.find(function(c){return c.id===o.clienteId;});
+      if(cl){document.getElementById("oc-telefono").value=cl.telefono||"";}
+      document.getElementById("op-marca").value=(o.patinete&&o.patinete.marca)||"";document.getElementById("op-modelo").value=(o.patinete&&o.patinete.modelo)||"";
+      (o.fallos||[]).forEach(function(f){addFallo();var l=document.querySelector("#fallos-list .dynamic-item:last-child");l.querySelector(".fallo-gravedad").value=f.gravedad;l.querySelector(".fallo-desc").value=f.descripcion||"";});
+      (o.piezasUsadas||[]).forEach(function(p){addPieza();var l=document.querySelector("#piezas-list .dynamic-item:last-child");l.querySelector(".pieza-nombre").value=p.nombre;l.querySelector(".pieza-precio").value=p.precio;l.querySelector(".pieza-cantidad").value=p.cantidad;});
+      document.getElementById("or-estado").value=o.estado||"pendiente";document.getElementById("or-coste").value=o.costeTotal||"";
+      document.getElementById("or-metodo-pago").value=o.metodoPago||"efectivo";
+      document.getElementById("or-num-factura").value=o.numeroFactura||"";
+      document.getElementById("or-solo-total-piezas").checked=!!o.soloTotalPiezas;
+      if(o.fechaEntrada){var d1=o.fechaEntrada.toDate?o.fechaEntrada.toDate():new Date(o.fechaEntrada);document.getElementById("or-fecha-entrada").value=d1.toISOString().split("T")[0];}
+      if(o.fechaSalida){var d2=o.fechaSalida.toDate?o.fechaSalida.toDate():new Date(o.fechaSalida);document.getElementById("or-fecha-salida").value=d2.toISOString().split("T")[0];}
+      openModal("modal-order");
+    }
+
+    async function deleteOrder(id){if(!confirm("¿Eliminar esta cotización?"))return;try{await db.collection("reparaciones").doc(id).delete();showToast("Cotización eliminada");await loadAllData();}catch(e){showToast("Error: "+e.message,"error");}}
+
+    function openClientForm(){document.getElementById("client-form").reset();document.getElementById("client-id").value="";document.getElementById("client-modal-title").textContent="Nuevo Cliente";openModal("modal-client");}
+    function editClient(id){var c=allClients.find(function(x){return x.id===id;});if(!c)return;document.getElementById("client-id").value=id;document.getElementById("client-modal-title").textContent="Editar Cliente";document.getElementById("cf-nombre").value=c.nombre||"";document.getElementById("cf-telefono").value=c.telefono||"";openModal("modal-client");}
+    async function saveClient(){var n=document.getElementById("cf-nombre"),t=document.getElementById("cf-telefono");clearValidation();if(!n.value.trim()){markInvalid(n);showToast("Nombre obligatorio","error");return;}if(!t.value.trim()){markInvalid(t);showToast("Teléfono obligatorio","error");return;}var data={nombre:n.value.trim(),telefono:t.value.trim()};try{var id=document.getElementById("client-id").value;if(id){await db.collection("clientes").doc(id).update(data);showToast("Cliente actualizado");}else{await db.collection("clientes").add(data);showToast("Cliente creado");}closeModal("modal-client");await loadAllData();}catch(e){showToast("Error: "+e.message,"error");}}
+    async function deleteClient(id){if(!confirm("¿Eliminar este cliente?"))return;try{await db.collection("clientes").doc(id).delete();showToast("Cliente eliminado");await loadAllData();}catch(e){showToast("Error: "+e.message,"error");}}
+
+    // ===== PDF =====
+    // ===== PDF =====
+    function generatePDF(id){
+      var o=allOrders.find(function(x){return x.id===id;});if(!o){showToast("No encontrada","error");return;}
+      var cl=allClients.find(function(c){return c.id===o.clienteId;});
+      var pdf=new window.jspdf.jsPDF();
+      var ac=[56,189,248],dk=[15,23,42],gr=[148,163,184],wh=[255,255,255],lb=[245,247,250];
+      pdf.setFillColor(dk[0],dk[1],dk[2]);pdf.rect(0,0,210,48,"F");
+      pdf.setFillColor(ac[0],ac[1],ac[2]);pdf.rect(0,45,210,3,"F");
+      pdf.setFont("helvetica","bold");pdf.setFontSize(24);pdf.setTextColor(255,255,255);pdf.text("ANACLETO",15,22);
+      pdf.setFontSize(9);pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("TALLER DE REPARACION DE PATINETES ELECTRICOS",15,30);
+      pdf.setFontSize(7);pdf.setTextColor(gr[0],gr[1],gr[2]);pdf.text("Calle del Taller, 12 - Madrid",15,38);pdf.text("Tel: +34 600 000 000 - info@anacleto.com",15,42);
+      pdf.setFillColor(ac[0],ac[1],ac[2]);pdf.roundedRect(130,10,65,14,2,2,"F");pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.setTextColor(0,0,0);pdf.text("COTIZACION",144,19);
+      pdf.setFontSize(8);pdf.setTextColor(gr[0],gr[1],gr[2]);pdf.text("No: "+o.id.slice(0,10).toUpperCase(),135,32);pdf.text("Fecha: "+formatDate(o.fechaEntrada),135,38);
+      var sl={pendiente:"PENDIENTE",en_reparacion:"EN REPARACION",listo:"LISTO",entregado:"ENTREGADO"};pdf.text("Estado: "+(sl[o.estado]||o.estado),135,42);
+      var y=58;
+      pdf.setFillColor(lb[0],lb[1],lb[2]);pdf.roundedRect(15,y,87,45,3,3,"F");pdf.setDrawColor(220,225,230);pdf.roundedRect(15,y,87,45,3,3,"S");
+      pdf.setFontSize(7);pdf.setFont("helvetica","bold");pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("DATOS DEL CLIENTE",20,y+8);
+      pdf.setFontSize(11);pdf.setTextColor(30,30,30);pdf.text(truncStr(o.clienteNombre||"---",28),20,y+17);
+      pdf.setFont("helvetica","normal");pdf.setFontSize(8);pdf.setTextColor(80,80,80);
+      if(cl&&cl.telefono)pdf.text("Tel: "+cl.telefono,20,y+24);
+      pdf.setFillColor(lb[0],lb[1],lb[2]);pdf.roundedRect(108,y,87,45,3,3,"F");pdf.setDrawColor(220,225,230);pdf.roundedRect(108,y,87,45,3,3,"S");
+      pdf.setFontSize(7);pdf.setFont("helvetica","bold");pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("DATOS DEL PATINETE",113,y+8);
+      var pM=(o.patinete&&o.patinete.marca)||"",pMo=(o.patinete&&o.patinete.modelo)||"";
+      pdf.setFontSize(11);pdf.setTextColor(30,30,30);pdf.text(pM+" "+pMo,113,y+17);
+      pdf.setFont("helvetica","normal");pdf.setFontSize(8);pdf.setTextColor(80,80,80);
+      pdf.text("Fecha: "+formatDate(o.fechaEntrada),113,y+24);
+      y+=55;
+      pdf.setFontSize(9);pdf.setFont("helvetica","bold");pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("DIAGNOSTICO DE FALLOS",15,y);y+=3;
+      var fd=(o.fallos||[]).map(function(f,i){return[(i+1).toString(),f.tipo,f.descripcion||"Sin descripcion",f.gravedad.toUpperCase()];});
+      if(fd.length>0){pdf.autoTable({startY:y,head:[["#","Componente","Descripcion","Gravedad"]],body:fd,margin:{left:15,right:15},theme:"grid",headStyles:{fillColor:dk,textColor:wh,fontStyle:"bold",fontSize:7.5,cellPadding:4},bodyStyles:{fontSize:8,textColor:[50,50,50],cellPadding:3.5},alternateRowStyles:{fillColor:lb},columnStyles:{0:{cellWidth:10,halign:"center"},3:{cellWidth:25,halign:"center"}}});y=pdf.lastAutoTable.finalY+8;}
+      pdf.setFontSize(9);pdf.setFont("helvetica","bold");pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("DESGLOSE DE COSTES",15,y);y+=3;
+      var cr=[];
+      var pt=(o.piezasUsadas||[]).reduce(function(s,p){return s+(p.precio*p.cantidad);},0),lc=(parseFloat(o.costeTotal)||0)-pt;
+      
+      if(o.soloTotalPiezas && (o.piezasUsadas||[]).length > 0) {
+        cr.push(["Piezas Utilizadas","1","€"+pt.toFixed(2),"€"+pt.toFixed(2)]);
+      } else {
+        (o.piezasUsadas||[]).forEach(function(p){cr.push(["Pieza: "+p.nombre,p.cantidad.toString(),"€"+p.precio.toFixed(2),"€"+(p.precio*p.cantidad).toFixed(2)]);});
+      }
+      
+      if(lc>0)cr.push(["Mano de obra","1","€"+lc.toFixed(2),"€"+lc.toFixed(2)]);
+      if(!cr.length)cr.push(["Servicio completo","1","€"+(o.costeTotal||0).toFixed(2),"€"+(o.costeTotal||0).toFixed(2)]);
+      pdf.autoTable({startY:y,head:[["Concepto","Cant.","Precio Ud.","Subtotal"]],body:cr,margin:{left:15,right:15},theme:"grid",headStyles:{fillColor:dk,textColor:wh,fontStyle:"bold",fontSize:7.5,cellPadding:4},bodyStyles:{fontSize:8,textColor:[50,50,50],cellPadding:3.5},alternateRowStyles:{fillColor:lb},columnStyles:{1:{cellWidth:15,halign:"center"},2:{cellWidth:25,halign:"right"},3:{cellWidth:25,halign:"right"}}});
+      y=pdf.lastAutoTable.finalY+2;
+      var tci=parseFloat(o.costeTotal||0), tsi=tci/1.21, iva=tci-tsi;
+      var pad=parseFloat(o.pagoAdelantado||0), res=tci-pad;
+      pdf.setFillColor(lb[0],lb[1],lb[2]);pdf.roundedRect(120,y,75,42,3,3,"F");pdf.setDrawColor(220,225,230);pdf.roundedRect(120,y,75,42,3,3,"S");
+      pdf.setFontSize(8);pdf.setFont("helvetica","normal");pdf.setTextColor(100,100,100);
+      pdf.text("Base imponible:",125,y+8);pdf.text("€"+tsi.toFixed(2),180,y+8,{align:"right"});
+      pdf.text("IVA (21%):",125,y+15);pdf.text("€"+iva.toFixed(2),180,y+15,{align:"right"});
+      pdf.text("P. Adelantado:",125,y+22);pdf.text("-€"+pad.toFixed(2),180,y+22,{align:"right"});
+      pdf.setDrawColor(ac[0],ac[1],ac[2]);pdf.line(125,y+25,190,y+25);
+      pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.setTextColor(dk[0],dk[1],dk[2]);pdf.text("TOTAL:",125,y+31);
+      pdf.setTextColor(dk[0],dk[1],dk[2]);pdf.text("€"+tci.toFixed(2),190,y+31,{align:"right"});
+      pdf.setFontSize(12);pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("Pte. Pagar:",125,y+38);
+      pdf.text("€"+res.toFixed(2),190,y+38,{align:"right"});
+      
+      pdf.setFont("helvetica","bold");pdf.setFontSize(7);pdf.setTextColor(dk[0],dk[1],dk[2]);
+      pdf.text("METODO PAGO: "+(o.metodoPago||"EFECTIVO").toUpperCase(),15,y+5);
+      
+      y+=48;
+      if(o.garantia||o.notas||o.fechaSalida){
+        pdf.setFontSize(7);pdf.setFont("helvetica","bold");pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("INFO ADICIONAL Y RECOMENDACIONES",15,y);y+=5;
+        pdf.setFont("helvetica","normal");pdf.setFontSize(8);pdf.setTextColor(80,80,80);
+        if(o.garantia){pdf.text("Recomendaciones: "+o.garantia,15,y);y+=5;}
+        if(o.fechaSalida){pdf.text("Entrega Estimada: "+formatDate(o.fechaSalida),15,y);y+=5;}
+        if(o.notas){pdf.text("Notas: "+o.notas,15,y);y+=5;}y+=5;
+      }
+      y=Math.max(y+10,235);pdf.setDrawColor(200,200,200);pdf.setLineWidth(0.5);pdf.line(15,y,90,y);pdf.line(120,y,195,y);
+      pdf.setFontSize(7);pdf.setFont("helvetica","normal");pdf.setTextColor(150,150,150);
+      pdf.text("Firma del Cliente",38,y+6);pdf.text("Firma del Tecnico / Sello",140,y+6);
+      pdf.setFillColor(lb[0],lb[1],lb[2]);pdf.rect(0,275,210,22,"F");pdf.setDrawColor(ac[0],ac[1],ac[2]);pdf.line(0,275,210,275);
+      pdf.setFontSize(6);pdf.setTextColor(130,130,130);pdf.text("Cotizacion valida 30 dias. Piezas sustituidas quedan en propiedad del taller.",15,281);
+      pdf.text("Documento generado por Anacleto Taller - "+new Date().getFullYear(),15,286);
+      pdf.save("Anacleto_Cotizacion_"+o.id.slice(0,8)+".pdf");
+      showToast("Cotización PDF generada ✅");
+    }
+
+    // ===== FACTURA PDF =====
+    function generateInvoice(id){
+      var o=allOrders.find(function(x){return x.id===id;});if(!o){showToast("No encontrada","error");return;}
+      var cl=allClients.find(function(c){return c.id===o.clienteId;});
+      var pdf=new window.jspdf.jsPDF();
+      var blue=[0,74,134], dark=[45,45,45], gray=[120,120,120], red=[192,57,43];
+
+      // Obtener o asignar número de factura secuencial
+      var numFactura = o.numeroFactura;
+      if(!numFactura) {
+        // Simple: contar órdenes existentes y sumar 1 (o buscar el máx actual)
+        var maxNum = allOrders.reduce(function(max, ord){ return (ord.numeroFactura || 0) > max ? ord.numeroFactura : max; }, 0);
+        numFactura = maxNum + 1;
+        // Guardar el número en la base de datos para que sea permanente
+        db.collection("reparaciones").doc(o.id).update({ numeroFactura: numFactura });
+        o.numeroFactura = numFactura; // Actualizar localmente
+      }
+
+      // Cabecera Principal y Logo
+      pdf.setFont("helvetica","bold");pdf.setFontSize(32);pdf.setTextColor(blue[0],blue[1],blue[2]);pdf.text("FACTURA",15,30);
+      
+      try {
+        // Posicionar logo en la esquina superior derecha
+        pdf.addImage('logo.png', 'PNG', 145, 8, 50, 40);
+      } catch(e) { console.warn("Logo no cargado"); }
+      
+      // Datos Empresa
+      pdf.setFontSize(9);pdf.setTextColor(0,0,0);pdf.text("PATINETO ANACLETO",15,45);
+      pdf.setFont("helvetica","normal");pdf.setFontSize(8);pdf.setTextColor(dark[0],dark[1],dark[2]);
+      pdf.text("NIF: 48412185-Z",15,50);
+      pdf.text("Avd/ Cortes Valencianas 11, bajo",15,54);
+      pdf.text("46980 PATERNA (VALENCIA)",15,58);
+
+      // Bloque Cliente y Datos Factura
+      pdf.setFont("helvetica","bold");pdf.setFontSize(10);pdf.setTextColor(blue[0],blue[1],blue[2]);pdf.text("FACTURAR A",15,75);
+      pdf.setFont("helvetica","normal");pdf.setFontSize(9);pdf.setTextColor(dark[0],dark[1],dark[2]);pdf.text(o.clienteNombre||"Cliente",15,82);
+      
+      pdf.setFont("helvetica","bold");pdf.setTextColor(blue[0],blue[1],blue[2]);pdf.text("Nº DE FACTURA",120,75);
+      pdf.text("FECHA",120,82);
+      pdf.setFont("helvetica","normal");pdf.setTextColor(dark[0],dark[1],dark[2]);
+      pdf.text(numFactura.toString().padStart(4, '0'), 180, 75, {align:"right"});
+      pdf.text(formatDate(o.fechaSalida||o.fechaEntrada),180,82,{align:"right"});
+
+      // Línea Roja Divisoria
+      var y=100;
+      pdf.setDrawColor(red[0],red[1],red[2]);pdf.setLineWidth(0.5);pdf.line(15,y,195,y);
+      pdf.setFont("helvetica","bold");pdf.setTextColor(blue[0],blue[1],blue[2]);pdf.text("DESCRIPCIÓN",15,y+8);pdf.text("IMPORTE",195,y+8,{align:"right"}); y+=14;
+
+      // Desglose de servicios
+      pdf.setFont("helvetica","normal");pdf.setFontSize(9);pdf.setTextColor(dark[0],dark[1],dark[2]);
+      
+      var items=[];
+      (o.fallos||[]).forEach(function(f){ items.push("Reparación: "+f.tipo+" - "+f.descripcion); });
+      
+      if(o.soloTotalPiezas && (o.piezasUsadas||[]).length > 0) {
+        var pt=(o.piezasUsadas||[]).reduce(function(s,p){return s+(p.precio*p.cantidad);},0);
+        items.push("Piezas Utilizadas (Total: "+pt.toFixed(2).replace('.',',')+" €)");
+      } else {
+        (o.piezasUsadas||[]).forEach(function(p){ items.push(p.cantidad+"x "+p.nombre); });
+      }
+      
+      if(items.length===0) items.push("Servicio integral de mantenimiento");
+
+      items.forEach(function(it){
+        if(y > 240) { pdf.addPage(); y = 20; }
+        pdf.text(it,15,y);
+        y+=6;
+      });
+      
+      // Totales con Desglose de IVA (Igual que en Cotización)
+      var tci=parseFloat(o.costeTotal||0), tsi=tci/1.21, iva=tci-tsi;
+      var pad=parseFloat(o.pagoAdelantado||0), res=tci-pad;
+      
+      y += 10;
+      pdf.setFont("helvetica","normal");pdf.setFontSize(8);pdf.setTextColor(gray[0],gray[1],gray[2]);
+      pdf.text("Base Imponible:", 130, y); pdf.text(tsi.toFixed(2).replace('.',',')+" €", 195, y, {align:"right"}); y+=5;
+      pdf.text("IVA (21%):", 130, y); pdf.text(iva.toFixed(2).replace('.',',')+" €", 195, y, {align:"right"}); y+=5;
+      if(pad > 0) {
+        pdf.setTextColor(red[0],red[1],red[2]);
+        pdf.text("Pago Adelantado:", 130, y); pdf.text("-"+pad.toFixed(2).replace('.',',')+" €", 195, y, {align:"right"}); y+=5;
+      }
+      
+      pdf.setFont("helvetica","bold");pdf.setFontSize(14);pdf.setTextColor(blue[0],blue[1],blue[2]);
+      pdf.text("TOTAL FACTURA", 130, y+8);
+      pdf.text(tci.toFixed(2).replace('.',',')+" €", 195, y+8, {align:"right"});
+      
+      if(res > 0 && pad > 0) {
+        y += 15;
+        pdf.setFontSize(10);pdf.setTextColor(dark[0],dark[1],dark[2]);
+        pdf.text("PENDIENTE DE PAGO:", 130, y);
+        pdf.setTextColor(red[0],red[1],red[2]);
+        pdf.text(res.toFixed(2).replace('.',',')+" €", 195, y, {align:"right"});
+      }
+      
+      // Footer con estilo "Gracias"
+      y=260;
+      pdf.setTextColor(blue[0],blue[1],blue[2]);
+      pdf.setFontSize(35);
+      // Simular estilo cursiva con fuente específica o dibujando
+      pdf.text("Gracias",40,y+10);
+      
+      pdf.setDrawColor(blue[0],blue[1],blue[2]);pdf.setLineWidth(0.3);pdf.line(90,y,90,y+20);
+      
+      pdf.setFontSize(9);pdf.setTextColor(red[0],red[1],red[2]);pdf.text("CONDICIONES Y FORMA DE PAGO",95,y+5);
+      pdf.setFont("helvetica","normal");pdf.setTextColor(dark[0],dark[1],dark[2]);
+      pdf.text("Pago en "+(o.metodoPago||"BIZUM").toUpperCase(),95,y+15);
+
+      pdf.save("Factura_Anacleto_"+o.id.slice(0,6).toUpperCase()+".pdf");
+      showToast("Factura generada con éxito ✅");
+    }
+
+    async function loadNotes() {
+      try {
+        var snap = await db.collection("notas").orderBy("fecha", "desc").get();
+        allNotes = []; snap.forEach(function(d) { allNotes.push(Object.assign({id: d.id}, d.data())); });
+      } catch(e) { console.error("Error notas:", e); allNotes = []; }
+    }
+    async function addNote() {
+      var inp = document.getElementById("new-note-input");
+      var text = inp.value.trim();
+      if(!text) return;
+      try {
+        await db.collection("notas").add({
+          texto: text,
+          fecha: firebase.firestore.Timestamp.now()
+        });
+        inp.value = "";
+        showToast("Nota añadida");
+        await loadAllData();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+    async function deleteNote(id) {
+      if(!confirm("¿Eliminar esta nota?")) return;
+      try {
+        await db.collection("notas").doc(id).delete();
+        showToast("Nota eliminada");
+        await loadAllData();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+    function renderNotes() {
+      var grid = document.getElementById("notes-grid");
+      if(!grid) return;
+      if(!allNotes.length) { grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:3rem;color:var(--text-muted);">No hay recordatorios pendientes 📝</div>'; return; }
+      var h = "";
+      allNotes.forEach(function(n) {
+        var date = n.fecha ? (n.fecha.toDate ? n.fecha.toDate() : new Date(n.fecha)) : new Date();
+        var dateStr = date.toLocaleDateString("es-ES") + " " + date.toLocaleTimeString("es-ES", {hour:'2-digit', minute:'2-digit'});
+        h += '<div class="note-card">';
+        h += '  <div class="note-text">' + n.texto + '</div>';
+        h += '  <div class="note-footer">';
+        h += '    <span class="note-date">' + dateStr + '</span>';
+        h += '    <button class="note-delete" onclick="deleteNote(\'' + n.id + '\')" title="Eliminar">🗑</button>';
+        h += '  </div>';
+        h += '</div>';
+      });
+      grid.innerHTML = h;
+    }
+
+    console.log("Anacleto Panel cargado OK");
+  </script>
+</body>
+</html>
+

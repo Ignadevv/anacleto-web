@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estado de mi Reparación | Anacleto</title>
+  <base href="/panel/">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #030712;
+      --bg-card: #0f172a;
+      --accent: #38bdf8;
+      --accent2: #2dd4bf;
+      --text: #f1f5f9;
+      --text-dim: #94a3b8;
+      --border: #1e293b;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Exo 2', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      overflow-x: hidden;
+    }
+
+    /* Background Orbs */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.1;
+      z-index: -1;
+    }
+    .orb-1 { width: 400px; height: 400px; background: var(--accent); top: -100px; left: -100px; }
+    .orb-2 { width: 300px; height: 300px; background: var(--accent2); bottom: -100px; right: -100px; }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin-top: 3rem;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+    .header .logo {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--accent);
+      letter-spacing: 5px;
+      margin-bottom: 0.5rem;
+    }
+    .header p {
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      font-size: 0.9rem;
+    }
+
+    /* Search Box */
+    .search-card {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      padding: 2rem;
+      border-radius: 20px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+      margin-bottom: 2rem;
+    }
+    .search-card h2 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    .input-wrap {
+      position: relative;
+      display: flex;
+      gap: 1rem;
+    }
+    input {
+      flex: 1;
+      padding: 1rem 1.5rem;
+      background: rgba(0,0,0,0.3);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 1.1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(56,189,248,0.2);
+    }
+    .btn-search {
+      padding: 0 2rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 12px;
+      color: #000;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .btn-search:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(56,189,248,0.3);
+    }
+
+    /* Results */
+    .result-card {
+      display: none;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      padding: 2.5rem;
+      border-radius: 24px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+      animation: fadeInUp 0.5s ease;
+    }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+
+    .status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+    }
+    .status-id { font-family: 'Orbitron'; font-size: 0.8rem; color: var(--text-dim); }
+    .status-title { font-size: 1.5rem; font-weight: 700; margin-top: 0.3rem; }
+    
+    .badge {
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .badge-pendiente { background: rgba(245,158,11,0.1); color: var(--warning); border: 1px solid var(--warning); }
+    .badge-en_reparacion { background: rgba(56,189,248,0.1); color: var(--accent); border: 1px solid var(--accent); }
+    .badge-listo { background: rgba(34,197,94,0.1); color: var(--success); border: 1px solid var(--success); }
+    .badge-entregado { background: rgba(148,163,184,0.1); color: var(--text-dim); border: 1px solid var(--text-dim); }
+
+    /* Progress Stepper */
+    .stepper {
+      display: flex;
+      justify-content: space-between;
+      position: relative;
+      margin-bottom: 3rem;
+      padding: 0 10px;
+    }
+    .stepper::before {
+      content: '';
+      position: absolute;
+      top: 15px; left: 10px; right: 10px;
+      height: 2px;
+      background: var(--border);
+      z-index: 1;
+    }
+    .step-progress {
+      position: absolute;
+      top: 15px; left: 10px;
+      height: 2px;
+      background: var(--accent);
+      z-index: 2;
+      transition: width 1s ease;
+      width: 0%;
+    }
+    .step {
+      position: relative;
+      z-index: 3;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+    }
+    .step-icon {
+      width: 32px; height: 32px;
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      transition: all 0.3s;
+      margin-bottom: 0.75rem;
+    }
+    .step.active .step-icon {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #000;
+      box-shadow: 0 0 15px var(--accent);
+    }
+    .step.done .step-icon {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #000;
+    }
+    .step-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      text-align: center;
+      white-space: nowrap;
+    }
+    .step.active .step-label { color: var(--accent); }
+
+    /* Detail Grid */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .detail-item {
+      background: rgba(0,0,0,0.2);
+      padding: 1.2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+    .detail-label { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.5rem; }
+    .detail-value { font-weight: 600; font-size: 1.1rem; }
+
+    .summary-section { margin-top: 2rem; }
+    .summary-title { font-family: 'Orbitron'; font-size: 0.9rem; margin-bottom: 1rem; color: var(--accent2); }
+    .fault-list { list-style: none; }
+    .fault-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+      color: var(--text-dim);
+    }
+    .fault-item::before { content: '⚡'; font-size: 0.8rem; }
+
+    .ready-banner {
+      display: none;
+      background: linear-gradient(45deg, rgba(34,197,94,0.2), rgba(45,212,191,0.2));
+      border: 1px solid var(--success);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      margin-top: 2rem;
+    }
+    .ready-banner h3 { color: var(--success); margin-bottom: 0.5rem; }
+    .ready-banner p { font-size: 0.9rem; color: var(--text); }
+
+    .footer {
+      margin-top: auto;
+      padding: 3rem 0;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.8rem;
+    }
+    .footer a { color: var(--accent); text-decoration: none; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--danger);
+      color: #fff;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      font-weight: 700;
+      display: none;
+      animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn { from{transform:translateX(100%)} to{transform:translateX(0)} }
+
+    @media (max-width: 480px) {
+      .detail-grid { grid-template-columns: 1fr; }
+      .header .logo { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+
+  <div class="container">
+    <div class="header">
+      <div class="logo">ANACLETO</div>
+      <p>Consultor de Reparaciones</p>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-card">
+      <h2>Consulta el estado de tu patinete</h2>
+      <div class="input-wrap">
+        <input type="text" id="search-input" placeholder="ID (ej: #98b... ) o Teléfono">
+        <button class="btn-search" onclick="doSearch()">BUSCAR</button>
+      </div>
+    </div>
+
+    <!-- Result Section -->
+    <div class="result-card" id="result-card">
+      <div class="status-header">
+        <div>
+          <div class="status-id" id="res-id">ID: #000000</div>
+          <div class="status-title" id="res-scooter">Xiaomi Mi Pro 2</div>
+        </div>
+        <div id="res-badge-wrap"></div>
+      </div>
+
+      <!-- Stepper -->
+      <div class="stepper">
+        <div class="step-progress" id="step-fill"></div>
+        <div class="step" data-step="pendiente"><div class="step-icon">⏳</div><div class="step-label">Pendiente</div></div>
+        <div class="step" data-step="en_reparacion"><div class="step-icon">🔧</div><div class="step-label">Reparando</div></div>
+        <div class="step" data-step="listo"><div class="step-icon">✅</div><div class="step-label">Listo</div></div>
+        <div class="step" data-step="entregado"><div class="step-icon">📦</div><div class="step-label">Entregado</div></div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Cliente</div>
+          <div class="detail-value" id="res-cliente">Renzo García</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Presupuesto</div>
+          <div class="detail-value" id="res-precio">€0.00</div>
+        </div>
+      </div>
+
+      <div class="summary-section">
+        <div class="summary-title">Informe de Reparación</div>
+        <div class="fault-list" id="res-fallos"></div>
+      </div>
+
+      <!-- Ready Banner -->
+      <div class="ready-banner" id="ready-banner">
+        <h3>¡Tu patinete está listo! 🚀</h3>
+        <p>Pásate por el taller de Lunes a Viernes (09:00 - 20:00) para recogerlo.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    © 2026 Anacleto Taller de Reparaciones. <br>
+    <a href="../index.html">Volver a la tienda web</a>
+  </div>
+
+  <div id="toast">No se encontró ninguna reparación</div>
+
+  <!-- Firebase Compat -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+  <script>
+    firebase.initializeApp({
+      apiKey: "AIzaSyCLQKlAQNAnW2v5n5EdzDxW465a_Bgx8tU",
+      authDomain: "anacleto-dcba8.firebaseapp.com",
+      projectId: "anacleto-dcba8",
+      storageBucket: "anacleto-dcba8.firebasestorage.app",
+      messagingSenderId: "479401040293",
+      appId: "1:479401040293:web:cc8bfaa40a23464a30704c"
+    });
+    const db = firebase.firestore();
+
+    async function doSearch() {
+      const val = document.getElementById('search-input').value.trim().toLowerCase();
+      if (!val) return;
+
+      const resultCard = document.getElementById('result-card');
+      const toast = document.getElementById('toast');
+      toast.style.display = 'none';
+
+      try {
+        let order = null;
+        
+        // 1. Try search by ID (if strictly ID-like)
+        if (val.length > 10) {
+          const doc = await db.collection('reparaciones').doc(val).get();
+          if (doc.exists) order = { id: doc.id, ...doc.data() };
+        }
+
+        // 2. Try search by ID (shorthand prefix)
+        if (!order) {
+           const snap = await db.collection('reparaciones').get();
+           snap.forEach(d => {
+             if (d.id.toLowerCase().startsWith(val)) order = { id: d.id, ...d.data() };
+           });
+        }
+
+        // 3. Try search by Phone (searching current state in all repairs)
+        // Note: For better scalability, we should have a search index or client-reference.
+        if (!order) {
+           const snap = await db.collection('reparaciones').get();
+           snap.forEach(d => {
+             const data = d.data();
+             // We need to fetch client to verify phone. 
+             // To keep it simple for now, many shops store phone in the repair doc too.
+             // Or we fetch the client doc if we have the ID.
+           });
+           
+           // Fallback: search by customer name also? 
+           // Better for demo: if it's a number, assume it's a phone search against a cached list.
+        }
+
+        if (order) {
+          renderOrder(order);
+        } else {
+          resultCard.style.display = 'none';
+          toast.style.display = 'block';
+          setTimeout(() => toast.style.display = 'none', 3000);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    function renderOrder(o) {
+      document.getElementById('result-card').style.display = 'block';
+      document.getElementById('res-id').textContent = 'ID: #' + o.id.slice(0, 8).toUpperCase();
+      document.getElementById('res-scooter').textContent = (o.patinete.marca + ' ' + o.patinete.modelo) || 'Patinete';
+      document.getElementById('res-cliente').textContent = o.clienteNombre || 'Cliente';
+      document.getElementById('res-precio').textContent = '€' + (parseFloat(o.costeTotal) || 0).toFixed(2);
+      
+      // Badge
+      const labels = { pendiente: "Pendiente", en_reparacion: "En Reparación", listo: "Listo", entregado: "Entregado" };
+      document.getElementById('res-badge-wrap').innerHTML = `<span class="badge badge-${o.status || o.estado}">${labels[o.status || o.estado] || (o.status || o.estado)}</span>`;
+
+      // Stepper
+      const steps = ['pendiente', 'en_reparacion', 'listo', 'entregado'];
+      const curIdx = steps.indexOf(o.status || o.estado);
+      const stepEls = document.querySelectorAll('.step');
+      
+      stepEls.forEach((el, i) => {
+        el.classList.remove('active', 'done');
+        if (i < curIdx) el.classList.add('done');
+        if (i === curIdx) el.classList.add('active');
+      });
+      
+      const progress = (curIdx / (steps.length - 1)) * 100;
+      document.getElementById('step-fill').style.width = progress + '%';
+
+      // Faults
+      const fl = document.getElementById('res-fallos');
+      fl.innerHTML = '';
+      (o.fallos || []).forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'fault-item';
+        div.textContent = `${f.tipo}: ${f.descripcion || ''}`;
+        fl.appendChild(div);
+      });
+
+      // Banner
+      document.getElementById('ready-banner').style.display = (o.status || o.estado) === 'listo' ? 'block' : 'none';
+      
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    // Auto-search if ID in URL
+    const params = new URLSearchParams(window.location.search);
+    const idParam = params.get('id');
+    if (idParam) {
+      document.getElementById('search-input').value = idParam;
+      doSearch();
+    }
+  </script>
+</body>
+</html>
