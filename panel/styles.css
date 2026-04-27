@@ -325,6 +325,8 @@ tr:last-child td { border-bottom: none; }
 }
 .badge-media { background: rgba(245,158,11,0.15); color: var(--warning); }
 .badge-baja { background: rgba(34,197,94,0.15); color: var(--success); }
+.badge-pagada { background: rgba(34,197,94,0.2); color: var(--success); border: 1px solid rgba(34,197,94,0.4); }
+.badge-anulada { background: rgba(239,68,68,0.2); color: var(--danger); border: 1px solid rgba(239,68,68,0.4); }
 
 /* ========== MODAL ========== */
 .modal-overlay {

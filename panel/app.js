@@ -104,7 +104,9 @@ async function loadClients() {
 function formatDate(val) {
   if (!val) return "\u2014";
   var d = val.toDate ? val.toDate() : new Date(val);
-  return d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" });
+  var datePart = d.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric", timeZone: "Europe/Madrid" });
+  var timePart = d.toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid" });
+  return datePart + " " + timePart;
 }
 
 function statusBadge(estado) {
@@ -735,6 +737,24 @@ function generatePDFFn(id) {
   pdf.text("Esta cotizacion tiene una validez de 30 dias a partir de la fecha de emision.", 15, 281);
   pdf.text("Las reparaciones incluyen la garantia indicada. Piezas sustituidas quedan en propiedad del taller salvo acuerdo previo.", 15, 285);
   pdf.text("Documento generado por Anacleto Taller - " + new Date().getFullYear() + " - " + new Date().toLocaleString("es-ES"), 15, 289);
+
+  pdf.setFont("helvetica", "bold"); pdf.setFontSize(7); pdf.setTextColor(dark[0], dark[1], dark[2]);
+  pdf.text("METODO PAGO: " + (o.metodoPago || "EFECTIVO").toUpperCase(), 15, y + 5);
+
+  // CONDICIONES DEL SERVICIO - Posicionadas debajo para evitar solapamiento
+  var ny = y + 45;
+  pdf.setFillColor(accent[0], accent[1], accent[2]);
+  pdf.roundedRect(15, ny, 22, 4, 1, 1, "F");
+  pdf.setFontSize(6); pdf.setTextColor(255, 255, 255);
+  pdf.text("IMPORTANTE", 17, ny + 3);
+
+  pdf.setFontSize(7); pdf.setTextColor(dark[0], dark[1], dark[2]); pdf.setFont("helvetica", "bold");
+  pdf.text("CONDICIONES DEL SERVICIO:", 40, ny + 3);
+
+  pdf.setFont("helvetica", "normal"); pdf.setFontSize(6.5); pdf.setTextColor(80, 80, 80);
+  var condText = "Una vez que el patinete haya sido reparado o se haya elaborado el presupuesto y comunicado al cliente, este dispondrá de un plazo de 2 días para proceder a su recogida. Transcurrido dicho plazo sin haber sido retirado, se aplicará un cargo de 5 € por día en concepto de almacenamiento o estancia.";
+  var splitCond = pdf.splitTextToSize(condText, 180);
+  pdf.text(splitCond, 15, ny + 8);
 
   pdf.save("Anacleto_Cotizacion_" + o.id.slice(0, 8) + ".pdf");
   showToast("Cotizacion PDF generada y descargada");
