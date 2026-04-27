@@ -526,12 +526,12 @@ function generatePDFFn(id) {
 
   pdf.setFontSize(9);
   pdf.setTextColor(accent[0], accent[1], accent[2]);
-  pdf.text("TALLER DE REPARACION DE PATINETES ELECTRICOS", 15, 30);
+  pdf.text("VICENTE LARA SOLER - NIF: 48412185Z", 15, 30);
 
   pdf.setFontSize(7);
   pdf.setTextColor(gray[0], gray[1], gray[2]);
-  pdf.text("Calle del Taller, 12 - Madrid, Espana", 15, 38);
-  pdf.text("Tel: +34 600 000 000 - info@anacleto.com", 15, 42);
+  pdf.text("Avenida cortes valencianas, n11 bajo", 15, 38);
+  pdf.text("46980 Paterna (Valencia) - info@anacleto.com", 15, 42);
 
   // COTIZACION badge
   pdf.setFillColor(accent[0], accent[1], accent[2]);

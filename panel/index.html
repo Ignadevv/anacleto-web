@@ -876,8 +876,8 @@
       pdf.setFillColor(dk[0],dk[1],dk[2]);pdf.rect(0,0,210,48,"F");
       pdf.setFillColor(ac[0],ac[1],ac[2]);pdf.rect(0,45,210,3,"F");
       pdf.setFont("helvetica","bold");pdf.setFontSize(24);pdf.setTextColor(255,255,255);pdf.text("ANACLETO",15,22);
-      pdf.setFontSize(9);pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("TALLER DE REPARACION DE PATINETES ELECTRICOS",15,30);
-      pdf.setFontSize(7);pdf.setTextColor(gr[0],gr[1],gr[2]);pdf.text("Calle del Taller, 12 - Madrid",15,38);pdf.text("Tel: +34 600 000 000 - info@anacleto.com",15,42);
+      pdf.setFontSize(9);pdf.setTextColor(ac[0],ac[1],ac[2]);pdf.text("VICENTE LARA SOLER - NIF: 48412185Z",15,30);
+      pdf.setFontSize(7);pdf.setTextColor(gr[0],gr[1],gr[2]);pdf.text("Avenida cortes valencianas, n11 bajo",15,38);pdf.text("46980 Paterna (Valencia) - info@anacleto.com",15,42);
       pdf.setFillColor(ac[0],ac[1],ac[2]);pdf.roundedRect(130,10,65,14,2,2,"F");pdf.setFont("helvetica","bold");pdf.setFontSize(11);pdf.setTextColor(0,0,0);pdf.text("HOJA DE ENTRADA",140,19);
       pdf.setFontSize(8);pdf.setTextColor(gr[0],gr[1],gr[2]);pdf.text("No: "+o.id.slice(0,10).toUpperCase(),135,32);pdf.text("Fecha: "+formatDate(o.fechaEntrada),135,38);
       var sl={pendiente:"PENDIENTE",en_reparacion:"EN REPARACION",listo:"LISTO",entregado:"ENTREGADO"};pdf.text("Estado: "+(sl[o.estado]||o.estado),135,42);
