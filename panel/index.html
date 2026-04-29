@@ -734,7 +734,16 @@
     }
 
     function formatDate(val) {
-      if (!val) return "—"; var d = val.toDate ? val.toDate() : new Date(val);
+      if (!val) return "—";
+      var d;
+      if (val.toDate) { d = val.toDate(); }
+      else if (typeof val === "string" && val.length === 10) { 
+        d = new Date(val + 'T00:00:00'); 
+      }
+      else { d = new Date(val); }
+      
+      if(isNaN(d.getTime())) return val;
+      
       var datePart = d.toLocaleDateString("es-ES", {day:"2-digit", month:"short", year:"numeric", timeZone: "Europe/Madrid"});
       var timePart = d.toLocaleTimeString("es-ES", {hour: "2-digit", minute: "2-digit", timeZone: "Europe/Madrid"});
       return datePart + " " + timePart;
@@ -857,7 +866,7 @@
           clienteId: o.clienteId || "",
           clienteNombre: o.clienteNombre || "Cliente",
           numeroFactura: num,
-          fecha: new Date().toISOString().split('T')[0],
+          fecha: new Date().toISOString(), // Guardar ISO completo con hora
           estado: "pagada",
           metodoPago: o.metodoPago || "efectivo",
           items: items,
@@ -1576,7 +1585,11 @@
       var se = document.getElementById("search-invoices"); var st = se?se.value.toLowerCase():"";
       if(currentInvoiceFilter === "hoy") {
         var today = new Date().toISOString().split("T")[0];
-        fil = fil.filter(function(i){ return i.fecha === today; });
+        fil = fil.filter(function(i){ 
+          var dStr = (i.fecha && i.fecha.toDate) ? i.fecha.toDate().toISOString().split("T")[0] : 
+                     (i.fecha ? new Date(i.fecha).toISOString().split("T")[0] : "");
+          return dStr === today;
+        });
       } else if(currentInvoiceFilter !== "todos") {
         fil = fil.filter(function(i){ return i.estado === currentInvoiceFilter; });
       }
@@ -2001,7 +2014,7 @@
           await db.collection("facturas").add({
             clienteNombre: data.cliente,
             numeroFactura: num,
-            fecha: data.fecha,
+            fecha: new Date().toISOString(), // Guardar ISO completo con hora
             estado: "pagada",
             metodoPago: data.metodoPago,
             items: [{ descripcion: data.productos, cantidad: 1, precio: data.total }],
