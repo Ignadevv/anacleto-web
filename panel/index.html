@@ -16,7 +16,7 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-brand">
-      <div class="icon">⚡</div>
+      <img src="logo.png" alt="Anacleto Logo" style="width: 42px; height: 42px; object-fit: contain;">
       <div>
         <h2>ANACLETO</h2>
         <span>Taller de Reparación</span>
@@ -36,6 +36,12 @@
       </div>
       <div class="nav-item" data-view="facturas" onclick="navigate('facturas')">
         <span class="emoji">🧾</span> Facturas
+      </div>
+      <div class="nav-item" data-view="citas" onclick="navigate('citas')">
+        <span class="emoji">📅</span> Citas
+      </div>
+      <div class="nav-item" data-view="ventas" onclick="navigate('ventas')">
+        <span class="emoji">🛍️</span> Ventas Accesorios
       </div>
       <div class="nav-item" data-view="recordatorios" onclick="navigate('recordatorios')">
         <span class="emoji">📝</span> Recordatorios
@@ -133,6 +139,7 @@
           </div>
           <div class="filter-group">
             <button class="filter-btn active" data-filter="todos" onclick="setFilter('todos',this)">Todos</button>
+            <button class="filter-btn" data-filter="hoy" onclick="setFilter('hoy',this)">📅 Hoy</button>
             <button class="filter-btn" data-filter="pendiente" onclick="setFilter('pendiente',this)">Pendiente</button>
             <button class="filter-btn" data-filter="en_reparacion" onclick="setFilter('en_reparacion',this)">En Reparación</button>
             <button class="filter-btn" data-filter="listo" onclick="setFilter('listo',this)">Listo</button>
@@ -177,6 +184,90 @@
         </table>
       </div>
     </section>
+
+    <!-- ===== VIEW: CITAS ===== -->
+    <section class="view" id="view-citas">
+      <div class="page-header">
+        <div>
+          <h1>📅 Citas Previas</h1>
+          <p class="subtitle">Gestión de citas agendadas por clientes</p>
+        </div>
+        <button class="btn btn-primary" onclick="openCitaForm()">+ Nueva Cita</button>
+      </div>
+
+      <div class="citas-layout">
+        <div class="calendar-wrapper">
+          <div class="calendar-header">
+            <button class="btn btn-secondary btn-small" onclick="changeMonth(-1)">&lt;</button>
+            <h3 id="calendar-month-year">Mes Año</h3>
+            <button class="btn btn-secondary btn-small" onclick="changeMonth(1)">&gt;</button>
+          </div>
+          <div class="calendar-grid">
+            <div class="calendar-day-name">Lun</div>
+            <div class="calendar-day-name">Mar</div>
+            <div class="calendar-day-name">Mié</div>
+            <div class="calendar-day-name">Jue</div>
+            <div class="calendar-day-name">Vie</div>
+            <div class="calendar-day-name">Sáb</div>
+            <div class="calendar-day-name">Dom</div>
+          </div>
+          <div class="calendar-grid" id="calendar-days">
+            <!-- Days will be generated here -->
+          </div>
+        </div>
+
+        <div class="table-container" style="margin-top:0;">
+          <div class="table-toolbar" style="gap: 1rem; align-items: center;">
+            <h3 id="citas-table-title" style="margin:0; font-size:1.1rem; color:var(--text);">Citas del Día</h3>
+            <input type="hidden" id="filter-cita-date" onchange="renderCitas()">
+            <button class="btn btn-secondary btn-small" style="margin-left:auto;" onclick="selectToday()">Ver Hoy</button>
+          </div>
+          <div style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
+            <table>
+              <thead>
+                <tr><th>Hora</th><th>Cliente</th><th>Patinete / Motivo</th><th>Teléfono</th><th>Acciones</th></tr>
+              </thead>
+              <tbody id="citas-table">
+                <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== VIEW: VENTAS ACCESORIOS ===== -->
+    <section class="view" id="view-ventas">
+      <div class="page-header">
+        <div>
+          <h1>🛍️ Ventas de Accesorios</h1>
+          <p class="subtitle">Registro de ventas directas de accesorios y componentes</p>
+        </div>
+        <button class="btn btn-primary" onclick="openVentaForm()">+ Nueva Venta</button>
+      </div>
+
+      <div class="table-container">
+        <div class="table-toolbar">
+          <div class="search-box">
+            <span>🔍</span>
+            <input type="text" id="search-ventas" placeholder="Buscar por producto o cliente..." oninput="renderVentasTable()">
+          </div>
+          <div class="filter-group">
+            <button class="filter-btn active" data-filter="todos" onclick="setVentasFilter('todos',this)">Todas</button>
+            <button class="filter-btn" data-filter="hoy" onclick="setVentasFilter('hoy',this)">📅 Hoy</button>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Fecha</th><th>Cliente</th><th>Productos</th><th>Total</th><th>Pago</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="ventas-table">
+            <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
     <!-- ===== VIEW: RECORDATORIOS ===== -->
     <section class="view" id="view-recordatorios">
       <div class="page-header">
@@ -184,9 +275,15 @@
           <h1>📝 Recordatorios</h1>
           <p class="subtitle">Gestiona notas y tareas pendientes del taller</p>
         </div>
-        <div class="header-actions" style="display:flex; gap:1rem;">
-          <div class="search-box">
-             <input type="text" id="new-note-input" placeholder="Escribir un recordatorio..." style="min-width:300px;" onkeypress="if(event.key==='Enter') addNote()">
+        <div class="header-actions" style="display:flex; gap:1rem; align-items: center;">
+          <div class="search-box" style="gap: 0.5rem; padding: 0.5rem 1rem;">
+             <select id="new-note-urgency" style="background:transparent; border:none; color:var(--text); outline:none; font-size:1.1rem; cursor:pointer;" title="Nivel de urgencia">
+               <option value="normal" title="Normal">⚪</option>
+               <option value="baja" title="Baja">🟢</option>
+               <option value="media" title="Media">🟡</option>
+               <option value="alta" title="Alta">🔴</option>
+             </select>
+             <input type="text" id="new-note-input" placeholder="Escribir un recordatorio..." style="min-width:300px; padding:0; border:none;" onkeypress="if(event.key==='Enter') addNote()">
           </div>
           <button class="btn btn-primary" onclick="addNote()">Añadir Nota</button>
         </div>
@@ -214,6 +311,7 @@
           </div>
           <div class="filter-group">
             <button class="filter-btn active" data-filter="todos" onclick="setInvoiceFilter('todos',this)">Todas</button>
+            <button class="filter-btn" data-filter="hoy" onclick="setInvoiceFilter('hoy',this)">📅 Hoy</button>
             <button class="filter-btn" data-filter="pendiente" onclick="setInvoiceFilter('pendiente',this)">Pendientes</button>
             <button class="filter-btn" data-filter="pagada" onclick="setInvoiceFilter('pagada',this)">Pagadas</button>
           </div>
@@ -297,7 +395,7 @@
             <div class="form-row">
               <div class="form-group"><label>Nº de Factura (opcional)</label><input type="number" id="or-num-factura" placeholder="Dejar vacío para auto"></div>
               <div class="form-group" style="display:flex; align-items:center; gap:0.5rem; padding-top:1.5rem;">
-                <input type="checkbox" id="or-solo-total-piezas" style="width:auto; cursor:pointer;">
+                <input type="checkbox" id="or-solo-total-piezas" onchange="autoSumPieces()" style="width:auto; cursor:pointer;">
                 <label for="or-solo-total-piezas" style="margin:0; cursor:pointer; font-size:0.85rem;">Solo sumar total en piezas</label>
               </div>
             </div>
@@ -442,6 +540,112 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: CITA ===== -->
+  <div class="modal-overlay" id="modal-cita">
+    <div class="modal" style="max-width:550px;">
+      <div class="modal-header">
+        <h2 id="cita-modal-title">Nueva Cita</h2>
+        <button class="modal-close" onclick="closeModal('modal-cita')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="cita-form" onsubmit="return false;">
+          <input type="hidden" id="cita-id">
+          <div class="form-group">
+            <label>Buscar cliente existente</label>
+            <select id="cita-client-select" onchange="onCitaClientSelect()">
+              <option value="">— Crear nuevo cliente —</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Nombre completo *</label><input type="text" id="ci-nombre" required><span class="form-error">Nombre obligatorio</span></div>
+            <div class="form-group"><label>Teléfono *</label><input type="tel" id="ci-telefono" placeholder="+34 612 345 678" required><span class="form-error">Teléfono obligatorio</span></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group"><label>Fecha *</label><input type="date" id="ci-fecha" required><span class="form-error">Obligatorio</span></div>
+            <div class="form-group"><label>Hora *</label><input type="time" id="ci-hora" required><span class="form-error">Obligatorio</span></div>
+          </div>
+          <div class="form-group"><label>Patinete y Motivo</label><input type="text" id="ci-motivo" placeholder="Ej: Xiaomi M365 - Cambio de rueda"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-cita')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveCita()">💾 Guardar Cita</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: WHATSAPP LISTO ===== -->
+  <div class="modal-overlay" id="modal-whatsapp-listo">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header">
+        <h2>Enviar Mensaje a Cliente</h2>
+        <button class="modal-close" onclick="closeModal('modal-whatsapp-listo')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Mensaje de WhatsApp</label>
+          <textarea id="wa-listo-msg" rows="4" style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Exo 2';font-size:0.9rem;outline:none;resize:vertical;"></textarea>
+        </div>
+        <input type="hidden" id="wa-listo-order-id">
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-whatsapp-listo')">Cancelar</button>
+        <button class="btn btn-whatsapp" onclick="sendWhatsappListo()">📱 Abrir WhatsApp y marcar Listo</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== MODAL: VENTA ===== -->
+  <div class="modal-overlay" id="modal-venta">
+    <div class="modal" style="max-width: 600px;">
+      <div class="modal-header">
+        <h2 id="venta-modal-title">Nueva Venta de Accesorios</h2>
+        <button class="modal-close" onclick="closeModal('modal-venta')">✕</button>
+      </div>
+      <form id="venta-form" onsubmit="event.preventDefault(); saveVenta();">
+        <input type="hidden" id="venta-id">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Cliente (Opcional)</label>
+              <input type="text" id="ve-cliente" placeholder="Nombre del cliente">
+            </div>
+            <div class="form-group">
+              <label>Fecha</label>
+              <input type="date" id="ve-fecha">
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Productos y Cantidades</label>
+            <textarea id="ve-productos" placeholder="Ej: 2x Luces LED, 1x Casco..." rows="3" required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Total (€)</label>
+              <input type="number" id="ve-total" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+              <label>Método de Pago</label>
+              <select id="ve-metodo-pago">
+                <option value="efectivo">💵 Efectivo</option>
+                <option value="bizum">📱 Bizum</option>
+                <option value="tarjeta">💳 Tarjeta</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Notas</label>
+            <input type="text" id="ve-notas" placeholder="Cualquier detalle adicional...">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('modal-venta')">Cancelar</button>
+          <button type="submit" class="btn btn-primary" id="btn-save-venta">Guardar Venta</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <!-- TOAST -->
   <div class="toast" id="toast"></div>
 
@@ -470,8 +674,11 @@
     var allOrders = [];
     var allClients = [];
     var allNotes = [];
+    var allCitas = [];
     var allInvoices = [];
+    var allVentas = [];
     var currentFilter = "todos";
+    var currentVentasFilter = "todos";
     var currentInvoiceFilter = "todos";
     var currentWizardStep = 1;
     var falloCounter = 0;
@@ -502,8 +709,9 @@
 
     // ===== DATA =====
     async function loadAllData() {
-      try { await Promise.all([loadOrders(), loadClients(), loadNotes(), loadInvoices()]); } catch(e) { console.error(e); }
-      updateKPIs(); renderRecentOrders(); renderOrdersTable(); renderClientsTable(); renderNotes(); renderInvoicesTable(); populateClientSelect(); populateInvoiceClientSelect();
+      try { await Promise.all([loadOrders(), loadClients(), loadNotes(), loadInvoices(), loadCitas(), loadVentas()]); } catch(e) { console.error(e); }
+      if(!document.getElementById("filter-cita-date").value) document.getElementById("filter-cita-date").value = new Date().toISOString().split("T")[0];
+      updateKPIs(); renderRecentOrders(); renderOrdersTable(); renderClientsTable(); renderNotes(); renderInvoicesTable(); renderVentasTable(); renderCalendar(); renderCitas(); populateClientSelect(); populateInvoiceClientSelect(); populateCitaClientSelect();
     }
 
     async function loadOrders() {
@@ -573,7 +781,18 @@
     function renderOrdersTable() {
       var tb = document.getElementById("orders-table"); var fil = allOrders.slice();
       var se = document.getElementById("search-orders"); var st = se?se.value.toLowerCase():"";
-      if(currentFilter!=="todos") fil=fil.filter(function(o){return o.estado===currentFilter;});
+      
+      if(currentFilter==="hoy") {
+        var today = new Date().toISOString().split("T")[0];
+        fil = fil.filter(function(o) {
+          var date = (o.fechaEntrada && o.fechaEntrada.toDate) ? o.fechaEntrada.toDate().toISOString().split("T")[0] : 
+                     (o.fechaEntrada ? new Date(o.fechaEntrada).toISOString().split("T")[0] : "");
+          return date === today;
+        });
+      } else if(currentFilter!=="todos") {
+        fil=fil.filter(function(o){return o.estado===currentFilter;});
+      }
+
       if(st) fil=fil.filter(function(o){
         var cl=allClients.find(function(c){return c.id===o.clienteId;});
         var ph=(cl?cl.telefono:"").toLowerCase();
@@ -597,19 +816,72 @@
         h+='<button class="btn btn-secondary btn-small" onclick="editOrder(\''+o.id+'\')">✏️</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" style="background:rgba(255,255,255,0.05);color:var(--text);">📄 Factura</button>';
         h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')">🟢 Listo</button>';
+        if(o.estado === "listo") {
+          h+='<button class="btn btn-primary btn-small" onclick="marcarRecogida(\''+o.id+'\')" style="background:var(--success); color:#000;">💰 Recogida</button>';
+        }
         h+='<button class="btn btn-danger btn-small" onclick="deleteOrder(\''+o.id+'\')">🗑</button>';
         h+='</div></td></tr>';
       }); tb.innerHTML=h;
     }
 
-    async function whatsappReady(id) {
+    function whatsappReady(id) {
       var o=allOrders.find(function(x){return x.id===id;}); if(!o) return;
       var cl=allClients.find(function(c){return c.id===o.clienteId;});
       var nombre = o.clienteNombre || (cl?cl.nombre:"");
-      var msg = "Hola " + nombre + ", ya esta listo tu patinete para que salga a rodar";
+      var msg = "Hola " + nombre + ", ya esta listo tu patinete para que salir a rodar";
+      document.getElementById("wa-listo-msg").value = msg;
+      document.getElementById("wa-listo-order-id").value = id;
+      openModal("modal-whatsapp-listo");
+    }
+
+    async function marcarRecogida(id) {
+      var o = allOrders.find(function(x){ return x.id === id; });
+      if(!o) return;
+      
+      try {
+        var num = o.numeroFactura || getNextInvoiceNumber();
+        await db.collection("reparaciones").doc(id).update({ 
+          estado: "entregado", 
+          numeroFactura: num,
+          fechaSalida: firebase.firestore.Timestamp.now()
+        });
+        
+        // Crear factura automática
+        var items = [];
+        (o.piezasUsadas||[]).forEach(function(p){ items.push({ descripcion: p.nombre, cantidad: p.cantidad, precio: p.precio }); });
+        var pt = (o.piezasUsadas||[]).reduce(function(s,p){return s+(p.precio*p.cantidad);},0);
+        var manoObra = (parseFloat(o.costeTotal)||0) - pt;
+        if(manoObra > 0) items.push({ descripcion: "Mano de Obra / Servicio", cantidad: 1, precio: manoObra });
+        
+        await db.collection("facturas").add({
+          clienteId: o.clienteId || "",
+          clienteNombre: o.clienteNombre || "Cliente",
+          numeroFactura: num,
+          fecha: new Date().toISOString().split('T')[0],
+          estado: "pagada",
+          metodoPago: o.metodoPago || "efectivo",
+          items: items,
+          total: parseFloat(o.costeTotal) || 0,
+          sourceId: o.id,
+          tipo: "taller",
+          lastUpdated: firebase.firestore.Timestamp.now()
+        });
+        
+        showToast("Reparación entregada y factura generada ✅");
+        await loadAllData();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    async function sendWhatsappListo() {
+      var id = document.getElementById("wa-listo-order-id").value;
+      var msg = document.getElementById("wa-listo-msg").value;
+      var o=allOrders.find(function(x){return x.id===id;}); if(!o) return;
+      var cl=allClients.find(function(c){return c.id===o.clienteId;});
       var tel = (cl && cl.telefono) ? cl.telefono.replace(/\D/g,'') : '';
       if(tel.length === 9 && (tel.startsWith('6') || tel.startsWith('7'))) tel = '34' + tel;
       window.open("https://api.whatsapp.com/send?phone=" + tel + "&text=" + encodeURIComponent(msg), "_blank");
+      
+      closeModal("modal-whatsapp-listo");
       
       // AUTO-LISTO
       if(o.estado !== 'listo' && o.estado !== 'entregado'){
@@ -711,14 +983,25 @@
     function addPieza() {
       piezaCounter++;
       var el=document.getElementById("piezas-list"), div=document.createElement("div"); div.className="dynamic-item";
-      div.innerHTML='<button type="button" class="remove-item" onclick="this.parentElement.remove()">✕</button>'+
+      div.innerHTML='<button type="button" class="remove-item" onclick="this.parentElement.remove(); autoSumPieces();">✕</button>'+
         '<div class="form-row"><div class="form-group" style="margin-bottom:0;"><label>Nombre pieza</label>'+
         '<input type="text" class="pieza-nombre" placeholder="Batería 10Ah, freno disco..."></div>'+
         '<div class="form-group" style="margin-bottom:0;"><label>Precio (€)</label>'+
-        '<input type="number" class="pieza-precio" step="0.01" min="0" placeholder="0.00"></div></div>'+
+        '<input type="number" class="pieza-precio" step="0.01" min="0" placeholder="0.00" oninput="autoSumPieces()"></div></div>'+
         '<div class="form-group" style="margin-top:0.8rem;margin-bottom:0;">'+
-        '<label>Cantidad</label><input type="number" class="pieza-cantidad" value="1" min="1"></div>';
+        '<label>Cantidad</label><input type="number" class="pieza-cantidad" value="1" min="1" oninput="autoSumPieces()"></div>';
       el.appendChild(div);
+    }
+    
+    function autoSumPieces() {
+      if (!document.getElementById("or-solo-total-piezas").checked) return;
+      var total = 0;
+      document.querySelectorAll("#piezas-list .dynamic-item").forEach(function(d){
+        var q = parseFloat(d.querySelector(".pieza-cantidad").value) || 0;
+        var p = parseFloat(d.querySelector(".pieza-precio").value) || 0;
+        total += q * p;
+      });
+      document.getElementById("or-coste").value = total.toFixed(2);
     }
 
     function collectFallos(){var items=[];document.querySelectorAll("#fallos-list .dynamic-item").forEach(function(d){items.push({gravedad:d.querySelector(".fallo-gravedad").value,descripcion:d.querySelector(".fallo-desc").value});});return items;}
@@ -771,6 +1054,92 @@
       }catch(e){showToast("Error: "+e.message,"error");return null;}
     }
 
+    // CALENDAR LOGIC
+    var calCurrentDate = new Date();
+    
+    function changeMonth(offset) {
+      calCurrentDate.setMonth(calCurrentDate.getMonth() + offset);
+      renderCalendar();
+    }
+    
+    function selectToday() {
+      calCurrentDate = new Date();
+      var todayStr = calCurrentDate.toISOString().split('T')[0];
+      document.getElementById("filter-cita-date").value = todayStr;
+      renderCalendar();
+      renderCitas();
+    }
+    
+    function renderCalendar() {
+      var monthYear = document.getElementById("calendar-month-year");
+      if(!monthYear) return;
+      var y = calCurrentDate.getFullYear(), m = calCurrentDate.getMonth();
+      var monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      monthYear.textContent = monthNames[m] + " " + y;
+      
+      var firstDay = new Date(y, m, 1).getDay();
+      var startDay = firstDay === 0 ? 6 : firstDay - 1; 
+      var daysInMonth = new Date(y, m + 1, 0).getDate();
+      
+      var todayStr = new Date().toISOString().split('T')[0];
+      var selectedStr = document.getElementById("filter-cita-date").value || todayStr;
+      if(!document.getElementById("filter-cita-date").value) {
+        document.getElementById("filter-cita-date").value = selectedStr;
+      }
+      
+      var grid = document.getElementById("calendar-days");
+      grid.innerHTML = "";
+      
+      for(var i=0; i<startDay; i++) {
+        var empty = document.createElement("div");
+        empty.className = "calendar-day empty";
+        grid.appendChild(empty);
+      }
+      
+      for(var d=1; d<=daysInMonth; d++) {
+        var dayDate = new Date(y, m, d);
+        var dateStr = dayDate.getFullYear() + "-" + String(dayDate.getMonth()+1).padStart(2,'0') + "-" + String(dayDate.getDate()).padStart(2,'0');
+        
+        var cell = document.createElement("div");
+        cell.className = "calendar-day";
+        if(dateStr === todayStr) cell.classList.add("today");
+        if(dateStr === selectedStr) cell.classList.add("active");
+        
+        cell.onclick = (function(ds) {
+          return function() {
+            document.getElementById("filter-cita-date").value = ds;
+            renderCalendar();
+            renderCitas();
+          };
+        })(dateStr);
+        
+        var num = document.createElement("div");
+        num.className = "day-num";
+        num.textContent = d;
+        cell.appendChild(num);
+        
+        var dayCitas = allCitas.filter(function(ci) { return ci.fecha === dateStr; });
+        dayCitas.sort(function(a,b){ return (a.hora||"").localeCompare(b.hora||""); });
+        
+        dayCitas.forEach(function(ci, idx) {
+          if(idx < 3) {
+            var b = document.createElement("div");
+            b.className = "cita-badge";
+            b.textContent = ci.hora + " " + (ci.nombre || "").split(" ")[0];
+            cell.appendChild(b);
+          } else if(idx === 3) {
+            var mx = document.createElement("div");
+            mx.className = "cita-badge";
+            mx.style.background = "var(--text-dim)";
+            mx.textContent = "+" + (dayCitas.length - 3) + " más";
+            cell.appendChild(mx);
+          }
+        });
+        
+        grid.appendChild(cell);
+      }
+    }
+
     async function saveAndGeneratePDF(){var id=await saveOrder();if(id)setTimeout(function(){generatePDF(id);},600);}
 
     function navigate(viewId){
@@ -788,6 +1157,13 @@
     function setFilter(f,btn){currentFilter=f;document.querySelectorAll(".filter-btn").forEach(function(b){b.classList.remove("active");});btn.classList.add("active");renderOrdersTable();}
     function filterOrders(){renderOrdersTable();}
     function filterClients(){renderClientsTable();}
+
+    function setVentasFilter(f, btn) {
+      currentVentasFilter = f;
+      document.querySelectorAll("#view-ventas .filter-btn").forEach(function(b){ b.classList.remove("active"); });
+      btn.classList.add("active");
+      renderVentasTable();
+    }
 
     function onClientSelect(){
       var sel=document.getElementById("order-client-select");
@@ -901,11 +1277,7 @@
       var cr=[];
       var pt=(o.piezasUsadas||[]).reduce(function(s,p){return s+(p.precio*p.cantidad);},0),lc=(parseFloat(o.costeTotal)||0)-pt;
       
-      if(o.soloTotalPiezas && (o.piezasUsadas||[]).length > 0) {
-        cr.push(["Piezas Utilizadas","1","€"+pt.toFixed(2),"€"+pt.toFixed(2)]);
-      } else {
-        (o.piezasUsadas||[]).forEach(function(p){cr.push(["Pieza: "+p.nombre,p.cantidad.toString(),"€"+p.precio.toFixed(2),"€"+(p.precio*p.cantidad).toFixed(2)]);});
-      }
+      (o.piezasUsadas||[]).forEach(function(p){cr.push(["Pieza: "+p.nombre,p.cantidad.toString(),"€"+p.precio.toFixed(2),"€"+(p.precio*p.cantidad).toFixed(2)]);});
       
       if(lc>0)cr.push(["Mano de obra","1","€"+lc.toFixed(2),"€"+lc.toFixed(2)]);
       if(!cr.length)cr.push(["Servicio completo","1","€"+(o.costeTotal||0).toFixed(2),"€"+(o.costeTotal||0).toFixed(2)]);
@@ -970,9 +1342,7 @@
       // Obtener o asignar número de factura secuencial
       var numFactura = o.numeroFactura;
       if(!numFactura) {
-        // Simple: contar órdenes existentes y sumar 1 (o buscar el máx actual)
-        var maxNum = allOrders.reduce(function(max, ord){ return (ord.numeroFactura || 0) > max ? ord.numeroFactura : max; }, 0);
-        numFactura = maxNum + 1;
+        numFactura = getNextInvoiceNumber();
         // Guardar el número en la base de datos para que sea permanente
         db.collection("reparaciones").doc(o.id).update({ numeroFactura: numFactura });
         o.numeroFactura = numFactura; // Actualizar localmente
@@ -1076,6 +1446,72 @@
       showToast("Factura generada con éxito ✅");
     }
 
+    function getNextInvoiceNumber() {
+      var max1 = allOrders.reduce(function(max, o){ return (o.numeroFactura || 0) > max ? o.numeroFactura : max; }, 0);
+      var max2 = allVentas.reduce(function(max, v){ return (v.numeroFactura || 0) > max ? v.numeroFactura : max; }, 0);
+      var max3 = allInvoices.reduce(function(max, i){ return (i.numeroFactura || 0) > max ? i.numeroFactura : max; }, 0);
+      return Math.max(max1, max2, max3, 0) + 1;
+    }
+
+    function generateVentaInvoice(id) {
+      var v = allVentas.find(function(x){ return x.id === id; });
+      if(!v) { showToast("Venta no encontrada", "error"); return; }
+      
+      var numFactura = v.numeroFactura;
+      if(!numFactura) {
+        numFactura = getNextInvoiceNumber();
+        db.collection("ventas_accesorios").doc(v.id).update({ numeroFactura: numFactura });
+        v.numeroFactura = numFactura;
+      }
+
+      var pdf = new window.jspdf.jsPDF();
+      var blue = [0,74,134], dark = [45,45,45], gray = [120,120,120], red = [192,57,43];
+
+      // Cabecera
+      pdf.setFont("helvetica","bold"); pdf.setFontSize(32); pdf.setTextColor(blue[0],blue[1],blue[2]); pdf.text("FACTURA",15,30);
+      try { pdf.addImage('logo.png', 'PNG', 145, 8, 50, 40); } catch(e) {}
+      
+      pdf.setFontSize(9); pdf.setTextColor(0,0,0); pdf.text("Vicente Lara Soler",15,45);
+      pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(dark[0],dark[1],dark[2]);
+      pdf.text("NIF: 48412185Z",15,50); pdf.text("Avenida cortes valencianas, n11 bajo",15,54); pdf.text("46980 Paterna (Valencia)",15,58);
+
+      pdf.setFont("helvetica","bold"); pdf.setFontSize(10); pdf.setTextColor(blue[0],blue[1],blue[2]); pdf.text("FACTURAR A",15,75);
+      pdf.setFont("helvetica","normal"); pdf.setFontSize(9); pdf.setTextColor(dark[0],dark[1],dark[2]); pdf.text(v.cliente || "Cliente Directo", 15, 82);
+      
+      pdf.setFont("helvetica","bold"); pdf.setTextColor(blue[0],blue[1],blue[2]); pdf.text("Nº DE FACTURA",120,75); pdf.text("FECHA",120,82);
+      pdf.setFont("helvetica","normal"); pdf.setTextColor(dark[0],dark[1],dark[2]);
+      pdf.text(numFactura.toString().padStart(4, '0'), 180, 75, {align:"right"});
+      pdf.text(v.fecha || new Date().toISOString().split("T")[0], 180, 82, {align:"right"});
+
+      var y = 100;
+      pdf.setDrawColor(red[0],red[1],red[2]); pdf.setLineWidth(0.5); pdf.line(15,y,195,y);
+      pdf.setFont("helvetica","bold"); pdf.setTextColor(blue[0],blue[1],blue[2]); pdf.text("DESCRIPCIÓN",15,y+8); pdf.text("IMPORTE",195,y+8,{align:"right"}); y+=14;
+
+      pdf.setFont("helvetica","normal"); pdf.setFontSize(9); pdf.setTextColor(dark[0],dark[1],dark[2]);
+      var prods = (v.productos || "Venta de accesorios").split('\n');
+      prods.forEach(function(line){
+        if(y > 250) { pdf.addPage(); y = 20; }
+        pdf.text(line, 15, y);
+        y += 6;
+      });
+
+      var total = parseFloat(v.total || 0);
+      var base = total / 1.21;
+      var iva = total - base;
+
+      y += 10;
+      pdf.setFontSize(8); pdf.setTextColor(gray[0],gray[1],gray[2]);
+      pdf.text("Base Imponible:", 130, y); pdf.text(base.toFixed(2).replace('.',',')+" €", 195, y, {align:"right"}); y+=5;
+      pdf.text("IVA (21%):", 130, y); pdf.text(iva.toFixed(2).replace('.',',')+" €", 195, y, {align:"right"}); y+=5;
+      
+      pdf.setFont("helvetica","bold"); pdf.setFontSize(14); pdf.setTextColor(blue[0],blue[1],blue[2]);
+      pdf.text("TOTAL FACTURA", 130, y+8);
+      pdf.text(total.toFixed(2).replace('.',',')+" €", 195, y+8, {align:"right"});
+
+      pdf.save("Factura_Venta_"+numFactura+".pdf");
+      showToast("Factura de venta generada ✅");
+    }
+
     async function loadNotes() {
       try {
         var snap = await db.collection("notas").orderBy("fecha", "desc").get();
@@ -1085,10 +1521,12 @@
     async function addNote() {
       var inp = document.getElementById("new-note-input");
       var text = inp.value.trim();
+      var urgency = document.getElementById("new-note-urgency").value;
       if(!text) return;
       try {
         await db.collection("notas").add({
           texto: text,
+          urgencia: urgency,
           fecha: firebase.firestore.Timestamp.now()
         });
         inp.value = "";
@@ -1112,7 +1550,8 @@
       allNotes.forEach(function(n) {
         var date = n.fecha ? (n.fecha.toDate ? n.fecha.toDate() : new Date(n.fecha)) : new Date();
         var dateStr = date.toLocaleDateString("es-ES") + " " + date.toLocaleTimeString("es-ES", {hour:'2-digit', minute:'2-digit'});
-        h += '<div class="note-card">';
+        var urg = n.urgencia || "normal";
+        h += '<div class="note-card note-' + urg + '">';
         h += '  <div class="note-text">' + n.texto + '</div>';
         h += '  <div class="note-footer">';
         h += '    <span class="note-date">' + dateStr + '</span>';
@@ -1135,8 +1574,14 @@
       var tb = document.getElementById("invoices-table"); if(!tb) return;
       var fil = allInvoices.slice();
       var se = document.getElementById("search-invoices"); var st = se?se.value.toLowerCase():"";
-      if(currentInvoiceFilter!=="todos") fil=fil.filter(function(i){return i.estado===currentInvoiceFilter;});
-      if(st) fil=fil.filter(function(i){
+      if(currentInvoiceFilter === "hoy") {
+        var today = new Date().toISOString().split("T")[0];
+        fil = fil.filter(function(i){ return i.fecha === today; });
+      } else if(currentInvoiceFilter !== "todos") {
+        fil = fil.filter(function(i){ return i.estado === currentInvoiceFilter; });
+      }
+
+      if(st) fil = fil.filter(function(i){
         return (i.clienteNombre||"").toLowerCase().indexOf(st)!==-1 || String(i.numeroFactura).indexOf(st)!==-1;
       });
       if(!fil.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:3rem;">No hay facturas registradas</td></tr>';return;}
@@ -1161,6 +1606,140 @@
       allClients.forEach(function(c){
         var o=document.createElement("option"); o.value=c.id; o.textContent=c.nombre; sel.appendChild(o);
       });
+    }
+
+    // ===== CITAS LOGIC =====
+    async function loadCitas() {
+      try {
+        var snap = await db.collection("citas").orderBy("fecha", "asc").get();
+        allCitas = []; snap.forEach(function(d) { allCitas.push(Object.assign({id: d.id}, d.data())); });
+      } catch(e) { console.error("Error citas:", e); allCitas = []; }
+    }
+
+    async function loadVentas() {
+      try {
+        var snap = await db.collection("ventas_accesorios").orderBy("fecha", "desc").get();
+        allVentas = []; snap.forEach(function(d) { allVentas.push(Object.assign({id: d.id}, d.data())); });
+      } catch(e) { console.error("Error ventas:", e); allVentas = []; }
+    }
+
+    function populateCitaClientSelect() {
+      var sel = document.getElementById("cita-client-select"); if(!sel) return;
+      sel.innerHTML='<option value="">-- Nuevo / Sin vincular --</option>';
+      allClients.forEach(function(c){
+        var o=document.createElement("option"); o.value=c.id; o.textContent=c.nombre; sel.appendChild(o);
+      });
+    }
+
+    function onCitaClientSelect() {
+      var cId = document.getElementById("cita-client-select").value;
+      if(cId) {
+        var cl = allClients.find(function(c){ return c.id === cId; });
+        if(cl) {
+          document.getElementById("ci-nombre").value = cl.nombre;
+          document.getElementById("ci-telefono").value = cl.telefono || "";
+        }
+      }
+    }
+
+    function openCitaForm() {
+      document.getElementById("cita-form").reset();
+      document.getElementById("cita-id").value = "";
+      document.getElementById("cita-modal-title").textContent = "Nueva Cita";
+      var sel = document.getElementById("filter-cita-date").value;
+      if(sel) document.getElementById("ci-fecha").value = sel;
+      else document.getElementById("ci-fecha").value = new Date().toISOString().split("T")[0];
+      populateCitaClientSelect();
+      openModal("modal-cita");
+    }
+
+    async function saveCita() {
+      var cId = document.getElementById("cita-client-select").value;
+      var nom = document.getElementById("ci-nombre").value.trim();
+      var tel = document.getElementById("ci-telefono").value.trim();
+      var fecha = document.getElementById("ci-fecha").value;
+      var hora = document.getElementById("ci-hora").value;
+      
+      if(!nom || !fecha || !hora) { showToast("Nombre, fecha y hora son obligatorios", "error"); return; }
+      
+      var data = {
+        clienteId: cId || null,
+        nombre: nom,
+        telefono: tel,
+        fecha: fecha,
+        hora: hora,
+        motivo: document.getElementById("ci-motivo").value.trim(),
+        lastUpdated: firebase.firestore.Timestamp.now()
+      };
+
+      try {
+        var id = document.getElementById("cita-id").value;
+        if(id) { await db.collection("citas").doc(id).update(data); showToast("Cita actualizada"); }
+        else { await db.collection("citas").add(data); showToast("Cita agendada"); }
+        closeModal("modal-cita"); await loadAllData();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    function renderCitas() {
+      var tb = document.getElementById("citas-table"); if(!tb) return;
+      var selDate = document.getElementById("filter-cita-date").value;
+      var fil = allCitas.slice();
+      if(selDate) {
+        fil = fil.filter(function(c){ return c.fecha === selDate; });
+        var dObj = new Date(selDate + 'T00:00:00');
+        var titleStr = dObj.toLocaleDateString("es-ES", {weekday: 'long', day: 'numeric', month: 'long'});
+        var ttl = document.getElementById("citas-table-title");
+        if(ttl) ttl.textContent = titleStr.charAt(0).toUpperCase() + titleStr.slice(1);
+      }
+      if(!fil.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:3rem;">No hay citas para esta fecha</td></tr>';return;}
+      
+      var h=""; fil.forEach(function(c){
+        h+='<tr>';
+        h+='<td style="font-weight:700; color:var(--accent);">'+c.hora+'</td>';
+        h+='<td style="font-weight:600;">'+c.nombre+'</td>';
+        h+='<td>'+(c.motivo||"—")+'</td>';
+        h+='<td>'+(c.telefono||"—")+'</td>';
+        h+='<td><div style="display:flex;gap:0.4rem;">';
+        h+='<button class="btn btn-whatsapp btn-small" onclick="avisarCita(\''+c.id+'\')">📱 Avisar</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="editCita(\''+c.id+'\')">✏️</button>';
+        h+='<button class="btn btn-danger btn-small" onclick="deleteCita(\''+c.id+'\')">🗑</button>';
+        h+='</div></td></tr>';
+      }); tb.innerHTML=h;
+    }
+
+    window.editCita = function(id) {
+      var c = allCitas.find(function(x){ return x.id === id; });
+      if(!c) return;
+      document.getElementById("cita-id").value = id;
+      document.getElementById("cita-modal-title").textContent = "Editar Cita";
+      populateCitaClientSelect();
+      document.getElementById("cita-client-select").value = c.clienteId || "";
+      document.getElementById("ci-nombre").value = c.nombre;
+      document.getElementById("ci-telefono").value = c.telefono;
+      document.getElementById("ci-fecha").value = c.fecha;
+      document.getElementById("ci-hora").value = c.hora;
+      document.getElementById("ci-motivo").value = c.motivo || "";
+      openModal("modal-cita");
+    }
+
+    async function deleteCita(id) {
+      if(!confirm("¿Eliminar esta cita?")) return;
+      try { await db.collection("citas").doc(id).delete(); showToast("Cita eliminada"); await loadAllData(); }
+      catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    function avisarCita(id) {
+      var c = allCitas.find(function(x){ return x.id === id; }); if(!c) return;
+      var today = new Date().toISOString().split('T')[0];
+      var msg = "";
+      if (c.fecha === today) {
+        msg = "Hola " + c.nombre + ", ¿qué tal? No te olvides, HOY tienes tu cita a las " + c.hora;
+      } else {
+        msg = "Hola " + c.nombre + ", mañana tienes cita a las " + c.hora + " no te olvides";
+      }
+      var tel = c.telefono ? c.telefono.replace(/\D/g,'') : '';
+      if(tel.length === 9 && (tel.startsWith('6') || tel.startsWith('7'))) tel = '34' + tel;
+      window.open("https://api.whatsapp.com/send?phone=" + tel + "&text=" + encodeURIComponent(msg), "_blank");
     }
 
     function onInvoiceClientSelect() {
@@ -1363,12 +1942,7 @@
         o.itemsIndependientes.forEach(function(it){ items.push(it.cantidad + "x " + it.descripcion + " (" + it.precio.toFixed(2) + " €/ud)"); });
       } else {
         (o.fallos||[]).forEach(function(f){ items.push("Reparación: "+f.tipo+" - "+f.descripcion); });
-        if(o.soloTotalPiezas && (o.piezasUsadas||[]).length > 0) {
-          var pt=(o.piezasUsadas||[]).reduce(function(s,p){return s+(p.precio*p.cantidad);},0);
-          items.push("Piezas Utilizadas (Total: "+pt.toFixed(2).replace('.',',')+" €)");
-        } else {
-          (o.piezasUsadas||[]).forEach(function(p){ items.push(p.cantidad+"x "+p.nombre); });
-        }
+        (o.piezasUsadas||[]).forEach(function(p){ items.push(p.cantidad+"x "+p.nombre); });
       }
       if(items.length===0) items.push("Servicio integral de mantenimiento");
       items.forEach(function(it){ if(y > 240) { pdf.addPage(); y = 20; } pdf.text(it,15,y); y+=6; });
@@ -1388,9 +1962,126 @@
       showToast("Factura PDF generada ✅");
     }
 
-    window.addInvoiceItem = addInvoiceItem;
-    window.importRepairToInvoice = importRepairToInvoice;
-    window.onInvoiceClientSelect = onInvoiceClientSelect;
+    // ===== VENTAS LOGIC =====
+    async function loadVentas() {
+      try {
+        var snap = await db.collection("ventas_accesorios").orderBy("fecha", "desc").get();
+        allVentas = []; snap.forEach(function(d) { allVentas.push(Object.assign({id: d.id}, d.data())); });
+      } catch(e) { console.error("Error ventas:", e); allVentas = []; }
+    }
+
+    function openVentaForm() {
+      document.getElementById("venta-form").reset();
+      document.getElementById("venta-id").value = "";
+      document.getElementById("ve-fecha").value = new Date().toISOString().split("T")[0];
+      document.getElementById("venta-modal-title").textContent = "Nueva Venta de Accesorios";
+      openModal("modal-venta");
+    }
+
+    async function saveVenta() {
+      var data = {
+        cliente: document.getElementById("ve-cliente").value.trim() || "Venta Directa",
+        fecha: document.getElementById("ve-fecha").value,
+        productos: document.getElementById("ve-productos").value.trim(),
+        total: parseFloat(document.getElementById("ve-total").value) || 0,
+        metodoPago: document.getElementById("ve-metodo-pago").value,
+        notas: document.getElementById("ve-notas").value.trim(),
+        lastUpdated: firebase.firestore.Timestamp.now()
+      };
+
+      try {
+        var id = document.getElementById("venta-id").value;
+        if(id) { await db.collection("ventas_accesorios").doc(id).update(data); showToast("Venta actualizada"); }
+        else { 
+          var res = await db.collection("ventas_accesorios").add(data); 
+          var num = getNextInvoiceNumber();
+          await db.collection("ventas_accesorios").doc(res.id).update({ numeroFactura: num });
+          
+          // Crear factura automática para la venta
+          await db.collection("facturas").add({
+            clienteNombre: data.cliente,
+            numeroFactura: num,
+            fecha: data.fecha,
+            estado: "pagada",
+            metodoPago: data.metodoPago,
+            items: [{ descripcion: data.productos, cantidad: 1, precio: data.total }],
+            total: data.total,
+            sourceId: res.id,
+            tipo: "accesorio",
+            lastUpdated: firebase.firestore.Timestamp.now()
+          });
+          
+          showToast("Venta registrada y factura generada ✅"); 
+        }
+        closeModal("modal-venta"); await loadAllData();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    function renderVentasTable() {
+      var tb = document.getElementById("ventas-table"); if(!tb) return;
+      var fil = allVentas.slice();
+      var se = document.getElementById("search-ventas"); var st = se?se.value.toLowerCase():"";
+      
+      if(currentVentasFilter==="hoy") {
+        var today = new Date().toISOString().split("T")[0];
+        fil = fil.filter(function(v) { return v.fecha === today; });
+      }
+
+      if(st) fil = fil.filter(function(v){
+        return (v.productos||"").toLowerCase().indexOf(st)!==-1 || (v.cliente||"").toLowerCase().indexOf(st)!==-1;
+      });
+
+      if(!fil.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:3rem;">No hay ventas registradas</td></tr>';return;}
+      
+      var h=""; fil.forEach(function(v){
+        h+='<tr>';
+        h+='<td style="color:var(--text-dim);">'+(v.fecha||"—")+'</td>';
+        h+='<td style="font-weight:600;">'+v.cliente+'</td>';
+        h+='<td style="font-size:0.85rem;">'+truncStr(v.productos, 40)+'</td>';
+        h+='<td style="font-weight:700; color:var(--accent);">€'+v.total.toFixed(2)+'</td>';
+        h+='<td><span class="badge badge-info">'+v.metodoPago.toUpperCase()+'</span></td>';
+        h+='<td><div style="display:flex;gap:0.4rem;">';
+        h+='<button class="btn btn-secondary btn-small" onclick="editVenta(\''+v.id+'\')">✏️</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generateVentaInvoice(\''+v.id+'\')" style="background:rgba(255,255,255,0.05);color:var(--text);">📄 Factura</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="deleteVenta(\''+v.id+'\')">🗑️</button>';
+        h+='</div></td></tr>';
+      }); tb.innerHTML=h;
+    }
+
+    window.editVenta = function(id) {
+      var v = allVentas.find(function(x){ return x.id === id; });
+      if(!v) return;
+      document.getElementById("venta-id").value = id;
+      document.getElementById("venta-modal-title").textContent = "Editar Venta";
+      document.getElementById("ve-cliente").value = v.cliente;
+      document.getElementById("ve-fecha").value = v.fecha;
+      document.getElementById("ve-productos").value = v.productos;
+      document.getElementById("ve-total").value = v.total;
+      document.getElementById("ve-metodo-pago").value = v.metodoPago;
+      document.getElementById("ve-notas").value = v.notas || "";
+      openModal("modal-venta");
+    }
+
+    async function deleteVenta(id) {
+      if(!confirm("¿Eliminar este registro de venta?")) return;
+      try { await db.collection("ventas_accesorios").doc(id).delete(); showToast("Venta eliminada"); await loadAllData(); }
+      catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    window.openCitaForm = openCitaForm;
+    window.saveCita = saveCita;
+    window.onCitaClientSelect = onCitaClientSelect;
+    window.renderCitas = renderCitas;
+    window.autoSumPieces = autoSumPieces;
+    window.sendWhatsappListo = sendWhatsappListo;
+    window.changeMonth = changeMonth;
+    window.selectToday = selectToday;
+    window.openVentaForm = openVentaForm;
+    window.saveVenta = saveVenta;
+    window.renderVentasTable = renderVentasTable;
+    window.setVentasFilter = setVentasFilter;
+    window.generateVentaInvoice = generateVentaInvoice;
+    window.marcarRecogida = marcarRecogida;
 
     console.log("Anacleto Panel cargado OK");
   </script>
