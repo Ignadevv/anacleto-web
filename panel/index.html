@@ -179,7 +179,7 @@
             <tr><th>Nombre</th><th>Teléfono</th><th>Reparaciones</th><th>Acciones</th></tr>
           </thead>
           <tbody id="clients-table">
-            <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
+            <tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
           </tbody>
         </table>
       </div>
@@ -190,7 +190,7 @@
       <div class="page-header">
         <div>
           <h1>📅 Citas Previas</h1>
-          <p class="subtitle">Gestión de citas agendadas por clientes</p>
+          <p class="subtitle">Gestiona y programa citas con tus clientes</p>
         </div>
         <button class="btn btn-primary" onclick="openCitaForm()">+ Nueva Cita</button>
       </div>
@@ -198,9 +198,17 @@
       <div class="citas-layout">
         <div class="calendar-wrapper">
           <div class="calendar-header">
-            <button class="btn btn-secondary btn-small" onclick="changeMonth(-1)">&lt;</button>
-            <h3 id="calendar-month-year">Mes Año</h3>
-            <button class="btn btn-secondary btn-small" onclick="changeMonth(1)">&gt;</button>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <button class="btn btn-secondary btn-small" onclick="changeMonth(-1)">&lt;</button>
+              <button class="btn btn-secondary btn-small" onclick="selectToday()">Hoy</button>
+              <button class="btn btn-secondary btn-small" onclick="changeMonth(1)">&gt;</button>
+            </div>
+            <h3 id="calendar-month-year">Abril 2026</h3>
+            <div class="search-box" style="min-width:auto; padding:0.4rem 0.8rem;">
+              <select id="calendar-view-type" style="padding:0; font-size:0.8rem; background:transparent; border:none; color:var(--text); box-shadow:none;">
+                <option value="mes">Mes</option>
+              </select>
+            </div>
           </div>
           <div class="calendar-grid">
             <div class="calendar-day-name">Lun</div>
@@ -214,24 +222,28 @@
           <div class="calendar-grid" id="calendar-days">
             <!-- Days will be generated here -->
           </div>
+          <div class="calendar-legend">
+            <div class="legend-item"><span class="dot dot-selected"></span> Cita seleccionada</div>
+            <div class="legend-item"><span class="dot dot-confirmada"></span> Confirmada</div>
+            <div class="legend-item"><span class="dot dot-pendiente"></span> Pendiente</div>
+            <div class="legend-item"><span class="dot dot-cancelada"></span> Cancelada</div>
+          </div>
         </div>
 
-        <div class="table-container" style="margin-top:0;">
-          <div class="table-toolbar" style="gap: 1rem; align-items: center;">
-            <h3 id="citas-table-title" style="margin:0; font-size:1.1rem; color:var(--text);">Citas del Día</h3>
-            <input type="hidden" id="filter-cita-date" onchange="renderCitas()">
-            <button class="btn btn-secondary btn-small" style="margin-left:auto;" onclick="selectToday()">Ver Hoy</button>
+        <div class="cita-details-panel">
+          <div class="panel-header">
+            <div class="panel-date-icon">📅</div>
+            <h3 id="citas-table-title" style="font-family:'Orbitron', sans-serif; font-size:1.1rem; flex:1;">Jueves, 9 de abril de 2026</h3>
+            <button class="btn btn-secondary btn-small" style="display:flex; align-items:center; gap:0.5rem; background:rgba(249, 115, 22, 0.1); border-color:rgba(249, 115, 22, 0.2); color:var(--accent);">
+              <span style="font-size:0.8rem;">👁️</span> VER AGENDA
+            </button>
           </div>
-          <div style="max-height: 480px; overflow-y: auto; padding-right: 5px;">
-            <table>
-              <thead>
-                <tr><th>Hora</th><th>Cliente</th><th>Patinete / Motivo</th><th>Teléfono</th><th>Acciones</th></tr>
-              </thead>
-              <tbody id="citas-table">
-                <tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
-              </tbody>
-            </table>
+          
+          <div id="citas-list-panel" class="citas-cards-container">
+            <!-- Citas cards will be generated here -->
           </div>
+          
+          <input type="hidden" id="filter-cita-date">
         </div>
       </div>
     </section>
@@ -564,7 +576,22 @@
             <div class="form-group"><label>Fecha *</label><input type="date" id="ci-fecha" required><span class="form-error">Obligatorio</span></div>
             <div class="form-group"><label>Hora *</label><input type="time" id="ci-hora" required><span class="form-error">Obligatorio</span></div>
           </div>
-          <div class="form-group"><label>Patinete y Motivo</label><input type="text" id="ci-motivo" placeholder="Ej: Xiaomi M365 - Cambio de rueda"></div>
+          <div class="form-row">
+            <div class="form-group">
+              <label>Estado</label>
+              <select id="ci-estado">
+                <option value="pendiente">⏳ Pendiente</option>
+                <option value="confirmada">✅ Confirmada</option>
+                <option value="cancelada">🚫 Cancelada</option>
+              </select>
+            </div>
+            <div class="form-group">
+                <label>Servicio</label>
+                <input type="text" id="ci-servicio" placeholder="Ej: Reparación de Ruedas">
+            </div>
+          </div>
+          <div class="form-group"><label>Patinete y Modelo</label><input type="text" id="ci-patinete" placeholder="Ej: Xiaomi Pro 2"></div>
+          <div class="form-group"><label>Notas adicionales</label><textarea id="ci-notas" rows="2" placeholder="Notas internas..."></textarea></div>
         </form>
       </div>
       <div class="modal-footer">
@@ -620,6 +647,10 @@
             <textarea id="ve-productos" placeholder="Ej: 2x Luces LED, 1x Casco..." rows="3" required></textarea>
           </div>
           <div class="form-row">
+            <div class="form-group">
+              <label>Nº Factura (Manual)</label>
+              <input type="number" id="ve-num-factura" placeholder="Ej: 123">
+            </div>
             <div class="form-group">
               <label>Total (€)</label>
               <input type="number" id="ve-total" step="0.01" min="0" placeholder="0.00" required>
@@ -837,7 +868,7 @@
       var o=allOrders.find(function(x){return x.id===id;}); if(!o) return;
       var cl=allClients.find(function(c){return c.id===o.clienteId;});
       var nombre = o.clienteNombre || (cl?cl.nombre:"");
-      var msg = "Hola " + nombre + ", ya esta listo tu patinete para que salir a rodar";
+      var msg = "Hola " + nombre + ", tu patinete ya está listo para recoger. Puedes pasarte cuando quieras.\n\nPasados 2 días desde la finalización de la reparación, se cobrará un recargo de 5€ por día en concepto de almacenamiento.\n\n¡Gracias! 🚀";
       document.getElementById("wa-listo-msg").value = msg;
       document.getElementById("wa-listo-order-id").value = id;
       openModal("modal-whatsapp-listo");
@@ -908,17 +939,28 @@
       if(st) fil=fil.filter(function(c){
         return (c.nombre||"").toLowerCase().indexOf(st)!==-1||(c.telefono||"").indexOf(st)!==-1;
       });
-      if(!fil.length){tb.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:3rem;">No hay clientes registrados</td></tr>';return;}
+      if(!fil.length){tb.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--text-dim);padding:3rem;">No hay clientes registrados</td></tr>';return;}
       var h=""; fil.forEach(function(c){
         var reps=allOrders.filter(function(o){return o.clienteId===c.id;}).length;
         h+='<tr><td style="font-weight:600;">'+c.nombre+'</td>';
         h+='<td>'+(c.telefono||"—")+'</td>';
-        h+='<td style="color:var(--text-dim);">'+reps+' reparacion'+(reps!==1?"es":"")+'</td>';
+        h+='<td style="color:var(--text-dim); cursor:pointer;" onclick="viewClientRepairs(\''+c.id+'\')">'+reps+' reparacion'+(reps!==1?"es":"")+'</td>';
         h+='<td><div style="display:flex;gap:0.4rem;">';
+        h+='<button class="btn btn-secondary btn-small" onclick="viewClientRepairs(\''+c.id+'\')" title="Ver reparaciones">👁️</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="editClient(\''+c.id+'\')">✏️</button>';
         h+='<button class="btn btn-danger btn-small" onclick="deleteClient(\''+c.id+'\')">🗑</button>';
         h+='</div></td></tr>';
       }); tb.innerHTML=h;
+    }
+
+    function viewClientRepairs(clientId) {
+      var c = allClients.find(function(x){return x.id===clientId;});
+      if(!c) return;
+      var searchInput = document.getElementById("search-orders");
+      if(searchInput) searchInput.value = c.nombre;
+      setFilter('todos', document.querySelector('.filter-btn[data-filter="todos"]'));
+      navigate('ordenes');
+      filterOrders();
     }
 
     function populateClientSelect() {
@@ -1019,6 +1061,10 @@
     function openOrderForm() {
       resetWizard();
       document.getElementById("order-modal-title").textContent="Nueva Hoja de Entrada de Reparación";
+      
+      // Auto-incrementar número sugerido
+      document.getElementById("or-num-factura").value = getNextInvoiceNumber();
+      
       addFallo(); openModal("modal-order");
     }
 
@@ -1128,22 +1174,24 @@
         cell.appendChild(num);
         
         var dayCitas = allCitas.filter(function(ci) { return ci.fecha === dateStr; });
-        dayCitas.sort(function(a,b){ return (a.hora||"").localeCompare(b.hora||""); });
         
-        dayCitas.forEach(function(ci, idx) {
-          if(idx < 3) {
-            var b = document.createElement("div");
-            b.className = "cita-badge";
-            b.textContent = ci.hora + " " + (ci.nombre || "").split(" ")[0];
-            cell.appendChild(b);
-          } else if(idx === 3) {
-            var mx = document.createElement("div");
-            mx.className = "cita-badge";
-            mx.style.background = "var(--text-dim)";
-            mx.textContent = "+" + (dayCitas.length - 3) + " más";
-            cell.appendChild(mx);
-          }
-        });
+        if(dayCitas.length > 0) {
+          var dotsWrap = document.createElement("div");
+          dotsWrap.className = "day-dots";
+          
+          // Show up to 3 status dots
+          var statusesShown = [];
+          dayCitas.forEach(function(ci) {
+            var s = ci.estado || "pendiente";
+            if(statusesShown.indexOf(s) === -1 && statusesShown.length < 3) {
+              statusesShown.push(s);
+              var dot = document.createElement("div");
+              dot.className = "day-dot dot-" + s;
+              dotsWrap.appendChild(dot);
+            }
+          });
+          cell.appendChild(dotsWrap);
+        }
         
         grid.appendChild(cell);
       }
@@ -1348,14 +1396,20 @@
       var pdf=new window.jspdf.jsPDF();
       var blue=[0,74,134], dark=[45,45,45], gray=[120,120,120], red=[192,57,43];
 
-      // Obtener o asignar número de factura secuencial
-      var numFactura = o.numeroFactura;
-      if(!numFactura) {
-        numFactura = getNextInvoiceNumber();
-        // Guardar el número en la base de datos para que sea permanente
-        db.collection("reparaciones").doc(o.id).update({ numeroFactura: numFactura });
-        o.numeroFactura = numFactura; // Actualizar localmente
-      }
+      // Obtener o preguntar por el número de factura
+      var numFactura = o.numeroFactura || getNextInvoiceNumber();
+      var inputNum = window.prompt("Introduce el Nº de Factura para esta reparación:", numFactura);
+      if(inputNum === null) return; // Cancelado
+      numFactura = parseInt(inputNum) || numFactura;
+
+      // Actualizar en base de datos
+      db.collection("reparaciones").doc(o.id).update({ numeroFactura: numFactura });
+      o.numeroFactura = numFactura;
+      
+      // Actualizar también en la colección de facturas si existe
+      db.collection("facturas").where("sourceId", "==", o.id).get().then(snap => {
+        snap.forEach(doc => doc.ref.update({ numeroFactura: numFactura }));
+      });
 
       // Cabecera Principal y Logo
       pdf.setFont("helvetica","bold");pdf.setFontSize(32);pdf.setTextColor(blue[0],blue[1],blue[2]);pdf.text("FACTURA",15,30);
@@ -1466,12 +1520,19 @@
       var v = allVentas.find(function(x){ return x.id === id; });
       if(!v) { showToast("Venta no encontrada", "error"); return; }
       
-      var numFactura = v.numeroFactura;
-      if(!numFactura) {
-        numFactura = getNextInvoiceNumber();
-        db.collection("ventas_accesorios").doc(v.id).update({ numeroFactura: numFactura });
-        v.numeroFactura = numFactura;
-      }
+      var numFactura = v.numeroFactura || getNextInvoiceNumber();
+      var inputNum = window.prompt("Introduce el Nº de Factura para esta venta:", numFactura);
+      if(inputNum === null) return; // Cancelado
+      numFactura = parseInt(inputNum) || numFactura;
+
+      // Actualizar en base de datos
+      db.collection("ventas_accesorios").doc(v.id).update({ numeroFactura: numFactura });
+      v.numeroFactura = numFactura;
+      
+      // Actualizar también en la colección de facturas si existe
+      db.collection("facturas").where("sourceId", "==", v.id).get().then(snap => {
+        snap.forEach(doc => doc.ref.update({ numeroFactura: numFactura }));
+      });
 
       var pdf = new window.jspdf.jsPDF();
       var blue = [0,74,134], dark = [45,45,45], gray = [120,120,120], red = [192,57,43];
@@ -1681,7 +1742,10 @@
         telefono: tel,
         fecha: fecha,
         hora: hora,
-        motivo: document.getElementById("ci-motivo").value.trim(),
+        estado: document.getElementById("ci-estado").value,
+        servicio: document.getElementById("ci-servicio").value.trim(),
+        patinete: document.getElementById("ci-patinete").value.trim(),
+        notas: document.getElementById("ci-notas").value.trim(),
         lastUpdated: firebase.firestore.Timestamp.now()
       };
 
@@ -1694,30 +1758,93 @@
     }
 
     function renderCitas() {
-      var tb = document.getElementById("citas-table"); if(!tb) return;
+      var panel = document.getElementById("citas-list-panel"); if(!panel) return;
       var selDate = document.getElementById("filter-cita-date").value;
       var fil = allCitas.slice();
       if(selDate) {
         fil = fil.filter(function(c){ return c.fecha === selDate; });
         var dObj = new Date(selDate + 'T00:00:00');
-        var titleStr = dObj.toLocaleDateString("es-ES", {weekday: 'long', day: 'numeric', month: 'long'});
+        var titleStr = dObj.toLocaleDateString("es-ES", {weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'});
         var ttl = document.getElementById("citas-table-title");
         if(ttl) ttl.textContent = titleStr.charAt(0).toUpperCase() + titleStr.slice(1);
       }
-      if(!fil.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text-dim);padding:3rem;">No hay citas para esta fecha</td></tr>';return;}
+      
+      if(!fil.length){
+        panel.innerHTML='<div style="text-align:center;color:var(--text-dim);padding:3rem;">No hay citas para esta fecha 📅</div>';
+        return;
+      }
+      
+      fil.sort(function(a,b){ return (a.hora||"").localeCompare(b.hora||""); });
       
       var h=""; fil.forEach(function(c){
-        h+='<tr>';
-        h+='<td style="font-weight:700; color:var(--accent);">'+c.hora+'</td>';
-        h+='<td style="font-weight:600;">'+c.nombre+'</td>';
-        h+='<td>'+(c.motivo||"—")+'</td>';
-        h+='<td>'+(c.telefono||"—")+'</td>';
-        h+='<td><div style="display:flex;gap:0.4rem;">';
-        h+='<button class="btn btn-whatsapp btn-small" onclick="avisarCita(\''+c.id+'\')">📱 Avisar</button>';
-        h+='<button class="btn btn-secondary btn-small" onclick="editCita(\''+c.id+'\')">✏️</button>';
-        h+='<button class="btn btn-danger btn-small" onclick="deleteCita(\''+c.id+'\')">🗑</button>';
-        h+='</div></td></tr>';
-      }); tb.innerHTML=h;
+        var initial = (c.nombre || "C").charAt(0).toUpperCase();
+        var reps = allOrders.filter(function(o){ return o.clienteId === c.clienteId && c.clienteId; }).length;
+        var badgeFrecuente = reps > 2 ? '<div class="client-badge-frecuente">⭐ Cliente frecuente</div>' : '';
+        var isConfirmada = c.estado === 'confirmada';
+        var recordatorioChecked = c.recordatorio !== false ? 'checked' : '';
+        
+        h += '<div class="cita-card">';
+        h += '  <div class="cita-card-top">';
+        h += '    <div class="client-info-wrap">';
+        h += '      <div class="client-avatar-circle">' + initial + '</div>';
+        h += '      <div class="client-name-box">';
+        h += '        <h4 style="margin-bottom: 2px;">' + c.nombre + '</h4>';
+        h += '        <div style="font-size: 0.8rem; color: var(--accent2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">' + (c.servicio || "Servicio General") + '</div>';
+        h += '        ' + badgeFrecuente;
+        h += '      </div>';
+        h += '    </div>';
+        h += '    <div class="cita-actions">';
+        h += '      <button class="action-btn btn-llamar" onclick="llamarCita(\'' + c.id + '\')" title="Llamar">📞</button>';
+        
+        // WhatsApp Dropdown Menu
+        h += '      <div class="ws-dropdown">';
+        h += '        <button class="action-btn btn-avisar" title="Opciones de WhatsApp">📱</button>';
+        h += '        <div class="ws-dropdown-content">';
+        h += '          <a href="#" onclick="avisarCita(\'' + c.id + '\', \'recordatorio\')">📅 Recordatorio</a>';
+        h += '          <a href="#" onclick="avisarCita(\'' + c.id + '\', \'retraso\')">⏳ Aviso Retraso</a>';
+        h += '          <a href="#" onclick="avisarCita(\'' + c.id + '\', \'ubicacion\')">📍 Enviar Ubicación</a>';
+        h += '          <a href="#" onclick="avisarCita(\'' + c.id + '\', \'listo\')">🛴 Ya estamos listos</a>';
+        h += '        </div>';
+        h += '      </div>';
+
+        h += '      <button class="action-btn btn-pdf" onclick="generateCitaPDF(\'' + c.id + '\')" title="Generar Resguardo PDF">📄</button>';
+        if(!isConfirmada) {
+          h += '      <button class="action-btn btn-confirmar" onclick="confirmarCita(\'' + c.id + '\')" title="Confirmar Cita" style="color:var(--success); border-color:var(--success);">✅</button>';
+        }
+        h += '      <button class="action-btn btn-editar" onclick="editCita(\'' + c.id + '\')" title="Editar">✏️</button>';
+        h += '      <button class="action-btn btn-cancelar" onclick="deleteCita(\'' + c.id + '\')" title="Eliminar">🗑</button>';
+        h += '    </div>';
+        h += '  </div>';
+        
+        h += '  <div class="cita-info-grid">';
+        h += '    <div class="info-row">';
+        h += '      <div class="info-icon">📅</div>';
+        h += '      <div class="info-content"><span class="info-label">Fecha</span><span class="info-value">' + formatDate(c.fecha).split(' ')[0] + '</span></div>';
+        h += '    </div>';
+        h += '    <div class="info-row">';
+        h += '      <div class="info-icon">🕒</div>';
+        h += '      <div class="info-content"><span class="info-label">Hora</span><span class="info-value">' + c.hora + '</span></div>';
+        h += '    </div>';
+        h += '    <div class="info-row">';
+        h += '      <div class="info-icon">🔧</div>';
+        h += '      <div class="info-content"><span class="info-label">Servicio</span><span class="info-value">' + (c.servicio || "General") + '</span></div>';
+        h += '    </div>';
+        h += '    <div class="info-row">';
+        h += '      <div class="info-icon">🛴</div>';
+        h += '      <div class="info-content"><span class="info-label">Patinete</span><span class="info-value">' + (c.patinete || "—") + '</span></div>';
+        h += '    </div>';
+        h += '  </div>';
+        
+        if(c.notas) {
+          h += '  <div class="cita-notes-box">';
+          h += '    <div class="notes-label">📝 Notas</div>';
+          h += '    <div class="notes-content">' + c.notas + '</div>';
+          h += '  </div>';
+        }
+        
+        h += '</div>';
+      });
+      panel.innerHTML = h;
     }
 
     window.editCita = function(id) {
@@ -1731,7 +1858,10 @@
       document.getElementById("ci-telefono").value = c.telefono;
       document.getElementById("ci-fecha").value = c.fecha;
       document.getElementById("ci-hora").value = c.hora;
-      document.getElementById("ci-motivo").value = c.motivo || "";
+      document.getElementById("ci-estado").value = c.estado || "pendiente";
+      document.getElementById("ci-servicio").value = c.servicio || "";
+      document.getElementById("ci-patinete").value = c.patinete || "";
+      document.getElementById("ci-notas").value = c.notas || "";
       openModal("modal-cita");
     }
 
@@ -1740,20 +1870,112 @@
       try { await db.collection("citas").doc(id).delete(); showToast("Cita eliminada"); await loadAllData(); }
       catch(e) { showToast("Error: " + e.message, "error"); }
     }
+    window.deleteCita = deleteCita;
 
-    function avisarCita(id) {
+    async function confirmarCita(id) {
+      try {
+        await db.collection("citas").doc(id).update({ estado: 'confirmada' });
+        showToast("Cita confirmada ✅");
+        await loadAllData();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+    window.confirmarCita = confirmarCita;
+
+    function llamarCita(id) {
+      var c = allCitas.find(function(x){ return x.id === id; }); if(!c || !c.telefono) return;
+      window.open("tel:" + c.telefono, "_self");
+    }
+    window.llamarCita = llamarCita;
+
+    function avisarCita(id, tipo) {
       var c = allCitas.find(function(x){ return x.id === id; }); if(!c) return;
-      var today = new Date().toISOString().split('T')[0];
+      tipo = tipo || 'recordatorio';
+      
+      var dObj = new Date(c.fecha + 'T00:00:00');
+      var fechaLegible = dObj.toLocaleDateString("es-ES", { weekday: 'long', day: 'numeric', month: 'long' });
       var msg = "";
-      if (c.fecha === today) {
-        msg = "Hola " + c.nombre + ", ¿qué tal? No te olvides, HOY tienes tu cita a las " + c.hora;
-      } else {
-        msg = "Hola " + c.nombre + ", mañana tienes cita a las " + c.hora + " no te olvides";
+
+      if (tipo === 'recordatorio') {
+        msg = "Hola " + c.nombre + ", el " + fechaLegible + " tienes Cita a las " + c.hora;
+      } else if (tipo === 'retraso') {
+        msg = "Hola " + c.nombre + ", te escribimos desde Anacleto. Vamos con un poco de retraso en el taller, te esperamos unos 20 min después de tu hora (" + c.hora + "). ¡Disculpa las molestias!";
+      } else if (tipo === 'ubicacion') {
+        msg = "Hola " + c.nombre + ", te paso nuestra ubicación exacta para tu cita del " + fechaLegible + ": https://maps.app.goo.gl/fwCj7EmMjACv7JkYA";
+      } else if (tipo === 'listo') {
+        msg = "Hola " + c.nombre + ", ya estamos preparados para recibir tu patinete " + (c.patinete || "") + ". ¡Te esperamos a las " + c.hora + "!";
       }
+      
       var tel = c.telefono ? c.telefono.replace(/\D/g,'') : '';
       if(tel.length === 9 && (tel.startsWith('6') || tel.startsWith('7'))) tel = '34' + tel;
       window.open("https://api.whatsapp.com/send?phone=" + tel + "&text=" + encodeURIComponent(msg), "_blank");
     }
+    window.avisarCita = avisarCita;
+
+    function generateCitaPDF(id) {
+      var c = allCitas.find(function(x){ return x.id === id; }); if(!c) return;
+      var pdf = new window.jspdf.jsPDF();
+      var blue = [0,74,134], dark = [45,45,45], gray = [120,120,120], orange = [249, 115, 22];
+
+      // Header
+      pdf.setFont("helvetica","bold"); pdf.setFontSize(24); pdf.setTextColor(orange[0],orange[1],orange[2]);
+      pdf.text("RESGUARDO DE CITA", 15, 30);
+      try { pdf.addImage('logo.png', 'PNG', 150, 10, 40, 32); } catch(e) {}
+
+      // Workshop Info
+      pdf.setFontSize(9); pdf.setTextColor(0,0,0); pdf.text("Anacleto - Taller de Reparación", 15, 42);
+      pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(dark[0],dark[1],dark[2]);
+      pdf.text("Avenida cortes valencianas, n11 bajo", 15, 47);
+      pdf.text("46980 Paterna (Valencia)", 15, 52);
+      pdf.text("Tel: 600 000 000", 15, 57);
+
+      pdf.setDrawColor(orange[0],orange[1],orange[2]); pdf.setLineWidth(0.5); pdf.line(15, 65, 195, 65);
+
+      // Appointment Details
+      pdf.setFont("helvetica","bold"); pdf.setFontSize(12); pdf.setTextColor(blue[0],blue[1],blue[2]);
+      pdf.text("DATOS DE LA CITA", 15, 75);
+
+      pdf.setFont("helvetica","normal"); pdf.setFontSize(10); pdf.setTextColor(dark[0],dark[1],dark[2]);
+      var y = 85;
+      pdf.text("Cliente:", 15, y); pdf.setFont("helvetica","bold"); pdf.text(c.nombre, 50, y); pdf.setFont("helvetica","normal"); y+=7;
+      pdf.text("Teléfono:", 15, y); pdf.text(c.telefono || "—", 50, y); y+=7;
+      pdf.text("Fecha:", 15, y); pdf.setFont("helvetica","bold"); pdf.text(formatDate(c.fecha), 50, y); pdf.setFont("helvetica","normal"); y+=7;
+      pdf.text("Hora:", 15, y); pdf.setFont("helvetica","bold"); pdf.text(c.hora, 50, y); pdf.setFont("helvetica","normal"); y+=10;
+
+      pdf.setFont("helvetica","bold"); pdf.text("Servicio:", 15, y); pdf.text(c.servicio || "General", 50, y); y+=7;
+      pdf.setFont("helvetica","normal"); pdf.text("Patinete:", 15, y); pdf.text(c.patinete || "—", 50, y); y+=15;
+
+      // Box for Notes
+      if(c.notas) {
+        pdf.setDrawColor(gray[0],gray[1],gray[2]); pdf.setLineWidth(0.1); pdf.rect(15, y, 180, 25);
+        pdf.setFontSize(8); pdf.setTextColor(gray[0],gray[1],gray[2]); pdf.text("NOTAS:", 17, y+5);
+        pdf.setTextColor(dark[0],dark[1],dark[2]); pdf.setFontSize(9);
+        var splitNotes = pdf.splitTextToSize(c.notas, 170);
+        pdf.text(splitNotes, 17, y+12);
+        y += 35;
+      }
+
+      // Important Info
+      pdf.setFont("helvetica","bold"); pdf.setFontSize(10); pdf.setTextColor(orange[0],orange[1],orange[2]);
+      pdf.text("INFORMACIÓN IMPORTANTE", 15, y); y+=6;
+      pdf.setFont("helvetica","normal"); pdf.setFontSize(8); pdf.setTextColor(dark[0],dark[1],dark[2]);
+      var cond = "Por favor, acuda a su cita con puntualidad. Si no puede asistir, le rogamos que nos avise con al menos 2 horas de antelación. Este documento sirve como confirmación de su reserva en nuestro taller.";
+      var splitCond = pdf.splitTextToSize(cond, 180);
+      pdf.text(splitCond, 15, y);
+
+      // Footer
+      pdf.setFontSize(7); pdf.setTextColor(gray[0],gray[1],gray[2]);
+      pdf.text("Gracias por confiar en Anacleto. ¡Te esperamos!", 105, 285, {align:"center"});
+
+      pdf.save("Resguardo_Cita_" + c.nombre.replace(/\s/g, '_') + ".pdf");
+      showToast("Resguardo PDF generado ✅");
+    }
+    window.generateCitaPDF = generateCitaPDF;
+
+    async function toggleCitaRecordatorio(id, checked) {
+      try { await db.collection("citas").doc(id).update({ recordatorio: checked }); }
+      catch(e) { console.error("Error toggle recordatorio:", e); }
+    }
+    window.toggleCitaRecordatorio = toggleCitaRecordatorio;
 
     function onInvoiceClientSelect() {
       var cId = document.getElementById("invoice-client-select").value;
@@ -1988,10 +2210,15 @@
       document.getElementById("venta-id").value = "";
       document.getElementById("ve-fecha").value = new Date().toISOString().split("T")[0];
       document.getElementById("venta-modal-title").textContent = "Nueva Venta de Accesorios";
+      
+      // Auto-incrementar número en la venta también
+      document.getElementById("ve-num-factura").value = getNextInvoiceNumber();
+      
       openModal("modal-venta");
     }
 
     async function saveVenta() {
+      var manualNum = parseInt(document.getElementById("ve-num-factura").value);
       var data = {
         cliente: document.getElementById("ve-cliente").value.trim() || "Venta Directa",
         fecha: document.getElementById("ve-fecha").value,
@@ -1999,22 +2226,24 @@
         total: parseFloat(document.getElementById("ve-total").value) || 0,
         metodoPago: document.getElementById("ve-metodo-pago").value,
         notas: document.getElementById("ve-notas").value.trim(),
+        numeroFactura: manualNum || getNextInvoiceNumber(),
         lastUpdated: firebase.firestore.Timestamp.now()
       };
 
       try {
         var id = document.getElementById("venta-id").value;
-        if(id) { await db.collection("ventas_accesorios").doc(id).update(data); showToast("Venta actualizada"); }
-        else { 
+        if(id) { 
+          await db.collection("ventas_accesorios").doc(id).update(data); 
+          showToast("Venta actualizada"); 
+        } else { 
           var res = await db.collection("ventas_accesorios").add(data); 
-          var num = getNextInvoiceNumber();
-          await db.collection("ventas_accesorios").doc(res.id).update({ numeroFactura: num });
+          var num = data.numeroFactura;
           
-          // Crear factura automática para la venta
+          // Crear factura automática para la venta en la colección unificada
           await db.collection("facturas").add({
             clienteNombre: data.cliente,
             numeroFactura: num,
-            fecha: new Date().toISOString(), // Guardar ISO completo con hora
+            fecha: new Date().toISOString(),
             estado: "pagada",
             metodoPago: data.metodoPago,
             items: [{ descripcion: data.productos, cantidad: 1, precio: data.total }],
