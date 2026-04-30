@@ -879,7 +879,12 @@
       if(!o) return;
       
       try {
-        var num = o.numeroFactura || getNextInvoiceNumber();
+        var num = o.numeroFactura;
+        if(!num) {
+          var inputNum = window.prompt("No hay número de factura asignado. Introdúcelo para continuar:");
+          if(!inputNum) { showToast("Es obligatorio para la recogida", "error"); return; }
+          num = parseInt(inputNum);
+        }
         await db.collection("reparaciones").doc(id).update({ 
           estado: "entregado", 
           numeroFactura: num,
@@ -1062,8 +1067,8 @@
       resetWizard();
       document.getElementById("order-modal-title").textContent="Nueva Hoja de Entrada de Reparación";
       
-      // Auto-incrementar número sugerido
-      document.getElementById("or-num-factura").value = getNextInvoiceNumber();
+      // Ya no auto-incrementamos. El campo empezará vacío.
+      document.getElementById("or-num-factura").value = "";
       
       addFallo(); openModal("modal-order");
     }
@@ -1396,11 +1401,10 @@
       var pdf=new window.jspdf.jsPDF();
       var blue=[0,74,134], dark=[45,45,45], gray=[120,120,120], red=[192,57,43];
 
-      // Obtener o preguntar por el número de factura
-      var numFactura = o.numeroFactura || getNextInvoiceNumber();
-      var inputNum = window.prompt("Introduce el Nº de Factura para esta reparación:", numFactura);
-      if(inputNum === null) return; // Cancelado
-      numFactura = parseInt(inputNum) || numFactura;
+      // Preguntar obligatoriamente por el número de factura
+      var inputNum = window.prompt("Introduce el Nº de Factura para esta reparación (OBLIGATORIO):", o.numeroFactura || "");
+      if(!inputNum) { showToast("Es obligatorio introducir un número de factura", "error"); return; }
+      var numFactura = parseInt(inputNum);
 
       // Actualizar en base de datos
       db.collection("reparaciones").doc(o.id).update({ numeroFactura: numFactura });
@@ -1520,10 +1524,9 @@
       var v = allVentas.find(function(x){ return x.id === id; });
       if(!v) { showToast("Venta no encontrada", "error"); return; }
       
-      var numFactura = v.numeroFactura || getNextInvoiceNumber();
-      var inputNum = window.prompt("Introduce el Nº de Factura para esta venta:", numFactura);
-      if(inputNum === null) return; // Cancelado
-      numFactura = parseInt(inputNum) || numFactura;
+      var inputNum = window.prompt("Introduce el Nº de Factura para esta venta (OBLIGATORIO):", v.numeroFactura || "");
+      if(!inputNum) { showToast("Es obligatorio introducir un número de factura", "error"); return; }
+      var numFactura = parseInt(inputNum);
 
       // Actualizar en base de datos
       db.collection("ventas_accesorios").doc(v.id).update({ numeroFactura: numFactura });
@@ -2211,14 +2214,16 @@
       document.getElementById("ve-fecha").value = new Date().toISOString().split("T")[0];
       document.getElementById("venta-modal-title").textContent = "Nueva Venta de Accesorios";
       
-      // Auto-incrementar número en la venta también
-      document.getElementById("ve-num-factura").value = getNextInvoiceNumber();
+      // Ya no auto-incrementamos. El campo empezará vacío.
+      document.getElementById("ve-num-factura").value = "";
       
       openModal("modal-venta");
     }
 
     async function saveVenta() {
       var manualNum = parseInt(document.getElementById("ve-num-factura").value);
+      if(!manualNum) { showToast("Debes introducir el número de factura", "error"); return; }
+      
       var data = {
         cliente: document.getElementById("ve-cliente").value.trim() || "Venta Directa",
         fecha: document.getElementById("ve-fecha").value,
