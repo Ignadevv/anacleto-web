@@ -792,6 +792,12 @@
           allOrders = []; snap2.forEach(function(d) { allOrders.push(Object.assign({id: d.id}, d.data())); });
         } catch(e2) { allOrders = []; }
       }
+      // Ordenar localmente por fechaEntrada desc para asegurar el orden correcto
+      allOrders.sort(function(a, b) {
+        var da = a.fechaEntrada && a.fechaEntrada.toDate ? a.fechaEntrada.toDate() : new Date(a.fechaEntrada);
+        var db_date = b.fechaEntrada && b.fechaEntrada.toDate ? b.fechaEntrada.toDate() : new Date(b.fechaEntrada);
+        return db_date - da;
+      });
     }
 
     async function loadClients() {
