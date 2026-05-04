@@ -48,6 +48,13 @@
       </div>
     </div>
 
+    <style>
+      .pay-status-paid { color: #10b981; font-weight: 700; }
+      .pay-status-partial { color: #f59e0b; font-size: 0.85rem; line-height: 1.2; }
+      .pay-status-pending { color: #94a3b8; font-size: 0.85rem; }
+      .pay-pending-amount { display: block; font-size: 0.7rem; opacity: 0.8; }
+    </style>
+
     <div class="nav-section">
       <div class="nav-section-title">Enlace</div>
       <div class="nav-item" onclick="window.location.href='../admin.html'">
@@ -112,7 +119,7 @@
         </div>
         <table>
           <thead>
-            <tr><th>#</th><th>Cliente</th><th>Patinete</th><th>Estado</th><th>Fecha</th><th>Total</th></tr>
+            <tr><th>#</th><th>Cliente</th><th>Patinete</th><th>Estado</th><th>Fecha</th><th>Total</th><th>Pagado</th><th>Acciones</th></tr>
           </thead>
           <tbody id="recent-orders">
             <tr><td colspan="6" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
@@ -148,7 +155,7 @@
         </div>
         <table>
           <thead>
-            <tr><th>#</th><th>Cliente</th><th>Patinete</th><th>Fallos</th><th>Estado</th><th>Entrada</th><th>Total</th><th>Acciones</th></tr>
+            <tr><th>#</th><th>Cliente</th><th>Patinete</th><th>Fallos</th><th>Estado</th><th>Entrada</th><th>Total</th><th>Pagado</th><th>Acciones</th></tr>
           </thead>
           <tbody id="orders-table">
             <tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:2rem;">Cargando...</td></tr>
@@ -832,14 +839,29 @@
 
     function renderRecentOrders() {
       var tb = document.getElementById("recent-orders"); var rec = allOrders.slice(0,5);
-      if(!rec.length) { tb.innerHTML='<tr><td colspan="6" class="empty-state"><p>No hay hojas de entrada todavía</p></td></tr>'; return; }
+      if(!rec.length) { tb.innerHTML='<tr><td colspan="8" class="empty-state"><p>No hay hojas de entrada todavía</p></td></tr>'; return; }
       var h=""; rec.forEach(function(o,i) {
+        var cost = parseFloat(o.costeTotal||0);
+        var paid = parseFloat(o.pagoAdelantado||0);
+        var pending = cost - paid;
+        var payStatus = "";
+        
+        if(paid >= cost && cost > 0) {
+          payStatus = '<span class="pay-status-paid">✅ Pagado</span>';
+        } else if(paid > 0) {
+          payStatus = '<div class="pay-status-partial">💰 €'+paid.toFixed(2)+'<span class="pay-pending-amount">Pte: €'+pending.toFixed(2)+'</span></div>';
+        } else {
+          payStatus = '<span class="pay-status-pending">⏳ Pendiente</span>';
+        }
+
         h+='<tr>';
         h+='<td style="color:var(--text-dim);">#'+String(i+1).padStart(3,"0")+'</td>';
         h+='<td style="font-weight:600;">'+(o.clienteNombre||"—")+'</td>';
         h+='<td>'+((o.patinete&&o.patinete.marca)||"")+' '+((o.patinete&&o.patinete.modelo)||"")+'</td>';
         h+='<td>'+statusBadge(o.estado)+'</td>';
-        h+='<td style="font-weight:700;color:var(--accent);">€'+parseFloat(o.costeTotal||0).toFixed(2)+'</td>';
+        h+='<td style="color:var(--text-dim);">'+formatDate(o.fechaEntrada)+'</td>';
+        h+='<td style="font-weight:700;color:var(--accent);">€'+cost.toFixed(2)+'</td>';
+        h+='<td>'+payStatus+'</td>';
         h+='<td><div style="display:flex;gap:0.4rem;">';
         h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')">👁</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" style="background:rgba(255,255,255,0.05);padding: 0.45rem 0.6rem;">📄</button>';
@@ -871,16 +893,30 @@
           ((o.patinete&&o.patinete.modelo)||"").toLowerCase().indexOf(st)!==-1||
           ph.indexOf(st)!==-1;
       });
-      if(!fil.length){tb.innerHTML='<tr><td colspan="8" style="text-align:center;color:var(--text-dim);padding:3rem;">No se encontraron hojas de entrada</td></tr>';return;}
+      if(!fil.length){tb.innerHTML='<tr><td colspan="9" style="text-align:center;color:var(--text-dim);padding:3rem;">No se encontraron hojas de entrada</td></tr>';return;}
       var h=""; fil.forEach(function(o){
         var fc=(o.fallos||[]).length;
+        var cost = parseFloat(o.costeTotal||0);
+        var paid = parseFloat(o.pagoAdelantado||0);
+        var pending = cost - paid;
+        var payStatus = "";
+        
+        if(paid >= cost && cost > 0) {
+          payStatus = '<span class="pay-status-paid">✅ Pagado</span>';
+        } else if(paid > 0) {
+          payStatus = '<div class="pay-status-partial">💰 €'+paid.toFixed(2)+'<span class="pay-pending-amount">Pte: €'+pending.toFixed(2)+'</span></div>';
+        } else {
+          payStatus = '<span class="pay-status-pending">⏳ Pendiente</span>';
+        }
+
         h+='<tr><td style="color:var(--text-dim);font-size:0.8rem;">'+o.id.slice(0,6)+'</td>';
         h+='<td style="font-weight:600;">'+(o.clienteNombre||"—")+'</td>';
         h+='<td>'+((o.patinete&&o.patinete.marca)||"")+' '+((o.patinete&&o.patinete.modelo)||"")+'</td>';
         h+='<td>'+fc+' fallo'+(fc!==1?"s":"")+'</td>';
         h+='<td>'+statusBadge(o.estado)+'</td>';
         h+='<td style="color:var(--text-dim);">'+formatDate(o.fechaEntrada)+'</td>';
-        h+='<td style="font-weight:700;">€'+parseFloat(o.costeTotal||0).toFixed(2)+'</td>';
+        h+='<td style="font-weight:700;">€'+cost.toFixed(2)+'</td>';
+        h+='<td>'+payStatus+'</td>';
         h+='<td><div style="display:flex;gap:0.4rem;flex-wrap:wrap;">';
         h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')">👁</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="editOrder(\''+o.id+'\')">✏️</button>';
@@ -1471,7 +1507,7 @@
       pdf.text("FECHA",120,82);
       pdf.setFont("helvetica","normal");pdf.setTextColor(dark[0],dark[1],dark[2]);
       pdf.text(numFactura.toString().padStart(4, '0'), 180, 75, {align:"right"});
-      pdf.text(formatDate(o.fechaSalida||o.fechaEntrada),180,82,{align:"right"});
+      pdf.text(formatDate(new Date()),180,82,{align:"right"});
 
       // Línea Roja Divisoria
       var y=100;
