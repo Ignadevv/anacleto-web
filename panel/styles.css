@@ -747,8 +747,8 @@ tr:last-child td { border-bottom: none; }
 .calendar-day {
   background: rgba(255,255,255,0.02);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  min-height: 80px;
+  border-radius: 12px;
+  min-height: 110px;
   padding: 0.5rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -783,16 +783,22 @@ tr:last-child td { border-bottom: none; }
   background: transparent;
 }
 .cita-badge {
-  background: var(--accent);
-  color: #fff;
-  font-size: 0.7rem;
-  padding: 0.15rem 0.3rem;
+  background: var(--bg-card-hover);
+  border-left: 3px solid var(--accent);
+  color: var(--text);
+  font-size: 0.65rem;
+  padding: 0.25rem 0.4rem;
   border-radius: 4px;
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.25rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-weight: 600;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
 }
+.cita-badge.confirmada { border-left-color: var(--success); }
+.cita-badge.pendiente { border-left-color: var(--warning); }
+.cita-badge.more { background: transparent; border: none; color: var(--text-dim); text-align: center; }
 .citas-layout {
   display: grid;
   grid-template-columns: 1.2fr 1fr;
@@ -1088,3 +1094,87 @@ input:checked + .slider:before { transform: translateX(20px); }
   background: var(--success);
   color: #000;
 }
+
+/* ========== SUPPLIERS GRID ========== */
+.suppliers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1rem;
+}
+
+.supplier-card {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass);
+  -webkit-backdrop-filter: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.supplier-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: linear-gradient(90deg, var(--accent), var(--accent-alt));
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.supplier-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--border-bright);
+  background: var(--bg-card-hover);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 20px var(--accent-glow);
+}
+
+.supplier-card:hover::before {
+  opacity: 1;
+}
+
+.supplier-logo-wrap {
+  width: 80px;
+  height: 80px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  transition: transform 0.3s;
+}
+
+.supplier-card:hover .supplier-logo-wrap {
+  transform: scale(1.1) rotate(5deg);
+  border-color: var(--accent);
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.supplier-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #fff;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.supplier-card p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.supplier-card .btn {
+  width: 100%;
+}
+

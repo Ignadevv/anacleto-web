@@ -48,6 +48,9 @@
       <div class="nav-item" data-view="recordatorios" onclick="navigate('recordatorios')">
         <span class="emoji">📝</span> Recordatorios
       </div>
+      <div class="nav-item" data-view="proveedores" onclick="navigate('proveedores')">
+        <span class="emoji">🏭</span> Proveedores
+      </div>
     </div>
 
     <style>
@@ -319,6 +322,20 @@
         <!-- Notas se cargan aquí -->
       </div>
     </section>
+    <!-- ===== VIEW: PROVEEDORES ===== -->
+    <section class="view" id="view-proveedores">
+      <div class="page-header">
+        <div>
+          <h1>🏭 Proveedores Oficiales</h1>
+          <p class="subtitle">Acceso rápido a tiendas de repuestos y componentes</p>
+        </div>
+        <button class="btn btn-primary" onclick="openProveedorForm()">+ Nuevo Proveedor</button>
+      </div>
+      <div id="suppliers-grid" class="suppliers-grid">
+        <!-- Cargado dinámicamente -->
+      </div>
+    </section>
+
     <!-- ===== VIEW: FACTURAS ===== -->
     <section class="view" id="view-facturas">
       <div class="page-header">
@@ -440,8 +457,24 @@
               <div class="form-group"><label>Pago Adelantado (€)</label><input type="number" id="or-pago-adelantado" step="0.01" min="0" value="0"></div>
             </div>
             <div class="form-row">
-              <div class="form-group"><label>Fecha Entrada</label><input type="date" id="or-fecha-entrada"></div>
-              <div class="form-group"><label>Fecha Salida</label><input type="date" id="or-fecha-salida"><span class="form-error">No puede ser antes de la entrada</span></div>
+              <div class="form-group">
+                <label>Fecha Entrada</label>
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                  <input type="date" id="or-fecha-entrada" style="flex:1;">
+                  <button type="button" class="btn btn-secondary btn-small" onclick="document.getElementById('or-fecha-entrada').value=new Date().toISOString().split('T')[0]" title="Hoy">🏠</button>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Fecha Salida (Estimada)</label>
+                <div style="display:flex; gap:0.5rem; flex-direction:column;">
+                  <input type="date" id="or-fecha-salida">
+                  <div style="display:flex; gap:0.4rem;">
+                    <button type="button" class="btn btn-secondary btn-small" style="font-size:0.7rem; padding:0.2rem 0.5rem;" onclick="setQuickDate('salida', 1)">+1 día</button>
+                    <button type="button" class="btn btn-secondary btn-small" style="font-size:0.7rem; padding:0.2rem 0.5rem;" onclick="setQuickDate('salida', 3)">+3 días</button>
+                    <button type="button" class="btn btn-secondary btn-small" style="font-size:0.7rem; padding:0.2rem 0.5rem;" onclick="setQuickDate('salida', 7)">+7 días</button>
+                  </div>
+                </div>
+              </div>
             </div>
             <div class="form-group"><label>Recomendaciones</label><input type="text" id="or-garantia" placeholder="ej: Revisar presión de neumáticos cada semana"></div>
             <div class="form-group"><label>Notas internas</label><textarea id="or-notas" rows="3" style="width:100%;padding:0.75rem 1rem;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Exo 2';font-size:0.9rem;outline:none;resize:vertical;"></textarea></div>
@@ -513,9 +546,11 @@
           <div class="form-row">
             <div class="form-group" style="flex:2;">
               <label>Cliente</label>
-              <select id="invoice-client-select" onchange="onInvoiceClientSelect()">
-                <option value="">-- Seleccionar Cliente --</option>
-              </select>
+              <div style="display:flex; gap:0.5rem; width:100%;">
+                <input type="text" id="invoice-client-input" list="invoice-clients-list" placeholder="Escribe o selecciona un cliente..." oninput="onInvoiceClientInput()" style="width:100%; padding:0.75rem; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:'Exo 2';">
+                <datalist id="invoice-clients-list"></datalist>
+                <input type="hidden" id="invoice-client-id">
+              </div>
             </div>
             <div class="form-group" style="flex:1;">
               <label>Vincular Reparación (Opcional)</label>
@@ -728,6 +763,33 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: PROVEEDOR ===== -->
+  <div class="modal-overlay" id="modal-proveedor">
+    <div class="modal" style="max-width:500px;">
+      <div class="modal-header">
+        <h2 id="proveedor-modal-title">Nuevo Proveedor</h2>
+        <button class="modal-close" onclick="closeModal('modal-proveedor')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="proveedor-form" onsubmit="return false;">
+          <input type="hidden" id="prov-id">
+          <div class="form-group"><label>Nombre del Proveedor *</label><input type="text" id="prov-nombre" placeholder="Ej: Ewheel" required></div>
+          <div class="form-group"><label>Descripción / Especialidad</label><input type="text" id="prov-desc" placeholder="Ej: Recambios Xiaomi y Ninebot"></div>
+          <div class="form-group"><label>URL de la tienda *</label><input type="url" id="prov-url" placeholder="https://..." required></div>
+          <div class="form-row">
+            <div class="form-group"><label>Logo URL (opcional)</label><input type="url" id="prov-logo" placeholder="https://logo.png"></div>
+            <div class="form-group"><label>Emoji / Icono</label><input type="text" id="prov-emoji" placeholder="🚲, 📦..." maxlength="5" value="🏭"></div>
+          </div>
+          <div class="form-group"><label>Nota Rápida / Recordatorio (ej: Pedir ruedas)</label><input type="text" id="prov-nota" placeholder="¿Qué necesitas pedir aquí?"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-proveedor')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveProveedor()">💾 Guardar Proveedor</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== MODAL: ENTREGAR REPARACIÓN ===== -->
   <div class="modal-overlay" id="modal-entregar">
     <div class="modal" style="max-width:400px;">
@@ -789,6 +851,7 @@
     var allCitas = [];
     var allInvoices = [];
     var allVentas = [];
+    var allProviders = [];
     var currentFilter = "todos";
     var currentVentasFilter = "todos";
     var currentInvoiceFilter = "todos";
@@ -821,9 +884,9 @@
 
     // ===== DATA =====
     async function loadAllData() {
-      try { await Promise.all([loadOrders(), loadClients(), loadNotes(), loadInvoices(), loadCitas(), loadVentas()]); } catch(e) { console.error(e); }
+      try { await Promise.all([loadOrders(), loadClients(), loadNotes(), loadInvoices(), loadCitas(), loadVentas(), loadProviders()]); } catch(e) { console.error(e); }
       if(!document.getElementById("filter-cita-date").value) document.getElementById("filter-cita-date").value = new Date().toISOString().split("T")[0];
-      updateKPIs(); renderRecentOrders(); renderOrdersTable(); renderClientsTable(); renderNotes(); renderInvoicesTable(); renderVentasTable(); renderCalendar(); renderCitas(); populateClientSelect(); populateInvoiceClientSelect(); populateCitaClientSelect();
+      updateKPIs(); renderRecentOrders(); renderOrdersTable(); renderClientsTable(); renderNotes(); renderInvoicesTable(); renderVentasTable(); renderCalendar(); renderCitas(); renderProveedores(); populateClientSelect(); populateInvoiceClientSelect(); populateCitaClientSelect();
     }
 
     async function loadOrders() {
@@ -922,6 +985,7 @@
         h+='<td><div class="icon-wrapper" style="display:flex;gap:0.4rem;justify-content:center;">';
         h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')" title="Ver">👁</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" title="Factura">📄</button>';
+        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappInquiry(\''+o.id+'\')" title="Consultar" style="background:#075e54;">💬</button>';
         h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')" title="Listo">🟢</button>';
         h+='</div></td></tr>';
       }); tb.innerHTML=h;
@@ -978,6 +1042,7 @@
         h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')" title="Ver">👁</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="editOrder(\''+o.id+'\')" title="Editar">✏️</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" title="Factura">📄</button>';
+        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappInquiry(\''+o.id+'\')" title="Consultar" style="background:#075e54;">💬</button>';
         h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')" title="Avisar">🟢</button>';
         if(o.estado === "listo") {
           h+='<button class="btn btn-primary btn-small" onclick="marcarRecogida(\''+o.id+'\')" title="Cobrar">💰</button>';
@@ -1073,6 +1138,18 @@
           await loadAllData();
         } catch(e) { console.error("Error auto-listo:", e); }
       }
+    }
+
+    function whatsappInquiry(id) {
+      var o = allOrders.find(function(x){ return x.id === id; });
+      if(!o) return;
+      var cl = allClients.find(function(c){ return c.id === o.clienteId; });
+      var nombre = o.clienteNombre || (cl ? cl.nombre : "Cliente");
+      var patinete = (o.patinete.marca || "") + " " + (o.patinete.modelo || "");
+      var msg = "Hola " + nombre + ", te escribimos de Anacleto para comentarte una duda sobre tu " + patinete + "...";
+      var tel = (cl && cl.telefono) ? cl.telefono.replace(/\D/g,'') : '';
+      if(tel.length === 9 && (tel.startsWith('6') || tel.startsWith('7'))) tel = '34' + tel;
+      window.open("https://api.whatsapp.com/send?phone=" + tel + "&text=" + encodeURIComponent(msg), "_blank");
     }
 
     function renderClientsTable() {
@@ -1302,6 +1379,35 @@
         if(dateStr === todayStr) cell.classList.add("today");
         if(dateStr === selectedStr) cell.classList.add("active");
         
+        var dayNum = document.createElement("div");
+        dayNum.className = "day-num";
+        dayNum.textContent = d;
+        cell.appendChild(dayNum);
+        
+        // Renderizar citas en este día
+        var dayCitas = allCitas.filter(function(c){ return c.fecha === dateStr; });
+        dayCitas.sort(function(a,b){ return (a.hora||"").localeCompare(b.hora||""); });
+        
+        var badgesWrap = document.createElement("div");
+        badgesWrap.style.flex = "1";
+        badgesWrap.style.overflow = "hidden";
+        
+        dayCitas.slice(0, 3).forEach(function(c){
+          var badge = document.createElement("div");
+          badge.className = "cita-badge " + (c.estado || "pendiente");
+          badge.textContent = (c.hora || "??") + " " + (c.nombre || "Cliente");
+          badgesWrap.appendChild(badge);
+        });
+        
+        if(dayCitas.length > 3) {
+          var more = document.createElement("div");
+          more.className = "cita-badge more";
+          more.textContent = "+ " + (dayCitas.length - 3) + " más";
+          badgesWrap.appendChild(more);
+        }
+        
+        cell.appendChild(badgesWrap);
+        
         cell.onclick = (function(ds) {
           return function() {
             document.getElementById("filter-cita-date").value = ds;
@@ -1309,31 +1415,6 @@
             renderCitas();
           };
         })(dateStr);
-        
-        var num = document.createElement("div");
-        num.className = "day-num";
-        num.textContent = d;
-        cell.appendChild(num);
-        
-        var dayCitas = allCitas.filter(function(ci) { return ci.fecha === dateStr; });
-        
-        if(dayCitas.length > 0) {
-          var dotsWrap = document.createElement("div");
-          dotsWrap.className = "day-dots";
-          
-          // Show up to 3 status dots
-          var statusesShown = [];
-          dayCitas.forEach(function(ci) {
-            var s = ci.estado || "pendiente";
-            if(statusesShown.indexOf(s) === -1 && statusesShown.length < 3) {
-              statusesShown.push(s);
-              var dot = document.createElement("div");
-              dot.className = "day-dot dot-" + s;
-              dotsWrap.appendChild(dot);
-            }
-          });
-          cell.appendChild(dotsWrap);
-        }
         
         grid.appendChild(cell);
       }
@@ -1347,6 +1428,7 @@
       document.getElementById("view-"+viewId).classList.add("active");
       var ni=document.querySelector('.nav-item[data-view="'+viewId+'"]'); if(ni)ni.classList.add("active");
       var sb=document.querySelector(".sidebar"); if(sb)sb.classList.remove("open");
+      if(viewId === 'proveedores') renderProveedores();
     }
 
     async function doLogout(){await auth.signOut();window.location.href="login.html";}
@@ -1535,7 +1617,7 @@
     }
 
     // ===== FACTURA PDF =====
-    function generateInvoice(id){
+    function generateInvoice(id, viewOnly){
       var o=allOrders.find(function(x){return x.id===id;});if(!o){showToast("No encontrada","error");return;}
       var cl=allClients.find(function(c){return c.id===o.clienteId;});
       var pdf=new window.jspdf.jsPDF();
@@ -1649,8 +1731,12 @@
       var splitCond = pdf.splitTextToSize(condText, 100);
       pdf.text(splitCond, 95, y + 18);
 
-      pdf.save("Factura_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
-      showToast("Factura generada con éxito ✅");
+      if(viewOnly) {
+        window.open(pdf.output('bloburl'), '_blank');
+      } else {
+        pdf.save("Factura_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
+        showToast("Factura generada con éxito ✅");
+      }
     }
 
     function getNextInvoiceNumber() {
@@ -1841,19 +1927,48 @@
         h+='<td><span class="badge badge-'+inv.estado+'">'+inv.estado.toUpperCase()+'</span></td>';
         h+='<td><span style="font-size:0.8rem; color:var(--text-dim); font-weight:600;">'+(inv.metodoPago||"—").toUpperCase()+'</span></td>';
         h+='<td><div style="display:flex;gap:0.4rem;">';
-        h+='<button class="btn btn-secondary btn-small" onclick="editInvoice(\''+inv.id+'\')">✏️</button>';
-        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoicePDF(\''+inv.id+'\', true)">📄</button>';
-        h+='<button class="btn btn-danger btn-small" onclick="deleteInvoice(\''+inv.id+'\')">🗑</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="editInvoice(\''+inv.id+'\')" title="Editar">✏️</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoicePDF(\''+inv.id+'\', true)" title="Descargar">📄</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="viewInvoicePDF(\''+inv.id+'\')" title="Visualizar" style="background:var(--info);">👁️</button>';
+        h+='<button class="btn btn-danger btn-small" onclick="deleteInvoice(\''+inv.id+'\')" title="Eliminar">🗑</button>';
         h+='</div></td></tr>';
       }); tb.innerHTML=h;
     }
 
     function populateInvoiceClientSelect() {
-      var sel = document.getElementById("invoice-client-select"); if(!sel) return;
-      sel.innerHTML='<option value="">-- Seleccionar Cliente --</option>';
+      var dl = document.getElementById("invoice-clients-list"); if(!dl) return;
+      dl.innerHTML = '';
       allClients.forEach(function(c){
-        var o=document.createElement("option"); o.value=c.id; o.textContent=c.nombre; sel.appendChild(o);
+        var o = document.createElement("option"); 
+        o.value = c.nombre;
+        o.dataset.id = c.id;
+        dl.appendChild(o);
       });
+    }
+
+    function onInvoiceClientInput() {
+      var val = document.getElementById("invoice-client-input").value;
+      var opts = document.getElementById("invoice-clients-list").childNodes;
+      var foundId = "";
+      for (var i = 0; i < opts.length; i++) {
+        if (opts[i].value === val) {
+          foundId = opts[i].dataset.id;
+          break;
+        }
+      }
+      document.getElementById("invoice-client-id").value = foundId;
+      
+      // Cargar reparaciones si se encontró el cliente
+      var repSel = document.getElementById("invoice-repair-select");
+      repSel.innerHTML = '<option value="">-- No vincular --</option>';
+      if(foundId) {
+        var reps = allOrders.filter(function(o){ return o.clienteId === foundId; });
+        reps.forEach(function(r){
+          var o = document.createElement("option"); o.value = r.id;
+          o.textContent = (r.patinete.marca||"") + " " + (r.patinete.modelo||"") + " (" + formatDate(r.fechaEntrada).split(' ')[0] + ")";
+          repSel.appendChild(o);
+        });
+      }
     }
 
     // ===== CITAS LOGIC =====
@@ -2152,17 +2267,7 @@
     window.toggleCitaRecordatorio = toggleCitaRecordatorio;
 
     function onInvoiceClientSelect() {
-      var cId = document.getElementById("invoice-client-select").value;
-      var repSel = document.getElementById("invoice-repair-select");
-      repSel.innerHTML = '<option value="">-- No vincular --</option>';
-      if(cId) {
-        var reps = allOrders.filter(function(o){ return o.clienteId === cId; });
-        reps.forEach(function(r){
-          var o = document.createElement("option"); o.value = r.id;
-          o.textContent = (r.patinete.marca||"") + " " + (r.patinete.modelo||"") + " (" + formatDate(r.fechaEntrada).split(' ')[0] + ")";
-          repSel.appendChild(o);
-        });
-      }
+      // Función obsoleta reemplazada por onInvoiceClientInput
     }
 
     function importRepairToInvoice() {
@@ -2230,9 +2335,10 @@
     }
 
     window.saveInvoice = async function() {
-      var cId = document.getElementById("invoice-client-select").value;
+      var cId = document.getElementById("invoice-client-id").value;
+      var cNom = document.getElementById("invoice-client-input").value.trim();
       var num = parseInt(document.getElementById("inf-numero").value);
-      if(!cId || !num) { showToast("Cliente y número son obligatorios", "error"); return; }
+      if(!cNom || !num) { showToast("Cliente y número son obligatorios", "error"); return; }
       
       var items = [];
       document.querySelectorAll("#invoice-items-list .dynamic-item").forEach(function(d){
@@ -2244,8 +2350,8 @@
       });
 
       var data = {
-        clienteId: cId,
-        clienteNombre: document.getElementById("invoice-client-select").options[document.getElementById("invoice-client-select").selectedIndex].text,
+        clienteId: cId || null,
+        clienteNombre: cNom,
         numeroFactura: num,
         fecha: document.getElementById("inf-fecha").value,
         estado: document.getElementById("inf-estado").value,
@@ -2267,10 +2373,9 @@
     window.editInvoice = function(id) {
       var inv = allInvoices.find(function(x){ return x.id === id; });
       if(!inv) return;
-      document.getElementById("invoice-id").value = id;
-      document.getElementById("invoice-modal-title").textContent = "Editar Factura #" + inv.numeroFactura;
-      document.getElementById("invoice-client-select").value = inv.clienteId;
-      onInvoiceClientSelect();
+      document.getElementById("invoice-client-id").value = inv.clienteId || "";
+      document.getElementById("invoice-client-input").value = inv.clienteNombre || "";
+      onInvoiceClientInput();
       document.getElementById("inf-numero").value = inv.numeroFactura;
       document.getElementById("inf-fecha").value = inv.fecha;
       document.getElementById("inf-estado").value = inv.estado;
@@ -2302,8 +2407,12 @@
     }
     window.filterInvoices = renderInvoicesTable;
 
+    window.viewInvoicePDF = function(id) {
+      generateInvoicePDF(id, true, true);
+    }
+
     // Adaptar generateInvoicePDF para que funcione con el nuevo módulo
-    window.generateInvoicePDF = function(id, fromModule) {
+    window.generateInvoicePDF = function(id, fromModule, viewOnly) {
       if(fromModule) {
         var inv = allInvoices.find(function(x){ return x.id === id; });
         if(!inv) return;
@@ -2319,13 +2428,13 @@
           itemsIndependientes: inv.items // Flag para indicar que use estos items
         };
         // Necesitamos sobreescribir temporalmente la lógica de items en generateInvoice
-        realGenerateInvoice(o);
+        realGenerateInvoice(o, viewOnly);
       } else {
-        generateInvoice(id);
+        generateInvoice(id, viewOnly);
       }
     }
 
-    function realGenerateInvoice(o) {
+    function realGenerateInvoice(o, viewOnly) {
       // Esta es una copia de generateInvoice adaptada
       var cl=allClients.find(function(c){return c.id===o.clienteId;});
       var pdf=new window.jspdf.jsPDF();
@@ -2341,7 +2450,7 @@
       pdf.setFont("helvetica","bold");pdf.setTextColor(blue[0],blue[1],blue[2]);pdf.text("Nº DE FACTURA",120,75);pdf.text("FECHA",120,82);
       pdf.setFont("helvetica","normal");pdf.setTextColor(dark[0],dark[1],dark[2]);
       pdf.text(o.numeroFactura.toString().padStart(4, '0'), 180, 75, {align:"right"});
-      pdf.text(formatDate(o.fechaSalida||o.fechaEntrada),180,82,{align:"right"});
+      pdf.text(formatDate(o.fechaSalida||o.fechaEntrada||new Date()),180,82,{align:"right"});
       var y=100; pdf.setDrawColor(red[0],red[1],red[2]);pdf.setLineWidth(0.5);pdf.line(15,y,195,y);
       pdf.setFont("helvetica","bold");pdf.setTextColor(blue[0],blue[1],blue[2]);pdf.text("DESCRIPCIÓN",15,y+8);pdf.text("IMPORTE",195,y+8,{align:"right"}); y+=14;
       pdf.setFont("helvetica","normal");pdf.setFontSize(9);pdf.setTextColor(dark[0],dark[1],dark[2]);
@@ -2367,8 +2476,13 @@
       pdf.setFontSize(9);pdf.setTextColor(red[0],red[1],red[2]);pdf.text("CONDICIONES Y FORMA DE PAGO",95,y+5);
       pdf.setFont("helvetica","normal");pdf.setTextColor(dark[0],dark[1],dark[2]);
       pdf.text("Pago en "+(o.metodoPago||"EFECTIVO").toUpperCase(),95,y+15);
-      pdf.save("Factura_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
-      showToast("Factura PDF generada ✅");
+      
+      if(viewOnly) {
+        window.open(pdf.output('bloburl'), '_blank');
+      } else {
+        pdf.save("Factura_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
+        showToast("Factura PDF generada ✅");
+      }
     }
 
     // ===== VENTAS LOGIC =====
@@ -2521,6 +2635,157 @@
     window.setVentasFilter = setVentasFilter;
     window.generateVentaInvoice = generateVentaInvoice;
     window.marcarRecogida = marcarRecogida;
+    window.renderProveedores = renderProveedores;
+
+    async function loadProviders() {
+      try {
+        var snap = await db.collection("proveedores").orderBy("nombre", "asc").get();
+        allProviders = [];
+        snap.forEach(function(d) { allProviders.push(Object.assign({id: d.id}, d.data())); });
+        // Si no hay ninguno, añadir los básicos por defecto la primera vez
+        if (allProviders.length === 0) {
+          const defaults = [
+            { nombre: "Ewheel", desc: "Principal proveedor de recambios en España. Especialistas en Xiaomi y Ninebot.", url: "https://www.ewheel.es", emoji: "🚲" },
+            { nombre: "Monorim", desc: "Mejoras de suspensión y componentes de alta calidad para patinetes.", url: "https://www.monorim.store", emoji: "🛠️" }
+          ];
+          for (const p of defaults) { await db.collection("proveedores").add(p); }
+          await loadProviders();
+        }
+      } catch(e) { console.error("Error providers:", e); allProviders = []; }
+    }
+
+    function renderProveedores() {
+      const grid = document.getElementById("suppliers-grid");
+      if(!grid) return;
+      
+      if(allProviders.length === 0) {
+        grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:4rem;color:var(--text-dim);">No hay proveedores registrados 🏭</div>';
+        return;
+      }
+      
+      grid.innerHTML = allProviders.map(p => {
+        const logoHtml = p.logo ? `<img src="${p.logo}" style="width:100%; height:100%; object-fit:contain; border-radius:15px;">` : (p.emoji || '🏭');
+        return `
+          <div class="supplier-card">
+            <div class="supplier-logo-wrap">${logoHtml}</div>
+            <div style="position:absolute; top:1rem; right:1rem; display:flex; gap:0.5rem;">
+              <button class="btn-delete" onclick="deleteProveedor('${p.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" title="Eliminar">🗑</button>
+              <button class="btn-edit" onclick="editProveedor('${p.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" title="Editar">✏️</button>
+              <button class="btn-note" onclick="quickUpdateProviderNote('${p.id}')" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:1.1rem;" title="Anotar">📝</button>
+            </div>
+            <h3>${p.nombre}</h3>
+            <p>${p.desc || ''}</p>
+            ${p.nota ? `<div style="background:rgba(249,115,22,0.1); border:1px dashed var(--accent); border-radius:8px; padding:0.5rem; margin-bottom:1.5rem; font-size:0.75rem; color:var(--accent); font-weight:700;">📌 ${p.nota}</div>` : ''}
+            <a href="${p.url}" target="_blank" class="btn btn-secondary">Ir a la tienda ➔</a>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openProveedorForm() {
+      document.getElementById("proveedor-modal-title").textContent = "Nuevo Proveedor";
+      document.getElementById("proveedor-form").reset();
+      document.getElementById("prov-id").value = "";
+      openModal("modal-proveedor");
+    }
+
+    function editProveedor(id) {
+      var p = allProviders.find(function(x){ return x.id === id; });
+      if(!p) return;
+      document.getElementById("proveedor-modal-title").textContent = "Editar Proveedor";
+      document.getElementById("prov-id").value = id;
+      document.getElementById("prov-nombre").value = p.nombre;
+      document.getElementById("prov-desc").value = p.desc || "";
+      document.getElementById("prov-url").value = p.url;
+      document.getElementById("prov-emoji").value = p.emoji || "🏭";
+      document.getElementById("prov-logo").value = p.logo || "";
+      document.getElementById("prov-nota").value = p.nota || "";
+      openModal("modal-proveedor");
+    }
+
+    async function saveProveedor() {
+      var id = document.getElementById("prov-id").value;
+      var data = {
+        nombre: document.getElementById("prov-nombre").value,
+        desc: document.getElementById("prov-desc").value,
+        url: document.getElementById("prov-url").value,
+        emoji: document.getElementById("prov-emoji").value || "🏭",
+        logo: document.getElementById("prov-logo").value,
+        nota: document.getElementById("prov-nota").value
+      };
+
+      if(!data.nombre || !data.url) { showToast("Nombre y URL son obligatorios", "error"); return; }
+
+      try {
+        if(id) {
+          await db.collection("proveedores").doc(id).update(data);
+          showToast("Proveedor actualizado ✅");
+        } else {
+          await db.collection("proveedores").add(data);
+          showToast("Proveedor añadido ✅");
+        }
+        closeModal("modal-proveedor");
+        await loadProviders();
+        renderProveedores();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    async function deleteProveedor(id) {
+      if(!confirm("¿Estás seguro de eliminar este proveedor?")) return;
+      try {
+        await db.collection("proveedores").doc(id).delete();
+        showToast("Proveedor eliminado");
+        await loadProviders();
+        renderProveedores();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    window.openProveedorForm = openProveedorForm;
+    window.saveProveedor = saveProveedor;
+    window.editProveedor = editProveedor;
+    window.deleteProveedor = deleteProveedor;
+    window.loadProviders = loadProviders;
+
+    function setQuickDate(type, days) {
+      const d = new Date();
+      d.setDate(d.getDate() + days);
+      const str = d.toISOString().split('T')[0];
+      if(type === 'salida') document.getElementById('or-fecha-salida').value = str;
+      if(type === 'entrada') document.getElementById('or-fecha-entrada').value = str;
+    }
+
+    function openQuickNote() {
+      const text = window.prompt("Escribe tu nota rápida:");
+      if(text && text.trim()) {
+        const data = {
+          texto: text.trim(),
+          fecha: firebase.firestore.Timestamp.now(),
+          urgencia: "normal"
+        };
+        db.collection("notas").add(data).then(() => {
+          showToast("Nota guardada ✅");
+          loadAllData();
+        }).catch(e => showToast("Error: " + e.message, "error"));
+      }
+    }
+
+    async function quickUpdateProviderNote(id) {
+      const p = allProviders.find(x => x.id === id);
+      if(!p) return;
+      const newNote = window.prompt("Añadir nota para " + p.nombre + ":", p.nota || "");
+      if(newNote !== null) {
+        try {
+          await db.collection("proveedores").doc(id).update({ nota: newNote });
+          showToast("Nota actualizada ✅");
+          await loadProviders();
+          renderProveedores();
+        } catch(e) { showToast("Error: " + e.message, "error"); }
+      }
+    }
+
+    window.quickUpdateProviderNote = quickUpdateProviderNote;
+    window.setQuickDate = setQuickDate;
+    // openQuickNote eliminada
 
     console.log("Anacleto Panel cargado OK");
   </script>
