@@ -7,6 +7,18 @@
   <meta name="description" content="Panel de gestión de reparaciones de patinetes eléctricos Anacleto">
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
+
+  <!-- FIREBASE SHIM AND IMPORT MAPS (MOVED BELOW) -->
+  
+  <script type="importmap">
+  {
+    "imports": {
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js": "data:text/javascript,export const initializeApp = () => ({});",
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js": "data:text/javascript,export const getAuth = () => ({ onAuthStateChanged: (cb) => setTimeout(() => cb({email:'local@anacleto.com'}), 100) }); export const onAuthStateChanged = (auth, cb) => auth.onAuthStateChanged(cb); export const signOut = () => window.location.reload();",
+      "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js": "data:text/javascript,export const getFirestore = () => window.mockFirestoreModular.getFirestore(); export const collection = (db, n) => window.mockFirestoreModular.collection(db, n); export const addDoc = (col, d) => window.mockFirestoreModular.addDoc(col, d); export const getDocs = (col) => window.mockFirestoreModular.getDocs(col); export const deleteDoc = (ref) => window.mockFirestoreModular.deleteDoc(ref); export const doc = (db, col, id) => window.mockFirestoreModular.doc(db, col, id); export const updateDoc = (ref, d) => window.mockFirestoreModular.updateDoc(ref, d); export const query = (col) => col; export const orderBy = () => ({}); export const Timestamp = { now: () => new Date(), fromDate: (d) => d };"
+    }
+  }
+  </script>
 </head>
 <body>
 
@@ -790,6 +802,34 @@
     </div>
   </div>
 
+  <!-- ===== MODAL: NOTA PROVEEDOR ===== -->
+  <div class="modal-overlay" id="modal-pnote">
+    <div class="modal" style="max-width:450px;">
+      <div class="modal-header">
+        <h2 id="pnote-modal-title">Nueva Nota de Proveedor</h2>
+        <button class="modal-close" onclick="closeModal('modal-pnote')">✕</button>
+      </div>
+      <div class="modal-body">
+        <form id="pnote-form" onsubmit="return false;">
+          <input type="hidden" id="pnote-id">
+          <input type="hidden" id="pnote-provider-id">
+          <div class="form-group">
+            <label>Título de la nota</label>
+            <input type="text" id="pnote-titulo" placeholder="Ej: Pedir Ruedas 10 pulgadas" required>
+          </div>
+          <div class="form-group">
+            <label>Detalles adicionales</label>
+            <textarea id="pnote-desc" rows="4" placeholder="Ej: Faltan 5 unidades del modelo reforzado..." style="width:100%; padding:0.75rem; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; color:var(--text); font-family:inherit; resize:vertical;"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('modal-pnote')">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveProviderNote()">💾 Guardar Nota</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== MODAL: ENTREGAR REPARACIÓN ===== -->
   <div class="modal-overlay" id="modal-entregar">
     <div class="modal" style="max-width:400px;">
@@ -832,6 +872,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
+  <!-- FIREBASE SHIM FOR LOCAL TESTING (MOVED HERE) -->
+  <script src="firebase-shim.js"></script>
+
   <script>
     // ===== FIREBASE SETUP =====
     firebase.initializeApp({
@@ -852,6 +895,7 @@
     var allInvoices = [];
     var allVentas = [];
     var allProviders = [];
+    var allProviderNotes = [];
     var currentFilter = "todos";
     var currentVentasFilter = "todos";
     var currentInvoiceFilter = "todos";
@@ -884,7 +928,7 @@
 
     // ===== DATA =====
     async function loadAllData() {
-      try { await Promise.all([loadOrders(), loadClients(), loadNotes(), loadInvoices(), loadCitas(), loadVentas(), loadProviders()]); } catch(e) { console.error(e); }
+      try { await Promise.all([loadOrders(), loadClients(), loadNotes(), loadInvoices(), loadCitas(), loadVentas(), loadProviders(), loadProviderNotes()]); } catch(e) { console.error(e); }
       if(!document.getElementById("filter-cita-date").value) document.getElementById("filter-cita-date").value = new Date().toISOString().split("T")[0];
       updateKPIs(); renderRecentOrders(); renderOrdersTable(); renderClientsTable(); renderNotes(); renderInvoicesTable(); renderVentasTable(); renderCalendar(); renderCitas(); renderProveedores(); populateClientSelect(); populateInvoiceClientSelect(); populateCitaClientSelect();
     }
@@ -984,9 +1028,10 @@
         h+='<td>'+payStatus+'</td>';
         h+='<td><div class="icon-wrapper" style="display:flex;gap:0.4rem;justify-content:center;">';
         h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')" title="Ver">👁</button>';
-        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" title="Factura">📄</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generatePDF(\''+o.id+'\')" title="Boletín Entrada" style="background:rgba(56,189,248,0.1); border-color:var(--info);">📄</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" title="Factura">🧾</button>';
         h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappInquiry(\''+o.id+'\')" title="Consultar" style="background:#075e54;">💬</button>';
-        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')" title="Listo">🟢</button>';
+        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')" title="Avisar Listo">🟢</button>';
         h+='</div></td></tr>';
       }); tb.innerHTML=h;
     }
@@ -1038,14 +1083,15 @@
         h+='<td style="color:var(--text-dim);">'+formatDate(o.fechaEntrada)+'</td>';
         h+='<td style="font-weight:700;">€'+cost.toFixed(2)+'</td>';
         h+='<td>'+payStatus+'</td>';
-        h+='<td><div class="icon-wrapper" style="display:flex;gap:0.4rem;justify-content:center;">';
+        h+='<td><div class="icon-wrapper" style="display:flex;gap:0.4rem;justify-content:center;flex-wrap:wrap;">';
         h+='<button class="btn btn-secondary btn-small" onclick="viewOrder(\''+o.id+'\')" title="Ver">👁</button>';
         h+='<button class="btn btn-secondary btn-small" onclick="editOrder(\''+o.id+'\')" title="Editar">✏️</button>';
-        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" title="Factura">📄</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generatePDF(\''+o.id+'\')" title="Boletín Entrada" style="background:rgba(56,189,248,0.1); border-color:var(--info);">📄</button>';
+        h+='<button class="btn btn-secondary btn-small" onclick="generateInvoice(\''+o.id+'\')" title="Factura">🧾</button>';
         h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappInquiry(\''+o.id+'\')" title="Consultar" style="background:#075e54;">💬</button>';
-        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')" title="Avisar">🟢</button>';
-        if(o.estado === "listo") {
-          h+='<button class="btn btn-primary btn-small" onclick="marcarRecogida(\''+o.id+'\')" title="Cobrar">💰</button>';
+        h+='<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\''+o.id+'\')" title="Avisar Listo">🟢</button>';
+        if(o.estado === "listo" || o.estado === "en_reparacion" || o.estado === "pendiente") {
+          h+='<button class="btn btn-primary btn-small" onclick="marcarRecogida(\''+o.id+'\')" title="Cobrar y Entregar" style="background:var(--success); color:#000;">💰</button>';
         }
         h+='<button class="btn btn-danger btn-small" onclick="deleteOrder(\''+o.id+'\')" title="Eliminar">🗑</button>';
         h+='</div></td></tr>';
@@ -2654,6 +2700,14 @@
       } catch(e) { console.error("Error providers:", e); allProviders = []; }
     }
 
+    async function loadProviderNotes() {
+      try {
+        var snap = await db.collection("notas_proveedores").orderBy("fecha", "desc").get();
+        allProviderNotes = [];
+        snap.forEach(function(d) { allProviderNotes.push(Object.assign({id: d.id}, d.data())); });
+      } catch(e) { console.error("Error provider notes:", e); allProviderNotes = []; }
+    }
+
     function renderProveedores() {
       const grid = document.getElementById("suppliers-grid");
       if(!grid) return;
@@ -2665,18 +2719,52 @@
       
       grid.innerHTML = allProviders.map(p => {
         const logoHtml = p.logo ? `<img src="${p.logo}" style="width:100%; height:100%; object-fit:contain; border-radius:15px;">` : (p.emoji || '🏭');
+        const notes = allProviderNotes.filter(n => n.providerId === p.id);
+        
         return `
           <div class="supplier-card">
-            <div class="supplier-logo-wrap">${logoHtml}</div>
-            <div style="position:absolute; top:1rem; right:1rem; display:flex; gap:0.5rem;">
-              <button class="btn-delete" onclick="deleteProveedor('${p.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" title="Eliminar">🗑</button>
-              <button class="btn-edit" onclick="editProveedor('${p.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" title="Editar">✏️</button>
-              <button class="btn-note" onclick="quickUpdateProviderNote('${p.id}')" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:1.1rem;" title="Anotar">📝</button>
+            <div style="display:flex; flex-direction:column; align-items:center; width:100%;">
+              <div class="supplier-logo-wrap">${logoHtml}</div>
+              <div style="position:absolute; top:1rem; right:1rem; display:flex; gap:0.5rem;">
+                <button class="btn-delete" onclick="deleteProveedor('${p.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" title="Eliminar">🗑</button>
+                <button class="btn-edit" onclick="editProveedor('${p.id}')" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:1.1rem;" title="Editar">✏️</button>
+              </div>
+              <h3>${p.nombre}</h3>
+              <p>${p.desc || ''}</p>
+              <a href="${p.url}" target="_blank" class="btn btn-secondary" style="margin-bottom:1.5rem;">Ir a la tienda ➔</a>
             </div>
-            <h3>${p.nombre}</h3>
-            <p>${p.desc || ''}</p>
-            ${p.nota ? `<div style="background:rgba(249,115,22,0.1); border:1px dashed var(--accent); border-radius:8px; padding:0.5rem; margin-bottom:1.5rem; font-size:0.75rem; color:var(--accent); font-weight:700;">📌 ${p.nota}</div>` : ''}
-            <a href="${p.url}" target="_blank" class="btn btn-secondary">Ir a la tienda ➔</a>
+
+            <div class="prov-notes-section" style="width:100%; border-top:1px solid var(--border); padding-top:1.5rem; text-align:left;">
+              <div class="prov-notes-header" style="border-bottom:none; margin-bottom:1rem; padding-bottom:0;">
+                <span style="font-size:1.2rem;">📋</span> <span>Notas pendientes</span>
+              </div>
+              <div class="prov-notes-list">
+                ${notes.map(n => {
+                  const d = n.fecha ? (n.fecha.toDate ? n.fecha.toDate() : new Date(n.fecha)) : new Date();
+                  const dStr = d.toLocaleDateString("es-ES") + " " + d.toLocaleTimeString("es-ES", {hour:'2-digit', minute:'2-digit'});
+                  return `
+                    <div class="prov-note-item">
+                      <div class="prov-note-icon">📂</div>
+                      <div class="prov-note-info">
+                        <div class="prov-note-top">
+                          <span class="prov-note-title">${n.titulo || 'Sin título'}</span>
+                          <div class="prov-note-actions">
+                            <button onclick="editProviderNote('${n.id}')" title="Editar">✏️</button>
+                            <button onclick="deleteProviderNote('${n.id}')" title="Eliminar">🗑️</button>
+                          </div>
+                        </div>
+                        <div class="prov-note-meta">
+                          <span style="font-size:0.8rem;">🕒</span> <span>${dStr}</span>
+                        </div>
+                        <div class="prov-note-desc">${n.desc || ''}</div>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+                ${notes.length === 0 ? '<div style="font-size:0.75rem; color:var(--text-dim); text-align:center; padding:0.5rem;">Sin notas pendientes</div>' : ''}
+              </div>
+              <button class="btn-new-note" onclick="openNewProviderNote('${p.id}')" style="margin-top:1rem;">+ NUEVA NOTA</button>
+            </div>
           </div>
         `;
       }).join('');
@@ -2772,7 +2860,7 @@
     async function quickUpdateProviderNote(id) {
       const p = allProviders.find(x => x.id === id);
       if(!p) return;
-      const newNote = window.prompt("Añadir nota para " + p.nombre + ":", p.nota || "");
+      const newNote = window.prompt("Añadir nota rápida para " + p.nombre + ":", p.nota || "");
       if(newNote !== null) {
         try {
           await db.collection("proveedores").doc(id).update({ nota: newNote });
@@ -2783,7 +2871,67 @@
       }
     }
 
+    function openNewProviderNote(providerId) {
+      document.getElementById("pnote-provider-id").value = providerId;
+      document.getElementById("pnote-id").value = "";
+      document.getElementById("pnote-form").reset();
+      document.getElementById("pnote-modal-title").textContent = "Nueva Nota de Proveedor";
+      openModal("modal-pnote");
+    }
+
+    function editProviderNote(noteId) {
+      const n = allProviderNotes.find(x => x.id === noteId);
+      if(!n) return;
+      document.getElementById("pnote-provider-id").value = n.providerId;
+      document.getElementById("pnote-id").value = n.id;
+      document.getElementById("pnote-titulo").value = n.titulo || "";
+      document.getElementById("pnote-desc").value = n.desc || "";
+      document.getElementById("pnote-modal-title").textContent = "Editar Nota de Proveedor";
+      openModal("modal-pnote");
+    }
+
+    async function saveProviderNote() {
+      const providerId = document.getElementById("pnote-provider-id").value;
+      const noteId = document.getElementById("pnote-id").value;
+      const data = {
+        providerId: providerId,
+        titulo: document.getElementById("pnote-titulo").value.trim(),
+        desc: document.getElementById("pnote-desc").value.trim(),
+        fecha: firebase.firestore.Timestamp.now()
+      };
+
+      if(!data.titulo) { showToast("El título es obligatorio", "error"); return; }
+
+      try {
+        if(noteId) {
+          await db.collection("notas_proveedores").doc(noteId).update(data);
+          showToast("Nota actualizada ✅");
+        } else {
+          await db.collection("notas_proveedores").add(data);
+          showToast("Nota añadida ✅");
+        }
+        closeModal("modal-pnote");
+        await loadProviderNotes();
+        renderProveedores();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
+    async function deleteProviderNote(id) {
+      if(!confirm("¿Eliminar esta nota?")) return;
+      try {
+        await db.collection("notas_proveedores").doc(id).delete();
+        showToast("Nota eliminada");
+        await loadProviderNotes();
+        renderProveedores();
+      } catch(e) { showToast("Error: " + e.message, "error"); }
+    }
+
     window.quickUpdateProviderNote = quickUpdateProviderNote;
+    window.openNewProviderNote = openNewProviderNote;
+    window.editProviderNote = editProviderNote;
+    window.saveProviderNote = saveProviderNote;
+    window.deleteProviderNote = deleteProviderNote;
+    window.loadProviderNotes = loadProviderNotes;
     window.setQuickDate = setQuickDate;
     // openQuickNote eliminada
 

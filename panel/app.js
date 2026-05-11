@@ -234,11 +234,17 @@ function renderOrdersTable() {
     html += "<td>" + statusBadge(o.estado) + "</td>";
     html += '<td style="font-weight:700;">\u20AC' + parseFloat(o.costeTotal || 0).toFixed(2) + "</td>";
     html += "<td>";
-    html += '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;">';
-    html += '<button class="btn btn-secondary btn-small" onclick="viewOrder(\'' + o.id + "')\">\uD83D\uDC41</button>";
-    html += '<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\'' + o.id + "')\">🟢 Listo</button>";
-    html += '<button class="btn btn-secondary btn-small" onclick="editOrder(\'' + o.id + "')\">\u270F\uFE0F</button>";
-    html += '<button class="btn btn-danger btn-small" onclick="deleteOrder(\'' + o.id + "')\">\uD83D\uDDD1</button>";
+    html += '<div style="display:flex;gap:0.4rem;flex-wrap:wrap;justify-content:center;">';
+    html += '<button class="btn btn-secondary btn-small" onclick="viewOrder(\'' + o.id + "')\" title=\"Ver\">\uD83D\uDC41</button>";
+    html += '<button class="btn btn-secondary btn-small" onclick="editOrder(\'' + o.id + "')\" title=\"Editar\">\u270F\uFE0F</button>";
+    html += '<button class="btn btn-secondary btn-small" onclick="generatePDF(\'' + o.id + "')\" title=\"Boletín Entrada\" style=\"background:rgba(56,189,248,0.1); border-color:var(--info);\">\uD83D\uDCC4</button>";
+    html += '<button class="btn btn-secondary btn-small" onclick="generateInvoice(\'' + o.id + "')\" title=\"Factura\">\uD83E\uDDFE</button>";
+    html += '<button class="btn btn-whatsapp btn-small" onclick="whatsappInquiry(\'' + o.id + "')\" title=\"Consultar\" style=\"background:#075e54;\">\uD83D\uDCAC</button>";
+    html += '<button class="btn btn-whatsapp btn-small" onclick="whatsappReady(\'' + o.id + "')\" title=\"Avisar Listo\">\uD83D\uDFE2</button>";
+    if(o.estado !== "entregado") {
+      html += '<button class="btn btn-primary btn-small" onclick="marcarRecogida(\'' + o.id + "')\" title=\"Cobrar y Entregar\" style=\"background:var(--success); color:#000;\">\uD83D\uDCB0</button>";
+    }
+    html += '<button class="btn btn-danger btn-small" onclick="deleteOrder(\'' + o.id + "')\" title=\"Eliminar\">\uD83D\uDDD1</button>";
     html += "</div></td></tr>";
   });
   tbody.innerHTML = html;
