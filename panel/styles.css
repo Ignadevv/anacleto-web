@@ -390,8 +390,7 @@ tr:last-child td { border-bottom: none; }
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.75);
-  backdrop-filter: blur(8px);
+  background: rgba(2, 6, 23, 0.5);
   display: none;
   align-items: center;
   justify-content: center;
