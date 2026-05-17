@@ -1780,7 +1780,7 @@
       if(viewOnly) {
         window.open(pdf.output('bloburl'), '_blank');
       } else {
-        pdf.save("Factura_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
+        pdf.save("Factura_" + numFactura + "_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
         showToast("Factura generada con éxito ✅");
       }
     }
@@ -1876,7 +1876,7 @@
 
       var nombreCli = v.esEmpresa ? v.empresaNombre : v.cliente;
       var filePrefix = v.esDevolucion ? "Devolucion_" : "Factura_";
-      pdf.save(filePrefix + (nombreCli || "Cliente").replace(/\s/g, '_') + ".pdf");
+      pdf.save(filePrefix + numFactura + "_" + (nombreCli || "Cliente").replace(/\s/g, '_') + ".pdf");
       showToast("Factura de venta generada ✅");
     }
 
@@ -2526,7 +2526,7 @@
       if(viewOnly) {
         window.open(pdf.output('bloburl'), '_blank');
       } else {
-        pdf.save("Factura_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
+        pdf.save("Factura_" + (o.numeroFactura || "") + "_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
         showToast("Factura PDF generada ✅");
       }
     }

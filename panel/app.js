@@ -762,7 +762,7 @@ function generatePDFFn(id) {
   var splitCond = pdf.splitTextToSize(condText, 180);
   pdf.text(splitCond, 15, ny + 8);
 
-  pdf.save("Factura_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
+  pdf.save("Cotizacion_" + o.id.slice(0, 8) + "_" + (o.clienteNombre || "Cliente").replace(/\s/g, '_') + ".pdf");
   showToast("Cotizacion PDF generada y descargada");
 }
 
