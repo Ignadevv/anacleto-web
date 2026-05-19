@@ -993,7 +993,9 @@
       document.getElementById("kpi-pendientes").textContent = c.pendiente;
       document.getElementById("kpi-reparacion").textContent = c.en_reparacion;
       document.getElementById("kpi-listos").textContent = c.listo;
-      document.getElementById("kpi-ingresos").textContent = "€" + Math.floor(ing);
+      if (document.getElementById("kpi-ingresos")) {
+        document.getElementById("kpi-ingresos").textContent = "€" + Math.floor(ing);
+      }
       document.getElementById("kpi-notas").textContent = allNotes.length;
     }
 
