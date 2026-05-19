@@ -166,7 +166,9 @@ function updateKPIs() {
   document.getElementById("kpi-pendientes").textContent = counts.pendiente;
   document.getElementById("kpi-reparacion").textContent = counts.en_reparacion;
   document.getElementById("kpi-listos").textContent = counts.listo;
-  document.getElementById("kpi-ingresos").textContent = "\u20AC" + ingresosMes.toFixed(0);
+  if (document.getElementById("kpi-ingresos")) {
+    document.getElementById("kpi-ingresos").textContent = "\u20AC" + ingresosMes.toFixed(0);
+  }
 }
 
 // ===== RENDER RECENT ORDERS =====
