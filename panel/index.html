@@ -8,17 +8,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css">
 
-  <!-- FIREBASE SHIM AND IMPORT MAPS (MOVED BELOW) -->
-  
-  <script type="importmap">
-  {
-    "imports": {
-      "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js": "data:text/javascript,export const initializeApp = () => ({});",
-      "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js": "data:text/javascript,export const getAuth = () => ({ onAuthStateChanged: (cb) => setTimeout(() => cb({email:'local@anacleto.com'}), 100) }); export const onAuthStateChanged = (auth, cb) => auth.onAuthStateChanged(cb); export const signOut = () => window.location.reload();",
-      "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js": "data:text/javascript,export const getFirestore = () => window.mockFirestoreModular.getFirestore(); export const collection = (db, n) => window.mockFirestoreModular.collection(db, n); export const addDoc = (col, d) => window.mockFirestoreModular.addDoc(col, d); export const getDocs = (col) => window.mockFirestoreModular.getDocs(col); export const deleteDoc = (ref) => window.mockFirestoreModular.deleteDoc(ref); export const doc = (db, col, id) => window.mockFirestoreModular.doc(db, col, id); export const updateDoc = (ref, d) => window.mockFirestoreModular.updateDoc(ref, d); export const query = (col) => col; export const orderBy = () => ({}); export const Timestamp = { now: () => new Date(), fromDate: (d) => d };"
-    }
-  }
-  </script>
 </head>
 <body>
 
@@ -868,8 +857,6 @@
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <!-- FIREBASE SHIM FOR LOCAL TESTING (MOVED HERE) -->
-  <script src="firebase-shim.js"></script>
 
   <script>
     // ===== FIREBASE SETUP =====
